@@ -1,0 +1,99 @@
+@import "tailwindcss";
+
+:root {
+  --primary: #d55f30;
+  --on-primary: #ffffff;
+  --secondary: #333028;
+  --on-secondary: #e6dcc5;
+  --background: #e6dcc5;
+  --foreground: #333028;
+  --pink: #ef9bb3;
+  --on-pink: #e6dcc5;
+  --green: #4e9e65;
+  --on-green: #e6dcc5;
+  --blue: #0285b9;
+  --on-blue: #e6dcc5;
+  --red: #741b1d;
+  --on-red: #e6dcc5;
+  --yellow: #de9a10;
+  --on-yellow: #e6dcc5;
+  --orange: #d25b2e;
+  --on-orange: #e6dcc5;
+  --accent: #fef3da;
+  --on-accent: #333028;
+  --muted: #9c9484;
+  --on-muted: #655e4f;
+  --card: #d0c6b0;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--on-primary);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--on-secondary);
+  --color-pink: var(--pink);
+  --color-pink-foreground: var(--on-pink);
+  --color-green: var(--green);
+  --color-green-foreground: var(--on-green);
+  --color-blue: var(--blue);
+  --color-blue-foreground: var(--on-blue);
+  --color-red: var(--red);
+  --color-red-foreground: var(--on-red);
+  --color-yellow: var(--yellow);
+  --color-yellow-foreground: var(--on-yellow);
+  --color-orange: var(--orange);
+  --color-orange-foreground: var(--on-orange);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--on-accent);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--on-muted);
+  --color-destructive: var(--red);
+  --color-destructive-doreground: var(--background);
+  --color-popover: var(--card);
+  --color-popover-foreground: var(--foreground);
+  --font-archivo: "Archivo Narrow", "Archivo Narrow Fallback";
+  --font-overpass: "Overpass", "Overpass Fallback";
+  --font-paytone: "Paytone One", "Paytone One Fallback";
+  --font-eight: "8 Heavy"; /* Should only be used for special titles (unreadable) */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary: #d55f30;
+    --on-primary: #ffffff;
+    --secondary: #333028;
+    --on-secondary: #e6dcc5;
+    --background: #e6dcc5;
+    --foreground: #333028;
+    --pink: #ef9bb3;
+    --on-pink: #e6dcc5;
+    --green: #4e9e65;
+    --on-green: #e6dcc5;
+    --blue: #0285b9;
+    --on-blue: #e6dcc5;
+    --red: #741b1d;
+    --on-red: #e6dcc5;
+    --yellow: #de9a10;
+    --on-yellow: #e6dcc5;
+    --orange: #d25b2e;
+    --on-orange: #e6dcc5;
+    --accent: #fef3da;
+    --on-accent: #333028;
+    --muted: #9c9484;
+    --on-muted: #655e4f;
+    --card: #d0c6b0;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-archivo);
+}
+
+@font-face {
+  font-family: "8 Heavy";
+  src: url("/8-heavy.ttf") format("truetype");
+}
