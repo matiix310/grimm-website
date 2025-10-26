@@ -2,8 +2,13 @@ import { BureauCarousel } from "@/components/home/BureauCarousel";
 import { MainCarousel } from "@/components/home/MainCarousel";
 import { Navbar } from "@/components/home/Navbar";
 import { db } from "@/db";
+import { connection } from "next/server";
 
 const Home = async () => {
+  // prevent nextjs from prerendering this page
+  // as it involves database content
+  await connection();
+
   const news = await db.query.news.findMany();
 
   return (

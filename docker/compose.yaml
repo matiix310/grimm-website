@@ -1,0 +1,35 @@
+services:
+  db:
+    image: postgres
+    restart: unless-stopped
+    shm_size: 128mb
+    ports:
+      - 5432:5432
+    env_file: db.env
+    networks:
+      - grimm-db
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "psql -U $${POSTGRES_USER} -d $${POSTGRES_DB} -c 'SELECT 1' || exit 1",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  website:
+    build:
+      context: ../website/
+      dockerfile: ../website/Dockerfile
+    restart: unless-stopped
+    ports:
+      - 8000:8000
+    networks:
+      - grimm-db
+    depends_on:
+      db:
+        condition: service_healthy
+
+networks:
+  grimm-db:

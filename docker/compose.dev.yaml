@@ -1,0 +1,23 @@
+services:
+  adminer:
+    image: adminer
+    restart: unless-stopped
+    ports:
+      - 8080:8080
+    networks:
+      - grimm-db
+
+  website:
+    build:
+      target: dev
+    develop:
+      watch:
+        - action: sync
+          path: ../website/
+          target: /app/
+          ignore:
+            - ../website/node_modules/
+            - ../website/package.json
+            - ../website/.next
+        - action: rebuild
+          path: ../website/package.json

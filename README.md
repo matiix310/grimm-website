@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Grimm Docker infrastructure
 
-## Getting Started
+This repository host the Grimm BDE docker infrastructure. Grimm is the current [EPITA](epita.fr) BDE. You can find the website at https://bde-epita.fr.
 
-First, run the development server:
+## Environment Variables
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+To run this project, you will need to add the following environment variables
+
+### `./docker/db.env`
+
+```
+POSTGRES_DB=<database>
+POSTGRES_USER=<user>
+POSTGRES_PASSWORD=<password>
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+| Variable          | Description            | Example value |
+| :---------------- | :--------------------- | :------------ |
+| POSTGRES_DB       | Name of the database   | grimm         |
+| POSTGRES_USER     | Default admin user     | postgres      |
+| POSTGRES_PASSWORD | Default admin password | password      |
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### `./website/.env`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Variable               | Description                        | Example value                                |
+| :--------------------- | :--------------------------------- | :------------------------------------------- |
+| DB_URL                 | Url to connect to the database     | postgresql://postgres:password@db:5432/grimm |
+| BETTER_AUTH_SECRET     | Internal Better-auth random secret | 1234                                         |
+| BASE_URL               | Public URL of the website          | http://localhost:8000                        |
+| FORGE_ID_CLIENT_ID     | Forge OIDC client id               | 1234                                         |
+| FORGE_ID_CLIENT_SECRET | Forge OIDC client secret           | 1234                                         |
 
-## Learn More
+## Deployment
 
-To learn more about Next.js, take a look at the following resources:
+To deploy this project with docker compose run:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+  cd docker
+  docker compose up
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Development
 
-## Deploy on Vercel
+This project include a custom docker compose configuration that enables hot reload of the website. Each saved file will sync into the docker and automatically refresh the page.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+To run the project in development mode run:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+  cd docker
+  docker compose -f compose.yaml -f compose.dev.yaml up --watch
+```
+
+## Architecture
+
+```
+.
+├── docker    # docker related files
+└── website   # nextjs website
+```
