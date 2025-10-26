@@ -8,12 +8,6 @@ To run this project, you will need to add the following environment variables
 
 ### `./docker/db.env`
 
-```
-POSTGRES_DB=<database>
-POSTGRES_USER=<user>
-POSTGRES_PASSWORD=<password>
-```
-
 | Variable          | Description            | Example value |
 | :---------------- | :--------------------- | :------------ |
 | POSTGRES_DB       | Name of the database   | grimm         |
