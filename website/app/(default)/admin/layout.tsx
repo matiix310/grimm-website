@@ -11,10 +11,10 @@ const AdminLayout = ({
         <h1 className="font-paytone text-7xl">Admin</h1>
         <Navbar
           routes={[
-            { name: "tokens", path: "/admin/tokens" },
-            { name: "events", path: "/admin/events" },
-            { name: "news", path: "/admin/news" },
-            { name: "users", path: "/admin/users" },
+            { name: "Clés API", path: "/admin/api-keys" },
+            { name: "Évenements", path: "/admin/events" },
+            { name: "Actualités", path: "/admin/news" },
+            { name: "Utilisateurs", path: "/admin/users" },
           ]}
         />
       </div>

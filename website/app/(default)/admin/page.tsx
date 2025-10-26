@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 
 const AdminPage = () => {
-  redirect("/admin/tokens");
+  redirect("/admin/api-keys");
 };
 
 export default AdminPage;

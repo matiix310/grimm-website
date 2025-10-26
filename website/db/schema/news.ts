@@ -2,6 +2,7 @@ import { cuid2 } from "drizzle-cuid2/postgres";
 import { InferSelectModel } from "drizzle-orm";
 import { pgTable, text, varchar } from "drizzle-orm/pg-core";
 import { timestamps } from "../columns.helper";
+import { createInsertSchema } from "drizzle-zod";
 
 export const news = pgTable("news", {
   id: cuid2("id").defaultRandom().primaryKey(),
@@ -11,3 +12,4 @@ export const news = pgTable("news", {
 });
 
 export type News = InferSelectModel<typeof news>;
+export const newsInsertSchema = createInsertSchema(news);

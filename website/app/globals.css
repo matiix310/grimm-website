@@ -24,6 +24,8 @@
   --muted: #9c9484;
   --on-muted: #655e4f;
   --card: #d0c6b0;
+  --radius: 1em;
+  --border: var(--secondary);
 }
 
 @theme inline {

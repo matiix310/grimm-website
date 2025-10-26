@@ -99,7 +99,7 @@ export const POST = async (
     .returning();
 
   if (insertedPoints.length === 0)
-    return NextResponse.json({ error: true, message: "Internal error" });
+    return NextResponse.json({ error: true, message: "Internal server error" });
 
   if (parsed.data.tags && parsed.data.tags.length > 0) {
     await db
@@ -157,13 +157,13 @@ export const DELETE = async (
       issues: parsed.error.issues,
     });
 
-  const removedPoints = await db
+  const deletedPoints = await db
     .delete(pointsSchema)
     .where(and(eq(pointsSchema.userId, user.id), eq(pointsSchema.id, parsed.data.id)))
     .returning();
 
-  if (removedPoints.length === 0)
+  if (deletedPoints.length === 0)
     return NextResponse.json({ error: true, message: "Internal error" });
 
-  return NextResponse.json({ error: false, data: parsed.data });
+  return NextResponse.json({ error: false, data: deletedPoints[0] });
 };
