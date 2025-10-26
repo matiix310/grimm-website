@@ -44,6 +44,8 @@ To run the project in development mode run:
   docker compose -f compose.yaml -f compose.dev.yaml up --watch
 ```
 
+In development mode, you have access to an `adminer` instance running on port `8080`. With it you can explore the currently running database: http://localhost:8080.
+
 ## Architecture
 
 ```
