@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Overpass, Archivo_Narrow, Paytone_One } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "@/components/ui/Sonner";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const overpass = Overpass({
@@ -30,7 +31,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr">
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        <Toaster />
+        {children}
+      </body>
     </html>
   );
 }

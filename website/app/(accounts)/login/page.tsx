@@ -6,7 +6,7 @@ import Image from "next/image";
 
 const LoginPage = () => {
   const handleForgeIdClick = async () => {
-    const { data, error } = await authClient.signIn.oauth2({
+    const { error } = await authClient.signIn.oauth2({
       providerId: "forge-id",
       callbackURL: "/",
       errorCallbackURL: "/",
@@ -16,7 +16,7 @@ const LoginPage = () => {
       requestSignUp: false,
     });
 
-    console.log(data, error);
+    if (error) throw new Error(error.message);
   };
 
   return (

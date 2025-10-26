@@ -1,5 +1,4 @@
-import { createId } from "@paralleldrive/cuid2";
-import { pgTable, text, timestamp, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, integer } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -16,10 +15,7 @@ export const user = pgTable("user", {
   banned: boolean("banned").default(false),
   banReason: text("ban_reason"),
   banExpires: timestamp("ban_expires"),
-  login: text("login")
-    .$defaultFn(() => createId())
-    .notNull()
-    .unique(),
+  login: text("login").notNull().unique(),
 });
 
 export const session = pgTable("session", {
@@ -68,4 +64,30 @@ export const verification = pgTable("verification", {
     .defaultNow()
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
+});
+
+export const apikey = pgTable("apikey", {
+  id: text("id").primaryKey(),
+  name: text("name"),
+  start: text("start"),
+  prefix: text("prefix"),
+  key: text("key").notNull(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  refillInterval: integer("refill_interval"),
+  refillAmount: integer("refill_amount"),
+  lastRefillAt: timestamp("last_refill_at"),
+  enabled: boolean("enabled").default(true),
+  rateLimitEnabled: boolean("rate_limit_enabled").default(true),
+  rateLimitTimeWindow: integer("rate_limit_time_window").default(86400000),
+  rateLimitMax: integer("rate_limit_max").default(10),
+  requestCount: integer("request_count").default(0),
+  remaining: integer("remaining"),
+  lastRequest: timestamp("last_request"),
+  expiresAt: timestamp("expires_at"),
+  createdAt: timestamp("created_at").notNull(),
+  updatedAt: timestamp("updated_at").notNull(),
+  permissions: text("permissions"),
+  metadata: text("metadata"),
 });

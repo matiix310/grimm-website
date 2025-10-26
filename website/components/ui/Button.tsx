@@ -10,10 +10,11 @@ const buttonVariants = cva(
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/90",
         destructive: "bg-red text-red-foreground hover:bg-red/90",
         accent: "bg-accent text-accent-foreground hover:bg-accent/90",
+        ghost: "bg-accent text-accent-foreground hover:bg-accent/90", // TODO
       },
       size: {
         lg: "px-9 py-5 text-xl",
-        default: "px-6 py-2 text-md pb-3",
+        default: "px-5 py-2 text-md pb-3",
         sm: "px-3 text-sm pb-0.5",
         icon: "size-10",
       },
@@ -33,4 +34,4 @@ const Button = ({ variant, size, className, ...rest }: ButtonProps) => {
   );
 };
 
-export { Button };
+export { Button, buttonVariants };

@@ -1,5 +1,7 @@
+import { redirect } from "next/navigation";
+
 const AdminPage = () => {
-  return <h1>Admin</h1>;
+  redirect("/admin/tokens");
 };
 
 export default AdminPage;

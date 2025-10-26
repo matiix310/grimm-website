@@ -1,9 +1,8 @@
 import { db } from "@/db";
-import { createId } from "@paralleldrive/cuid2";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
-import { admin as adminPlugin, genericOAuth } from "better-auth/plugins";
+import { admin as adminPlugin, apiKey, genericOAuth } from "better-auth/plugins";
 import { createAccessControl } from "better-auth/plugins/access";
 import { adminAc, defaultStatements, userAc } from "better-auth/plugins/admin/access";
 
@@ -34,7 +33,6 @@ export const auth = betterAuth({
         type: "string",
         required: true,
         unique: true,
-        defaultValue: () => createId(),
       },
     },
   },
@@ -66,6 +64,7 @@ export const auth = betterAuth({
         },
       ],
     }),
+    apiKey(),
     nextCookies(), // Should always be the last plugin in the array
   ],
 });
