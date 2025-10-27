@@ -6,7 +6,7 @@ import {
   points as pointsSchema,
   pointsToTags,
 } from "@/db/schema/points";
-import { auth } from "@/lib/auth";
+import { hasPermission } from "@/utils/auth";
 import { and, eq, sum } from "drizzle-orm";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
@@ -41,8 +41,9 @@ export const POST = async (
   request: NextRequest,
   ctx: RouteContext<"/api/users/[userId]/points">
 ) => {
-  // must have the admin role
-  if ((await auth.api.getSession({ headers: await headers() }))?.user.role !== "admin")
+  if (
+    !(await hasPermission({ headers: await headers(), permissions: { points: ["add"] } }))
+  )
     return NextResponse.json({
       error: true,
       message: "You don't have the required permissions to use this endpoint",
@@ -115,7 +116,9 @@ export const DELETE = async (
   ctx: RouteContext<"/api/users/[userId]/points">
 ) => {
   // must have the admin role
-  if ((await auth.api.getSession({ headers: await headers() }))?.user.role !== "admin")
+  if (
+    !(await hasPermission({ headers: await headers(), permissions: { points: ["add"] } }))
+  )
     return NextResponse.json({
       error: true,
       message: "You don't have the required permissions to use this endpoint",

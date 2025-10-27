@@ -218,15 +218,6 @@ const AddPointButton = ({ availableTags, userLogin }: AddPointButtonProps) => {
                         </PopoverContent>
                       </Popover>
                     </div>
-                    {/* <Input
-                      id={field.name}
-                      name={field.name}
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      placeholder="42"
-                      autoComplete="off"
-                    /> */}
                   </Field>
                 );
               }}

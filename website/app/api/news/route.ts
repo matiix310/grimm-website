@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { news, newsInsertSchema } from "@/db/schema/news";
-import { auth } from "@/lib/auth";
+import { hasPermission } from "@/utils/auth";
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
@@ -13,12 +13,12 @@ export const GET = async () => {
 };
 
 export const PUT = async (request: NextRequest) => {
-  // check the user permission
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (!session || session.user.role !== "admin")
+  if (
+    !(await hasPermission({
+      headers: await headers(),
+      permissions: { news: ["create"] },
+    }))
+  )
     return NextResponse.json({
       error: true,
       message: "You don't have the required permissions to use this endpoint",
@@ -49,12 +49,12 @@ export const PUT = async (request: NextRequest) => {
 };
 
 export const DELETE = async (request: NextRequest) => {
-  // check the user permission
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (!session || session.user.role !== "admin")
+  if (
+    !(await hasPermission({
+      headers: await headers(),
+      permissions: { news: ["delete"] },
+    }))
+  )
     return NextResponse.json({
       error: true,
       message: "You don't have the required permissions to use this endpoint",

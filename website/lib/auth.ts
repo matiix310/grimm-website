@@ -4,24 +4,25 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
 import { admin as adminPlugin, apiKey, genericOAuth } from "better-auth/plugins";
 import { createAccessControl } from "better-auth/plugins/access";
-import { adminAc, defaultStatements, userAc } from "better-auth/plugins/admin/access";
-
-const statement = {
-  ...defaultStatements,
-  project: ["create", "share", "update", "delete"],
-} as const;
+import { adminAc, userAc } from "better-auth/plugins/admin/access";
+import { statement } from "./authStatement";
 
 const ac = createAccessControl(statement);
 
 export const user = ac.newRole({
-  project: ["create"],
   ...userAc.statements,
 });
 
 export const admin = ac.newRole({
-  project: ["create", "update"],
   ...adminAc.statements,
+  points: ["add", "delete"],
+  news: ["create", "delete"],
+  "api-keys": ["create"],
 });
+
+const roles = { user, admin };
+
+export type Roles = keyof typeof roles;
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -39,10 +40,7 @@ export const auth = betterAuth({
   plugins: [
     adminPlugin({
       ac,
-      roles: {
-        admin,
-        user,
-      },
+      roles,
       defaultRole: "user",
       adminRoles: ["admin"],
     }),
@@ -53,18 +51,24 @@ export const auth = betterAuth({
           clientId: process.env.FORGE_ID_CLIENT_ID!,
           clientSecret: process.env.FORGE_ID_CLIENT_SECRET!,
           discoveryUrl: "https://cri.epita.fr/.well-known/openid-configuration",
-          scopes: ["profile", "epita", "email"],
-          redirectURI: `${process.env.BASE_URL}/complete/epita/`,
+          scopes: ["profile"],
+          redirectURI: `${process.env.BASE_URL}${process.env.FORGE_ID_REDIRECT_URI}`,
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
-          mapProfileToUser: (profile) => ({
-            login: profile.id,
-            image: `https://photos.cri.epita.fr/square/${profile.id}`,
-          }),
+          mapProfileToUser: (profile) => {
+            return {
+              login: profile.id,
+              email: `${profile.id}@epita.fr`,
+              emailVerified: true,
+              image: `https://photos.cri.epita.fr/square/${profile.id}`,
+            };
+          },
         },
       ],
     }),
-    apiKey(),
+    apiKey({
+      requireName: true,
+    }),
     nextCookies(), // Should always be the last plugin in the array
   ],
 });

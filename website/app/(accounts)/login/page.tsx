@@ -12,7 +12,7 @@ const LoginPage = () => {
       errorCallbackURL: "/",
       newUserCallbackURL: "/",
       disableRedirect: false,
-      scopes: ["profile", "epita", "email"],
+      scopes: ["profile"],
       requestSignUp: false,
     });
 

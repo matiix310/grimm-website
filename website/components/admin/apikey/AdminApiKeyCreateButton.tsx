@@ -3,6 +3,14 @@
 import { Button } from "@/components/ui/Button";
 import { Calendar } from "@/components/ui/Calendar";
 import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/Command";
+import {
   Dialog,
   DialogClose,
   DialogContent,
@@ -16,7 +24,7 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/Field
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/Popover";
-import { authClient } from "@/lib/authClient";
+import { apiSafeStatement } from "@/lib/authStatement";
 import { useForm } from "@tanstack/react-form";
 import { Plus } from "lucide-react";
 import React from "react";
@@ -28,6 +36,7 @@ const formSchema = z.object({
     error: "Ne dois pas être vide",
   }),
   expirationDate: z.date().min(Date.now(), { error: "La date doit être dans le future" }),
+  permissions: z.record(z.string(), z.array(z.string())),
 });
 
 type AdminApiKeyCreateButtonProps = {
@@ -40,11 +49,13 @@ const AdminApiKeyCreateButton = ({ onNewApiKey }: AdminApiKeyCreateButtonProps) 
   const [open, setOpen] = React.useState(false);
   const [createTokenOpen, setCreateTokenOpen] = React.useState(false);
   const [time, setTime] = React.useState(0);
+  const [permissionOpen, setPermissionOpen] = React.useState(false);
 
   const form = useForm({
     defaultValues: {
       name: "",
       expirationDate: new Date(time + 1000 * 60 * 60 * 24 * 7), // 7j from now
+      permissions: {},
     },
     validators: {
       onSubmit: formSchema,
@@ -52,25 +63,34 @@ const AdminApiKeyCreateButton = ({ onNewApiKey }: AdminApiKeyCreateButtonProps) 
     onSubmit: async ({ value }) => {
       if (loading) return;
       setLoading(true);
-      const { data, error } = await authClient.apiKey.create({
-        expiresIn: (value.expirationDate.getTime() - time) / 1000,
-        name: value.name,
+
+      const res = await fetch("/api/admin/api-keys", {
+        method: "PUT",
+        body: JSON.stringify({
+          expiresIn: (value.expirationDate.getTime() - time) / 1000,
+          name: value.name,
+          permissions: value.permissions,
+        }),
       });
 
       setLoading(false);
 
-      if (error) throw new Error(error.message);
+      if (res.status !== 200) throw new Error("Error while creating the api key");
+
+      const json = await res.json();
+
+      if (json.error) throw new Error(json.message);
 
       setCreateTokenOpen(false);
 
       toast("Click pour copier ta clé API", {
         action: {
           label: "Copy",
-          onClick: () => navigator.clipboard.writeText(data.key),
+          onClick: () => navigator.clipboard.writeText(json.data.key),
         },
       });
 
-      onNewApiKey({ ...data, key: undefined });
+      onNewApiKey({ ...json.data, key: undefined });
       form.reset();
     },
   });
@@ -196,6 +216,105 @@ const AdminApiKeyCreateButton = ({ onNewApiKey }: AdminApiKeyCreateButtonProps) 
                       </div>
                     </div>
                     {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                  </Field>
+                );
+              }}
+            />
+            <form.Field
+              name="permissions"
+              // eslint-disable-next-line react/no-children-prop
+              children={(field) => {
+                return (
+                  <Field>
+                    <FieldLabel htmlFor={field.name}>Permissions</FieldLabel>
+                    <div className="flex items-center gap-2">
+                      {Object.keys(field.state.value).length === 0 && (
+                        <p>Aucune permission séléctionée</p>
+                      )}
+                      {Object.entries(field.state.value).flatMap(([k, v]) =>
+                        v.map((v) => {
+                          const permissionName = `${k}/${v}`;
+                          return (
+                            <p
+                              key={permissionName}
+                              className="rounded-full px-2 py-0.5 cursor-pointer border-2 border-transparent hover:border-background"
+                              onClick={() =>
+                                field.handleChange((old) => {
+                                  const copy = Object.fromEntries(
+                                    Object.entries(old).map(([k, v]) => [k, [...v]])
+                                  );
+
+                                  if (copy[k].length === 1) {
+                                    delete copy[k];
+                                  } else {
+                                    copy[k] = copy[k].filter((p) => p !== v);
+                                  }
+
+                                  return copy;
+                                })
+                              }
+                            >
+                              {permissionName}
+                            </p>
+                          );
+                        })
+                      )}
+                      <Popover
+                        modal={true}
+                        open={permissionOpen}
+                        onOpenChange={setPermissionOpen}
+                      >
+                        <PopoverTrigger asChild>
+                          <Button variant="secondary" size="icon" className="size-8">
+                            <Plus size={20} />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[200px] p-0" align="start">
+                          <Command>
+                            <CommandInput placeholder="Rechercher une permission..." />
+                            <CommandList>
+                              <CommandEmpty>Aucune permission disponible</CommandEmpty>
+                              <CommandGroup>
+                                {Object.entries(apiSafeStatement).flatMap(([k, v]) =>
+                                  v
+                                    .filter(
+                                      (v) =>
+                                        !field.state.value[k] ||
+                                        !field.state.value[k].includes(v)
+                                    )
+                                    .map((v) => {
+                                      const permissionName = `${k}/${v}`;
+                                      return (
+                                        <CommandItem
+                                          className="cursor-pointer"
+                                          key={permissionName}
+                                          value={permissionName}
+                                          onSelect={() => {
+                                            field.handleChange((old) => {
+                                              const copy = Object.fromEntries(
+                                                Object.entries(old).map(([k, v]) => [
+                                                  k,
+                                                  [...v],
+                                                ])
+                                              );
+                                              if (!copy[k]) copy[k] = [v];
+                                              else copy[k] = [...copy[k], v];
+                                              return copy;
+                                            });
+                                            setPermissionOpen(false);
+                                          }}
+                                        >
+                                          {permissionName}
+                                        </CommandItem>
+                                      );
+                                    })
+                                )}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                    </div>
                   </Field>
                 );
               }}
