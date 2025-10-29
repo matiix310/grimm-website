@@ -1,25 +1,32 @@
 import { drizzle } from "drizzle-orm/node-postgres";
+import type {
+  BuildQueryResult,
+  DBQueryConfig,
+  ExtractTablesWithRelations,
+} from "drizzle-orm";
 
 import * as auth from "./schema/auth";
 import * as events from "./schema/events";
 import * as news from "./schema/news";
 import * as points from "./schema/points";
 import * as pointTags from "./schema/pointTags";
+import * as minecraftUsernames from "./schema/minecraftUsernames";
 
 if (process.env.DB_URL === undefined)
   throw new Error("Environement variable DB_URL is not defined!");
 
-const schema = { ...auth, ...events, ...news, ...points, ...pointTags } as const;
+const schema = {
+  ...auth,
+  ...events,
+  ...news,
+  ...points,
+  ...pointTags,
+  ...minecraftUsernames,
+} as const;
 
 export const db = drizzle(process.env.DB_URL, {
   schema,
 });
-
-import type {
-  BuildQueryResult,
-  DBQueryConfig,
-  ExtractTablesWithRelations,
-} from "drizzle-orm";
 
 type Schema = typeof schema;
 type TablesWithRelations = ExtractTablesWithRelations<Schema>;
