@@ -55,7 +55,7 @@ const AdminApiKeyCreateButton = ({ onNewApiKey }: AdminApiKeyCreateButtonProps) 
     defaultValues: {
       name: "",
       expirationDate: new Date(time + 1000 * 60 * 60 * 24 * 7), // 7j from now
-      permissions: {},
+      permissions: {} as z.infer<typeof formSchema>["permissions"],
     },
     validators: {
       onSubmit: formSchema,

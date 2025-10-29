@@ -30,14 +30,19 @@ export const PUT = async (request: NextRequest) => {
   if (json === null)
     return NextResponse.json({ error: true, message: "Invalid json body" });
 
-  const permissions = z.object(
-    Object.fromEntries(
-      Object.entries(apiSafeStatement).map(([k, v]) => [
-        k,
-        z.optional(z.array(z.union(v.map((p) => z.literal(p))))),
-      ])
+  const permissions = z
+    .record(
+      z.union(Object.keys(apiSafeStatement).map((p) => z.literal(p))),
+      z.array(z.string()).nonempty()
     )
-  );
+    .refine((perms) => {
+      for (const perm in perms) {
+        for (const subPerm in perms[perm])
+          if (!(apiSafeStatement as Record<string, string[]>)[perm].includes(subPerm))
+            return false;
+      }
+      return true;
+    });
 
   const parsed = z
     .object({
