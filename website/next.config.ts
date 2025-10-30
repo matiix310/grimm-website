@@ -4,11 +4,11 @@ const nextConfig: NextConfig = {
   output: "standalone",
   async redirects() {
     return [
-      {
-        source: "/complete/epita/:slug*",
-        destination: "/api/auth/oauth2/callback/forge-id/:slug*",
-        permanent: false,
-      },
+      // {
+      //   source: "/complete/epita/:slug*",
+      //   destination: "/api/auth/oauth2/callback/forge-id/:slug*",
+      //   permanent: false,
+      // },
     ];
   },
   images: {

@@ -4,13 +4,13 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
 import { admin as adminPlugin, apiKey, genericOAuth } from "better-auth/plugins";
 import { createAccessControl } from "better-auth/plugins/access";
-import { adminAc, userAc } from "better-auth/plugins/admin/access";
+import { adminAc } from "better-auth/plugins/admin/access";
 import { statement } from "./authStatement";
 
 const ac = createAccessControl(statement);
 
 export const user = ac.newRole({
-  ...userAc.statements,
+  user: ["get"],
 });
 
 export const admin = ac.newRole({
@@ -51,8 +51,7 @@ export const auth = betterAuth({
           clientId: process.env.FORGE_ID_CLIENT_ID!,
           clientSecret: process.env.FORGE_ID_CLIENT_SECRET!,
           discoveryUrl: "https://cri.epita.fr/.well-known/openid-configuration",
-          scopes: ["profile"],
-          redirectURI: `${process.env.BASE_URL}${process.env.FORGE_ID_REDIRECT_URI}`,
+          scopes: ["openid", "profile"],
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           mapProfileToUser: (profile) => {

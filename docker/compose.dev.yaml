@@ -21,3 +21,5 @@ services:
             - ../website/.next
         - action: rebuild
           path: ../website/package.json
+        - action: rebuild
+          path: ../website/.env

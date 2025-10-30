@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
 import { authClient } from "@/lib/authClient";
 import Image from "next/image";
 
@@ -12,7 +13,7 @@ const LoginPage = () => {
       errorCallbackURL: "/",
       newUserCallbackURL: "/",
       disableRedirect: false,
-      scopes: ["profile"],
+      scopes: ["openid", "profile"],
       requestSignUp: false,
     });
 
@@ -29,16 +30,14 @@ const LoginPage = () => {
         height={100}
         priority
       />
-      <div className="bg-secondary flex flex-col gap-10 w-150 rounded-4xl p-10">
-        <h1 className="text-4xl font-paytone text-secondary-foreground">
-          Se connecter au site web du BDE GRIMM
-        </h1>
+      <Card>
+        <h1 className="text-4xl font-paytone">Se connecter au site web du BDE GRIMM</h1>
         <div className="w-full flex justify-center">
           <Button className="w-[80%]" onClick={() => handleForgeIdClick()}>
             Se connecter avec ForgeID
           </Button>
         </div>
-      </div>
+      </Card>
     </div>
   );
 };
