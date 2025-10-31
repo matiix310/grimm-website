@@ -1,5 +1,5 @@
 SELECT cron.schedule('*/5 * * * *', 
   $$
-    SELECT update_total_points();
+    SELECT update_ranking();
   $$
 );

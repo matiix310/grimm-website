@@ -89,9 +89,6 @@ export const POST = async (
     where: eq(minecraftUsernames.userId, user.id),
   });
 
-  console.log(minecraftUsername);
-  console.log(isAdmin);
-
   if (minecraftUsername && !isAdmin)
     return NextResponse.json({
       error: true,

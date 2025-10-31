@@ -6,9 +6,9 @@ const NavbarLayout = ({
   children: React.ReactNode;
 }>) => {
   return (
-    <div>
+    <div className="flex flex-col h-screen">
       <Navbar />
-      <div>{children}</div>
+      <div className="size-full">{children}</div>
     </div>
   );
 };

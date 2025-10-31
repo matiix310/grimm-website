@@ -39,6 +39,11 @@ const Navbar = async ({ className, ...rest }: NavbarProps) => {
             Les Events
           </Button>
         </Link>
+        <Link href="/ranking">
+          <Button size="lg" variant="secondary">
+            Le Classement
+          </Button>
+        </Link>
         {session ? (
           <>
             <Link href="/users/me">
