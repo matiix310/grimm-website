@@ -1,7 +1,6 @@
 import { Ranking } from "@/components/ranking/ranking";
 import { RefreshRankingButton } from "@/components/ranking/refreshRankingButton";
 import { db } from "@/db";
-import { auth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { hasPermission } from "@/utils/auth";
 import { headers } from "next/headers";
