@@ -1,11 +1,25 @@
 services:
   db:
-    image: postgres
+    build:
+      context: .
+      dockerfile: db.Dockerfile
     restart: unless-stopped
     shm_size: 128mb
     ports:
       - 5432:5432
-    env_file: db.env
+    env_file: .env
+    command:
+      [
+        "postgres",
+        "-c",
+        "log_statement=all",
+        "-c",
+        "log_destination=stderr",
+        "-c",
+        "shared_preload_libraries=pg_cron",
+        "-c",
+        "cron.database_name=${POSTGRES_DB}",
+      ]
     networks:
       - grimm-db
     healthcheck:
@@ -17,6 +31,10 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
+    volumes:
+      - ./01_cron_extension.sql:/docker-entrypoint-initdb.d/01_cron_extension.sql
+      - ./02_update_total_points_function.sql:/docker-entrypoint-initdb.d/02_update_total_points_function.sql
+      - ./03_cron_job.sql:/docker-entrypoint-initdb.d/03_cron_job.sql
 
   website:
     build:

@@ -81,7 +81,7 @@ export const POST = async (
                   .refine((items) => new Set(items).size === items.length, {
                     message: "tags must be a list of unique tags",
                   })
-              : z.never(),
+              : z.array(z.never()),
         })
         .partial()
     )

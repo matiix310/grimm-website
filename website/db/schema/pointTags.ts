@@ -5,7 +5,7 @@ import { timestamps } from "../columns.helper";
 import { pointsToTags } from "./points";
 import { createSelectSchema } from "drizzle-zod";
 
-export const pointTags = pgTable("pointTags", {
+export const pointTags = pgTable("point_tags", {
   id: cuid2("id").defaultRandom().primaryKey(),
   name: varchar("name", { length: 100 }).notNull(),
   color: varchar("color", { length: 32 }).notNull(),

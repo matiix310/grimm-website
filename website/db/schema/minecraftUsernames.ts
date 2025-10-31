@@ -4,10 +4,11 @@ import { timestamps } from "../columns.helper";
 import { user } from "./auth";
 
 export const minecraftUsernames = pgTable("minecraft_usernames", {
-  username: text("username").primaryKey(),
+  username: text("username").notNull(),
   userId: text("user_id")
     .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
+    .references(() => user.id, { onDelete: "cascade" })
+    .primaryKey(),
   ...timestamps,
 });
 
