@@ -5,6 +5,7 @@ export const statement = {
   points: ["add", "delete"],
   news: ["create", "delete"],
   "api-keys": ["create"],
+  ranking: ["force-refresh"],
 } as const;
 
 export type Permissions = typeof statement;
@@ -12,6 +13,8 @@ export type Permissions = typeof statement;
 export const apiSafeStatement: {
   [key in keyof Permissions]?: Permissions[key][number][];
 } = {
-  news: ["create", "delete"],
+  user: ["update"],
   points: ["add", "delete"],
+  news: ["create", "delete"],
+  ranking: ["force-refresh"],
 };

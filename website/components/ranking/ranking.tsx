@@ -34,7 +34,10 @@ const Ranking = ({ className, ...rest }: RankingProps) => {
   const [totalPlayers, setTotalPlayers] = React.useState(0);
 
   const totalPages = React.useMemo(
-    () => Math.ceil((totalPlayers - defaultOffset) / playerPerPage),
+    () =>
+      totalPlayers <= defaultOffset
+        ? 0
+        : Math.ceil((totalPlayers - defaultOffset) / playerPerPage),
     [totalPlayers]
   );
 
@@ -174,7 +177,9 @@ const Ranking = ({ className, ...rest }: RankingProps) => {
             <PaginationItem>
               <PaginationNext
                 content="Suivant"
-                onClick={() => setCurrentPage((old) => Math.min(totalPages - 1, old + 1))}
+                onClick={() =>
+                  setCurrentPage((old) => Math.min(Math.max(totalPages - 1, 0), old + 1))
+                }
               />
             </PaginationItem>
           </PaginationContent>
@@ -184,4 +189,4 @@ const Ranking = ({ className, ...rest }: RankingProps) => {
   );
 };
 
-export default Ranking;
+export { Ranking };

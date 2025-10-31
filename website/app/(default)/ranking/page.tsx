@@ -1,6 +1,10 @@
-import Ranking from "@/components/ranking/ranking";
+import { Ranking } from "@/components/ranking/ranking";
+import { RefreshRankingButton } from "@/components/ranking/refreshRankingButton";
 import { db } from "@/db";
+import { auth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
+import { hasPermission } from "@/utils/auth";
+import { headers } from "next/headers";
 import Link from "next/link";
 
 const RankingPage = async () => {
@@ -21,9 +25,17 @@ const RankingPage = async () => {
     },
   });
 
+  const canRefresh = await hasPermission({
+    headers: await headers(),
+    permissions: { ranking: ["force-refresh"] },
+  });
+
   return (
     <div className="flex flex-col px-8 size-full">
-      <h1 className="font-paytone text-7xl">Classement</h1>
+      <div className="flex gap-2 items-center">
+        <h1 className="font-paytone text-7xl">Classement</h1>
+        {canRefresh && <RefreshRankingButton className="mt-3" />}
+      </div>
       <div className="flex gap-50 h-full">
         <div className="flex-1 flex flex-col justify-center gap-6">
           {bestPlayers.map((player) => (
@@ -35,7 +47,9 @@ const RankingPage = async () => {
                     ? "text-primary"
                     : player.rank === 2
                     ? "text-blue"
-                    : "text-green"
+                    : player.rank == 3
+                    ? "text-green"
+                    : "text-foreground"
                 )}
               >
                 <p className="w-20 text-6xl">{player.rank}.</p>

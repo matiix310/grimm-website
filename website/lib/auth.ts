@@ -4,8 +4,11 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
 import { admin as adminPlugin, apiKey, genericOAuth } from "better-auth/plugins";
 import { createAccessControl } from "better-auth/plugins/access";
-import { adminAc } from "better-auth/plugins/admin/access";
 import { statement } from "./authStatement";
+
+type Mutable<T> = {
+  -readonly [P in keyof T]: Mutable<T[P]>;
+};
 
 const ac = createAccessControl(statement);
 
@@ -13,12 +16,11 @@ export const user = ac.newRole({
   user: ["get"],
 });
 
-export const admin = ac.newRole({
-  ...adminAc.statements,
-  points: ["add", "delete"],
-  news: ["create", "delete"],
-  "api-keys": ["create"],
-});
+const adminStatement = Object.fromEntries(
+  Object.entries(statement).map(([k, v]) => [k, [...v]])
+) as Mutable<typeof statement>;
+
+export const admin = ac.newRole(adminStatement);
 
 const roles = { user, admin };
 
