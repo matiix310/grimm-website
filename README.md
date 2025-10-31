@@ -1,6 +1,6 @@
 # Grimm Docker infrastructure
 
-This repository host the Grimm BDE docker infrastructure. Grimm is the current [EPITA](epita.fr) BDE. You can find the website at https://bde-epita.fr.
+This repository host the Grimm BDE docker infrastructure. Grimm is the current [EPITA](https://epita.fr) BDE. You can find the website at https://bde-epita.fr.
 
 ## Environment Variables
 
