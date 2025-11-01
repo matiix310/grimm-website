@@ -8,6 +8,7 @@ export const news = pgTable("news", {
   id: cuid2("id").defaultRandom().primaryKey(),
   name: varchar("name", { length: 100 }).notNull(),
   description: text("description").notNull(),
+  image: text("image").notNull(),
   ...timestamps,
 });
 

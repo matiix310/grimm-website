@@ -30,7 +30,9 @@ export const PUT = async (request: NextRequest) => {
   if (json === null)
     return NextResponse.json({ error: true, message: "Invalid json body" });
 
-  const parsed = newsInsertSchema.pick({ name: true, description: true }).safeParse(json);
+  const parsed = newsInsertSchema
+    .pick({ name: true, description: true, image: true })
+    .safeParse(json);
 
   if (parsed.error)
     return NextResponse.json({

@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/Dialog";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
+import { Textarea } from "@/components/ui/Textarea";
 import { useForm } from "@tanstack/react-form";
 import { Plus } from "lucide-react";
 import React from "react";
@@ -25,6 +26,7 @@ const formSchema = z.object({
   description: z.string().refine((name) => name.replaceAll(" ", "").length > 0, {
     error: "Ne dois pas être vide",
   }),
+  image: z.url(),
 });
 
 type AdminNewsCreateButtonProps = {
@@ -40,6 +42,7 @@ const AdminNewsCreateButton = ({ onNewNews }: AdminNewsCreateButtonProps) => {
     defaultValues: {
       name: "",
       description: "",
+      image: "",
     },
     validators: {
       onSubmit: formSchema,
@@ -122,7 +125,7 @@ const AdminNewsCreateButton = ({ onNewNews }: AdminNewsCreateButtonProps) => {
                 return (
                   <Field data-invalid={isInvalid}>
                     <FieldLabel htmlFor={field.name}>Description</FieldLabel>
-                    <Input
+                    <Textarea
                       id={field.name}
                       name={field.name}
                       value={field.state.value}
@@ -130,6 +133,29 @@ const AdminNewsCreateButton = ({ onNewNews }: AdminNewsCreateButtonProps) => {
                       onChange={(e) => field.handleChange(e.target.value)}
                       aria-invalid={isInvalid}
                       placeholder="Une description qui accompagne le titre"
+                      autoComplete="off"
+                    />
+                    {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                  </Field>
+                );
+              }}
+            />
+            <form.Field
+              name="image"
+              // eslint-disable-next-line react/no-children-prop
+              children={(field) => {
+                const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+                return (
+                  <Field data-invalid={isInvalid}>
+                    <FieldLabel htmlFor={field.name}>Image</FieldLabel>
+                    <Input
+                      id={field.name}
+                      name={field.name}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      aria-invalid={isInvalid}
+                      placeholder="https://bde-grimm.com/image.png"
                       autoComplete="off"
                     />
                     {isInvalid && <FieldError errors={field.state.meta.errors} />}

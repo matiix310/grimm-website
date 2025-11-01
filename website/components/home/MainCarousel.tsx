@@ -7,7 +7,7 @@ import Image from "next/image";
 import React, { useEffect } from "react";
 
 type MainCarouselProps = {
-  carouselContent: { id: string; name: string; description: string; imageUrl?: string }[];
+  carouselContent: { id: string; name: string; description: string; image: string }[];
 } & React.ComponentProps<"div">;
 
 const MainCarousel = ({ carouselContent, className }: MainCarouselProps) => {
