@@ -34,6 +34,7 @@ import {
 import { AdminMinecraftEditDialog } from "./AdminMinecraftEditDialog";
 import { AdminUserEditDialog } from "./AdminUserEditDialog";
 import { Input } from "@/components/ui/Input";
+import { redirect } from "next/navigation";
 
 type AdminUsersTableProps = {
   _?: string;
@@ -107,6 +108,10 @@ const AdminUsersTable = ({}: AdminUsersTableProps) => {
           updateUser(data.user);
         };
 
+        const handleShowProfile = () => {
+          redirect(`/users/${user.login}`);
+        };
+
         return (
           <div className="flex justify-end">
             <DropdownMenu>
@@ -117,6 +122,9 @@ const AdminUsersTable = ({}: AdminUsersTableProps) => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => handleShowProfile()}>
+                  Voir le profil
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => handleEditUser()}>
                   Modifier
                 </DropdownMenuItem>
