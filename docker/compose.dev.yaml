@@ -26,6 +26,6 @@ services:
 
   reverse-proxy:
     ports:
-      - 80:80
+      - 8000:8000
     volumes:
       - ./nginx.dev.conf:/etc/nginx/nginx.conf:ro

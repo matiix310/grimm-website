@@ -6,7 +6,7 @@ services:
     restart: unless-stopped
     shm_size: 128mb
     ports:
-      - 5432:5432 # TODO: only listen for host on prod
+      - 127.0.0.1:5432:5432
     env_file: .env
     command:
       [
