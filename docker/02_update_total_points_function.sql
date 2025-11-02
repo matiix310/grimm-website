@@ -9,13 +9,13 @@ BEGIN
     ON CONFLICT (user_id)
     DO UPDATE SET points = EXCLUDED.points;
 
-    UPDATE ranking r1
-    SET rank = (
-        SELECT row_number() over (
-            ORDER BY points DESC
-        )
-        FROM ranking r2
-        WHERE r1.user_id = r2.user_id
-    );
+    WITH ranked_points AS (
+        SELECT user_id, DENSE_RANK() OVER (ORDER BY points DESC, user_id ASC) AS rank_value
+        FROM ranking
+    )
+    UPDATE ranking
+    SET rank = ranked_points.rank_value
+    FROM ranked_points
+    WHERE ranking.user_id = ranked_points.user_id
 END;
 $$ LANGUAGE plpgsql;
