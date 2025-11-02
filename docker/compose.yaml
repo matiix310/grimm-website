@@ -45,9 +45,23 @@ services:
       - 8000:8000
     networks:
       - grimm-db
+      - grimm-proxy
     depends_on:
       db:
         condition: service_healthy
 
+  reverse-proxy:
+    image: nginx
+    restart: unless-stopped
+    depends_on:
+      - website
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - grimm-proxy
+
 networks:
   grimm-db:
+  grimm-proxy:
