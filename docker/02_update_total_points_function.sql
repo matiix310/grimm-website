@@ -16,6 +16,6 @@ BEGIN
     UPDATE ranking
     SET rank = ranked_points.rank_value
     FROM ranked_points
-    WHERE ranking.user_id = ranked_points.user_id
+    WHERE ranking.user_id = ranked_points.user_id;
 END;
 $$ LANGUAGE plpgsql;
