@@ -5,15 +5,7 @@ import { cn } from "@/lib/utils";
 import { RefreshCw, SearchX } from "lucide-react";
 import Link from "next/link";
 import React from "react";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "../ui/Pagination";
+import { FullPagination } from "../ui/FullPagination";
 
 const defaultOffset = 3;
 const playerPerPage = 10;
@@ -111,79 +103,11 @@ const Ranking = ({ className, ...rest }: RankingProps) => {
         <p className="font-archivo">
           {totalPlayers} joueur{totalPlayers > 1 ? "s" : ""}
         </p>
-        <Pagination className="w-fit mx-0">
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                content="Précedent"
-                onClick={() => setCurrentPage((old) => Math.max(0, old - 1))}
-              />
-            </PaginationItem>
-            {totalPages > 4 ? (
-              <>
-                {currentPage > 1 && (
-                  <>
-                    <PaginationItem>
-                      <PaginationLink onClick={() => setCurrentPage(0)}>1</PaginationLink>
-                    </PaginationItem>
-
-                    <PaginationItem>
-                      <PaginationEllipsis />
-                    </PaginationItem>
-                  </>
-                )}
-
-                {currentPage > 0 && (
-                  <PaginationItem>
-                    <PaginationLink onClick={() => setCurrentPage(currentPage - 1)}>
-                      {currentPage}
-                    </PaginationLink>
-                  </PaginationItem>
-                )}
-
-                <PaginationItem>
-                  <PaginationLink isActive>{currentPage + 1}</PaginationLink>
-                </PaginationItem>
-
-                {currentPage + 1 < totalPages && (
-                  <PaginationItem>
-                    <PaginationLink onClick={() => setCurrentPage(currentPage + 1)}>
-                      {currentPage + 2}
-                    </PaginationLink>
-                  </PaginationItem>
-                )}
-
-                {currentPage < totalPages - 2 && (
-                  <>
-                    <PaginationItem>
-                      <PaginationEllipsis />
-                    </PaginationItem>
-
-                    <PaginationItem>
-                      <PaginationLink onClick={() => setCurrentPage(totalPages - 1)}>
-                        {totalPages}
-                      </PaginationLink>
-                    </PaginationItem>
-                  </>
-                )}
-              </>
-            ) : (
-              [...Array(totalPages).keys()].map((i) => (
-                <PaginationItem key={i}>
-                  <PaginationLink isActive={currentPage === i}>{i + 1}</PaginationLink>
-                </PaginationItem>
-              ))
-            )}
-            <PaginationItem>
-              <PaginationNext
-                content="Suivant"
-                onClick={() =>
-                  setCurrentPage((old) => Math.min(Math.max(totalPages - 1, 0), old + 1))
-                }
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
+        <FullPagination
+          selectedPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
       </div>
     </div>
   );

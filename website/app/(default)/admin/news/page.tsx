@@ -9,7 +9,6 @@ const NewsPage = () => {
   const [news, setNews] = React.useState<News[]>([]);
 
   React.useEffect(() => {
-    // TODO fetch news from /api/news
     fetch("/api/news")
       .then((res) => res.json())
       .then((res) => {
@@ -20,11 +19,14 @@ const NewsPage = () => {
   }, []);
 
   return (
-    <div className="ml-8 flex flex-col gap-4">
+    <div className="mx-8 flex flex-col gap-4">
       <AdminNewsCreateButton onNewNews={(news) => setNews((old) => [...old, news])} />
       <AdminNewsTable
         news={news}
         onRemoveNews={(keyId) => setNews((old) => old.filter((k) => k.id !== keyId))}
+        onUpdateNews={(news) =>
+          setNews((old) => [...old.filter((k) => k.id !== news.id), news])
+        }
       />
     </div>
   );

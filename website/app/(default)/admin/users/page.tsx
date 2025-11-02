@@ -1,7 +1,13 @@
 "use client";
 
+import { AdminUsersTable } from "@/components/admin/users/AdminUsersTable";
+
 const UsersPage = () => {
-  return <h1>Users</h1>;
+  return (
+    <div className="mx-8 flex flex-col gap-4">
+      <AdminUsersTable />
+    </div>
+  );
 };
 
 export default UsersPage;

@@ -1,10 +1,6 @@
 import { auth, type Roles } from "@/lib/auth";
-import { Permissions as AuthPermissions } from "@/lib/authStatement";
+import { Permissions } from "@/lib/permissions";
 import { headers as nextHeaders } from "next/headers";
-
-type Permissions = {
-  [statement in keyof AuthPermissions]?: AuthPermissions[statement][number][];
-};
 
 // check user and api-key permissions
 // avoid using role and user the permissions instead
@@ -25,12 +21,15 @@ const hasPermission = async (options: {
 
     return !error && valid;
   } else {
+    const user = await auth.api.getSession({ headers: options.headers });
+    if (!user) return false;
+
     const { error, success } = await auth.api.userHasPermission({
       body: {
+        userId: user.user.id,
         permissions: options.permissions,
         role: options.role,
       },
-      headers: options.headers,
     });
 
     return !error && success;

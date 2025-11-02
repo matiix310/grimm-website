@@ -1,5 +1,5 @@
 import { auth } from "@/lib/auth";
-import { apiSafeStatement } from "@/lib/authStatement";
+import { apiSafeStatement } from "@/lib/permissions";
 import { hasPermission } from "@/utils/auth";
 import { headers as nextHeaders } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";

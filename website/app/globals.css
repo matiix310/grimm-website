@@ -55,6 +55,7 @@
   --color-destructive-doreground: var(--background);
   --color-popover: var(--card);
   --color-popover-foreground: var(--foreground);
+  --color-border: var(--border);
   --font-archivo: "Archivo Narrow", "Archivo Narrow Fallback";
   --font-overpass: "Overpass", "Overpass Fallback";
   --font-paytone: "Paytone One", "Paytone One Fallback";

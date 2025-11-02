@@ -24,7 +24,7 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/Field
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/Popover";
-import { apiSafeStatement } from "@/lib/authStatement";
+import { apiSafeStatement } from "@/lib/permissions";
 import { useForm } from "@tanstack/react-form";
 import { Plus } from "lucide-react";
 import React from "react";

@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import { cva, type VariantProps } from "class-variance-authority";
 
 const buttonVariants = cva(
-  "font-paytone rounded-full flex justify-center items-center cursor-pointer transition-all ease-in-out gap-2 select-none",
+  "font-paytone rounded-full flex justify-center items-center cursor-pointer transition-all ease-in-out gap-2 select-none disabled:opacity-0.8 disabled:cursor-default",
   {
     variants: {
       variant: {
@@ -11,7 +11,8 @@ const buttonVariants = cva(
         destructive: "bg-red text-red-foreground hover:bg-red/90",
         accent: "bg-accent text-accent-foreground hover:bg-accent/90",
         ghost: "bg-transparent text-foreground hover:bg-accent/90",
-        outline: "bg-accent text-accent-foreground hover:bg-accent/90", // TODO
+        outline:
+          "bg-background text-foreground border-1 border-secondary hover:bg-accent/90", // TODO
       },
       size: {
         lg: "px-9 py-5 text-xl",

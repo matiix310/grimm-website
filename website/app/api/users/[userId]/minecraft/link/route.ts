@@ -47,7 +47,7 @@ export const POST = async (
   const params = await ctx.params;
   const userLogin = params.userId;
 
-  if (!(await hasPermission({ headers, permissions: { user: ["update"] } }))) {
+  if (!(await hasPermission({ headers, permissions: { minecraft: ["manage-link"] } }))) {
     if (!((await auth.api.getSession({ headers }))?.user.login === userLogin))
       return NextResponse.json({
         error: true,

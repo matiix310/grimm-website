@@ -45,7 +45,7 @@ const ApiKeysPage = () => {
   }, []);
 
   return (
-    <div className="ml-8 flex flex-col gap-4">
+    <div className="mx-8 flex flex-col gap-4">
       <AdminApiKeyCreateButton
         onNewApiKey={(apiKey) => setApiKeys((old) => [...old, apiKey])}
       />
