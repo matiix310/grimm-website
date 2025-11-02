@@ -8,9 +8,8 @@ import React from "react";
 import { FullPagination } from "../ui/FullPagination";
 import { $fetch } from "@/lib/betterFetch";
 import * as motion from "motion/react-client";
-import { AnimatePresence } from "motion/react";
 
-const defaultOffset = 0;
+const defaultOffset = 3;
 const playerPerPage = 10;
 
 type RankingProps = {} & React.ComponentProps<"div">;
