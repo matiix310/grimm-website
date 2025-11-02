@@ -77,15 +77,17 @@ const Ranking = ({ className, ...rest }: RankingProps) => {
             <div />
           </>
         ) : (
-          cache[currentPage].map((player) => (
-            <Link key={player.user.login} href={`/users/${player.user.login}`}>
-              <div className="flex w-full font-paytone text-4xl items-center">
-                <p className="w-30 text-5xl">{player.rank}.</p>
-                <p className="flex-1">{player.user.name}</p>
-                <p className="text-5xl">{player.points}</p>
-              </div>
-            </Link>
-          ))
+          <div className="flex gap-0">
+            {cache[currentPage].map((player) => (
+              <Link key={player.user.login} href={`/users/${player.user.login}`}>
+                <div className="flex w-full font-paytone text-4xl items-center">
+                  <p className="w-30 text-5xl">{player.rank}.</p>
+                  <p className="flex-1">{player.user.name}</p>
+                  <p className="text-5xl">{player.points}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
         )
       ) : (
         <>
