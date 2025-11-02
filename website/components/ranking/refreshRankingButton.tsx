@@ -4,25 +4,23 @@ import React from "react";
 import { RefreshCw } from "lucide-react";
 import { Button } from "../ui/Button";
 import { cn } from "@/lib/utils";
+import { $fetch } from "@/lib/betterFetch";
 
 type RefreshRankingButtonProps = {} & React.ComponentProps<typeof Button>;
 
 const RefreshRankingButton = ({ className, ...rest }: RefreshRankingButtonProps) => {
   const [loading, setLoading] = React.useState(false);
 
-  const handleRefresh = () => {
+  const handleRefresh = async () => {
     setLoading(true);
-    fetch("/api/ranking/refresh").then(async (res) => {
-      setLoading(false);
 
-      if (res.status !== 200) throw new Error("Error while refreshing the ranking");
+    const { error } = await $fetch("/api/ranking/refresh");
 
-      const json = await res.json();
+    setLoading(false);
 
-      if (json.error) throw new Error(json.message);
+    if (error) throw new Error(error.message);
 
-      window.location.reload();
-    });
+    window.location.reload();
   };
 
   return (

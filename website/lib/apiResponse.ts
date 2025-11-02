@@ -42,6 +42,9 @@ class ApiResponse {
   static badRequestBodyValidation = (issues: z.core.$ZodIssue[]) =>
     this.badRequest("Malformed body", { issues });
 
+  static badRequestQueryValidation = (issues: z.core.$ZodIssue[]) =>
+    this.badRequest("Malformed query parameters", { issues });
+
   // unauthorized
   static unauthorizedPermission = (requiredPermissions: Permissions) =>
     this.unauthorized("You don't have the required permissions to use this endpoint", {

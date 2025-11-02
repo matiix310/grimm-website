@@ -14,6 +14,7 @@ import {
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
+import { $fetch } from "@/lib/betterFetch";
 import { useForm } from "@tanstack/react-form";
 import { Plus } from "lucide-react";
 import React from "react";
@@ -51,22 +52,15 @@ const AdminNewsCreateButton = ({ onNewNews }: AdminNewsCreateButtonProps) => {
       if (loading) return;
       setLoading(true);
 
-      const res = await fetch("/api/news", {
-        method: "PUT",
-        body: JSON.stringify(value),
-      });
+      const { data, error } = await $fetch("@put/api/news", { body: value });
 
       setLoading(false);
 
-      if (res.status !== 200) throw new Error("Error while creating the news");
-
-      const json = await res.json();
-
-      if (json.error) throw new Error(json.message);
+      if (error) throw new Error(error.message);
 
       setCreateNewsOpen(false);
 
-      onNewNews(json.data);
+      onNewNews(data);
       form.reset();
     },
   });

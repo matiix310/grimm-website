@@ -4,18 +4,17 @@ import React from "react";
 import { AdminNewsCreateButton } from "@/components/admin/news/AdminNewsCreateButton";
 import { AdminNewsTable } from "@/components/admin/news/AdminNewsTable";
 import { News } from "@/db/schema/news";
+import { $fetch } from "@/lib/betterFetch";
 
 const NewsPage = () => {
   const [news, setNews] = React.useState<News[]>([]);
 
   React.useEffect(() => {
-    fetch("/api/news")
-      .then((res) => res.json())
-      .then((res) => {
-        if (res.error) throw new Error(res.message);
+    $fetch("/api/news").then(({ data, error }) => {
+      if (error) throw new Error(error.message);
 
-        setNews(res.data);
-      });
+      setNews(data);
+    });
   }, []);
 
   return (

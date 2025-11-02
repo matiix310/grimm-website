@@ -1,7 +1,8 @@
 import { db } from "@/db";
 import { ranking } from "@/db/schema/ranking";
+import ApiResponse from "@/lib/apiResponse";
 import { count } from "drizzle-orm";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import z from "zod";
 
 export const GET = async (request: NextRequest) => {
@@ -17,12 +18,7 @@ export const GET = async (request: NextRequest) => {
     })
     .safeParse(params);
 
-  if (parsed.error)
-    return NextResponse.json({
-      error: true,
-      message: "Invalid search parameters",
-      issues: parsed.error.issues,
-    });
+  if (parsed.error) return ApiResponse.badRequestQueryValidation(parsed.error.issues);
 
   const rankingResult = await db.query.ranking.findMany({
     orderBy: (ranking, { asc }) => [asc(ranking.rank)],
@@ -41,15 +37,11 @@ export const GET = async (request: NextRequest) => {
 
   const totalResult = await db.select({ total: count() }).from(ranking);
 
-  if (totalResult.length === 0)
-    return NextResponse.json({ error: true, message: "Internal server error" });
+  if (totalResult.length === 0) return ApiResponse.internalServerError();
 
-  return NextResponse.json({
-    error: false,
-    data: {
-      ...parsed.data,
-      total: totalResult[0].total,
-      ranking: rankingResult,
-    },
+  return ApiResponse.json({
+    ...parsed.data,
+    total: totalResult[0].total,
+    ranking: rankingResult,
   });
 };

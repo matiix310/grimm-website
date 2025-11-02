@@ -1,9 +1,10 @@
 import { db } from "@/db";
 import { news, newsUpdateSchema } from "@/db/schema/news";
+import ApiResponse from "@/lib/apiResponse";
 import { hasPermission } from "@/utils/auth";
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 
 export const DELETE = async (
   request: NextRequest,
@@ -15,10 +16,7 @@ export const DELETE = async (
       permissions: { news: ["delete"] },
     }))
   )
-    return NextResponse.json({
-      error: true,
-      message: "You don't have the required permissions to use this endpoint",
-    });
+    return ApiResponse.unauthorizedPermission({ news: ["delete"] });
 
   const params = await ctx.params;
   const newsId = params.newsId;
@@ -29,15 +27,14 @@ export const DELETE = async (
     columns: { id: true },
   }));
 
-  if (!newsExists) return NextResponse.json({ error: true, message: "News not found" });
+  if (!newsExists) return ApiResponse.notFound("News not found");
 
   // delete the news
   const deletedNews = await db.delete(news).where(eq(news.id, newsId)).returning();
 
-  if (deletedNews.length === 0)
-    return NextResponse.json({ error: true, message: "Internal server error" });
+  if (deletedNews.length === 0) return ApiResponse.internalServerError();
 
-  return NextResponse.json({ error: false, data: deletedNews[0] });
+  return ApiResponse.json(deletedNews[0]);
 };
 
 export const POST = async (
@@ -50,10 +47,7 @@ export const POST = async (
       permissions: { news: ["update"] },
     }))
   )
-    return NextResponse.json({
-      error: true,
-      message: "You don't have the required permissions to use this endpoint",
-    });
+    return ApiResponse.unauthorizedPermission({ news: ["update"] });
 
   const params = await ctx.params;
   const newsId = params.newsId;
@@ -64,13 +58,12 @@ export const POST = async (
     columns: { id: true },
   }));
 
-  if (!newsExists) return NextResponse.json({ error: true, message: "News not found" });
+  if (!newsExists) return ApiResponse.notFound("News not found");
 
   // get the request body
   const json = await request.json().catch(() => null);
 
-  if (json === null)
-    return NextResponse.json({ error: true, message: "Invalid json body" });
+  if (json === null) return ApiResponse.badRequestBodyParsing();
 
   const parsed = newsUpdateSchema
     .pick({ name: true, description: true, image: true })
@@ -79,12 +72,7 @@ export const POST = async (
     })
     .safeParse(json);
 
-  if (parsed.error)
-    return NextResponse.json({
-      error: true,
-      message: "Invalid body",
-      issues: parsed.error.issues,
-    });
+  if (parsed.error) return ApiResponse.badRequestBodyValidation(parsed.error.issues);
 
   // update the news
   const updatedNews = await db
@@ -93,8 +81,7 @@ export const POST = async (
     .where(eq(news.id, newsId))
     .returning();
 
-  if (updatedNews.length === 0)
-    return NextResponse.json({ error: true, message: "Internal server error" });
+  if (updatedNews.length === 0) return ApiResponse.internalServerError();
 
-  return NextResponse.json({ error: false, data: updatedNews[0] });
+  return ApiResponse.json(updatedNews[0]);
 };

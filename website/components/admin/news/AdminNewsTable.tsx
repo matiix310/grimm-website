@@ -25,6 +25,7 @@ import {
 import { MoreHorizontal } from "lucide-react";
 import React from "react";
 import { AdminNewsEditDialog } from "./AdminNewsEditDialog";
+import { $fetch } from "@/lib/betterFetch";
 
 type AdminNewsTableProps = {
   news: News[];
@@ -59,17 +60,13 @@ const AdminNewsTable = ({ news, onRemoveNews, onUpdateNews }: AdminNewsTableProp
         };
 
         const handleDelete = async () => {
-          const res = await fetch(`/api/news/${newsId}`, {
-            method: "DELETE",
+          const { data, error } = await $fetch("@delete/api/news/:newsId", {
+            params: { newsId: newsId },
           });
 
-          if (res.status !== 200) throw new Error("Error while deleting the news");
+          if (error) throw new Error(error.message);
 
-          const json = await res.json();
-
-          if (json.error) throw new Error(json.message);
-
-          onRemoveNews(newsId);
+          onRemoveNews(data.id);
         };
 
         return (

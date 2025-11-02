@@ -6,6 +6,7 @@ import { RefreshCw, SearchX } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import { FullPagination } from "../ui/FullPagination";
+import { $fetch } from "@/lib/betterFetch";
 
 const defaultOffset = 3;
 const playerPerPage = 10;
@@ -45,26 +46,19 @@ const Ranking = ({ className, ...rest }: RankingProps) => {
     if (cache[currentPage] !== undefined) return;
 
     const currentPageCopy = currentPage;
-    fetch(
-      `/api/ranking?limit=${playerPerPage}&offset=${
-        currentPageCopy * playerPerPage + defaultOffset
-      }`
-    ).then(async (res) => {
-      if (res.status !== 200) {
+    $fetch("/api/ranking", {
+      query: {
+        limit: playerPerPage,
+        offset: currentPageCopy * playerPerPage + defaultOffset,
+      },
+    }).then(({ data, error }) => {
+      if (error) {
         setCacheAt(currentPageCopy, null);
-        throw new Error("Error while fetching the ranking");
+        throw new Error(error.message);
       }
 
-      const json = await res.json();
-
-      if (json.error) {
-        setCacheAt(currentPageCopy, null);
-        throw new Error(json.message);
-      }
-
-      setTotalPlayers(json.data.total);
-
-      setCacheAt(currentPageCopy, json.data.ranking);
+      setTotalPlayers(data.total);
+      setCacheAt(currentPageCopy, data.ranking);
     });
   }, [currentPage, cache, setCacheAt]);
 

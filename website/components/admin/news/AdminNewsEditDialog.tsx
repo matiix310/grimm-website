@@ -14,9 +14,9 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/Field
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { News } from "@/db/schema/news";
+import { $fetch } from "@/lib/betterFetch";
 import { useForm } from "@tanstack/react-form";
 import React from "react";
-import { toast } from "sonner";
 import z from "zod";
 
 const formSchema = z.object({
@@ -55,22 +55,20 @@ const AdminNewsEditDialog = ({
       if (loading || !news) return;
       setLoading(true);
 
-      const res = await fetch(`/api/news/${news.id}`, {
-        method: "POST",
-        body: JSON.stringify({
+      const { data, error } = await $fetch("@post/api/news/:newsId", {
+        params: {
+          newsId: news.id,
+        },
+        body: {
           name: value.name,
           description: value.description,
           image: value.image,
-        }),
+        },
       });
 
-      if (res.status !== 200) throw new Error("Error while deleting the news");
+      if (error) throw new Error(error.message);
 
-      const json = await res.json();
-
-      if (json.error) throw new Error(json.message);
-
-      onEditNews(json.data);
+      onEditNews(data);
       setLoading(false);
 
       if (onOpenChange) onOpenChange(false);

@@ -24,6 +24,7 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/Field
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/Popover";
+import { $fetch } from "@/lib/betterFetch";
 import { apiSafeStatement } from "@/lib/permissions";
 import { useForm } from "@tanstack/react-form";
 import { Plus } from "lucide-react";
@@ -64,33 +65,30 @@ const AdminApiKeyCreateButton = ({ onNewApiKey }: AdminApiKeyCreateButtonProps) 
       if (loading) return;
       setLoading(true);
 
-      const res = await fetch("/api/admin/api-keys", {
-        method: "PUT",
-        body: JSON.stringify({
+      const { data, error } = await $fetch("@put/api/admin/api-keys", {
+        body: {
           expiresIn: (value.expirationDate.getTime() - time) / 1000,
           name: value.name,
-          permissions: value.permissions,
-        }),
+          permissions: value.permissions as Partial<
+            Record<keyof typeof apiSafeStatement, string[]>
+          >,
+        },
       });
 
       setLoading(false);
 
-      if (res.status !== 200) throw new Error("Error while creating the api key");
-
-      const json = await res.json();
-
-      if (json.error) throw new Error(json.message);
+      if (error) throw new Error(error.message);
 
       setCreateTokenOpen(false);
 
       toast("Click pour copier ta clé API", {
         action: {
           label: "Copy",
-          onClick: () => navigator.clipboard.writeText(json.data.key),
+          onClick: () => navigator.clipboard.writeText(data.key),
         },
       });
 
-      onNewApiKey({ ...json.data, key: undefined });
+      onNewApiKey({ ...data, key: undefined });
       form.reset();
     },
   });

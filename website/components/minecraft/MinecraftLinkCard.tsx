@@ -5,6 +5,7 @@ import { Button } from "../ui/Button";
 import { Card } from "../ui/Card";
 import { redirect } from "next/navigation";
 import { RefreshCw } from "lucide-react";
+import { $fetch } from "@/lib/betterFetch";
 
 type MinecraftLinkCardProps = {
   userLogin: string;
@@ -22,20 +23,16 @@ const MinecraftLinkCard = ({
   const handleLinkClick = async () => {
     setLoading(true);
 
-    const res = await fetch(`/api/users/${userLogin}/minecraft/link`, {
-      method: "POST",
-      body: JSON.stringify({
+    const { error } = await $fetch("@post/api/users/:id/minecraft/link", {
+      params: { id: userLogin },
+      body: {
         username,
-      }),
+      },
     });
 
     setLoading(false);
 
-    if (res.status !== 200) throw new Error("Error while creating the api key");
-
-    const json = await res.json();
-
-    if (json.error) throw new Error(json.message);
+    if (error) throw new Error(error.message);
 
     // TODO: success page
     redirect("/");

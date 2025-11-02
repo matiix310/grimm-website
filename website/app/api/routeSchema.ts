@@ -1,9 +1,13 @@
 import usersSchema from "./users/[userId]/routeSchema";
-
-// TODO add other schemas
+import rankingSchema from "./ranking/routeSchema";
+import newsSchema from "./news/routeSchema";
+import apiKeysSchema from "./admin/api-keys/routeSchema";
 
 const schema = {
   ...usersSchema,
+  ...rankingSchema,
+  ...newsSchema,
+  ...apiKeysSchema,
 };
 
 export default schema;

@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/Dialog";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
+import { $fetch } from "@/lib/betterFetch";
 import { useForm } from "@tanstack/react-form";
 import React from "react";
 import z from "zod";
@@ -26,6 +27,7 @@ type AdminMinecraftEditDialogProps = { userLogin?: string } & React.ComponentPro
   typeof Dialog
 >;
 
+// TODO: add edit callback
 const AdminMinecraftEditDialog = ({
   userLogin,
   open,
@@ -47,21 +49,16 @@ const AdminMinecraftEditDialog = ({
       if (loading || !userLogin) return;
       setLoading(true);
 
-      const res = await fetch(`/api/users/${userLogin}/minecraft/link`, {
-        method: "POST",
-        body: JSON.stringify({
+      const { data, error } = await $fetch("@post/api/users/:id/minecraft/link", {
+        params: { id: userLogin },
+        body: {
           username: value.username,
-        }),
+        },
       });
 
       setLoading(false);
 
-      if (res.status !== 200)
-        throw new Error("Error while updating the minecraft username");
-
-      const json = await res.json();
-
-      if (json.error) throw new Error(json.message);
+      if (error) throw new Error(error.message);
 
       if (onOpenChange) onOpenChange(false);
     },
@@ -71,17 +68,14 @@ const AdminMinecraftEditDialog = ({
     if (!userLogin) return;
 
     // fetch the pseudo
-    fetch(`/api/users/${userLogin}/minecraft/link`).then(async (res) => {
-      if (res.status !== 200)
-        throw new Error("Error while fetching the minecraft username");
+    $fetch("/api/users/:id/minecraft/link", { params: { id: userLogin } }).then(
+      ({ data, error }) => {
+        if (error && !error.message?.includes("not linked"))
+          throw new Error(error.message);
 
-      const json = await res.json();
-
-      if (json.error && !json.message.includes("not linked"))
-        throw new Error(json.message);
-
-      setMinecraftUsername(json.data?.username ?? "");
-    });
+        setMinecraftUsername(data?.username ?? "");
+      }
+    );
   }, [userLogin]);
 
   return (

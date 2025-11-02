@@ -1,8 +1,9 @@
+import ApiResponse from "@/lib/apiResponse";
 import { auth } from "@/lib/auth";
-import { apiSafeStatement } from "@/lib/permissions";
+import { apiSafeStatement, Permissions } from "@/lib/permissions";
 import { hasPermission } from "@/utils/auth";
 import { headers as nextHeaders } from "next/headers";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import z from "zod";
 
 export const PUT = async (request: NextRequest) => {
@@ -14,30 +15,30 @@ export const PUT = async (request: NextRequest) => {
       onlyUsers: true,
     }))
   )
-    return NextResponse.json({
-      error: true,
-      message: "You don't have the required permissions to use this endpoint",
-    });
+    return ApiResponse.unauthorizedPermission({ "api-keys": ["create"] });
 
   const user = await auth.api.getSession({
     headers,
   });
 
-  if (!user) return NextResponse.json({ error: true, message: "Internal server error" });
+  if (!user) return ApiResponse.notFoundUser();
 
   const json = await request.json().catch(() => null);
 
-  if (json === null)
-    return NextResponse.json({ error: true, message: "Invalid json body" });
+  if (json === null) return ApiResponse.badRequestBodyParsing();
 
   const permissions = z
-    .record(
-      z.union(Object.keys(apiSafeStatement).map((p) => z.literal(p))),
+    .partialRecord(
+      z.union(
+        Object.keys(apiSafeStatement).map((p) =>
+          z.literal(p as keyof typeof apiSafeStatement)
+        )
+      ),
       z.array(z.string()).nonempty()
     )
     .refine((perms) => {
       for (const perm in perms) {
-        for (const subPerm in perms[perm])
+        for (const subPerm in perms[perm as keyof typeof apiSafeStatement])
           if (!(apiSafeStatement as Record<string, string[]>)[perm].includes(subPerm))
             return false;
       }
@@ -52,31 +53,23 @@ export const PUT = async (request: NextRequest) => {
     })
     .safeParse(json);
 
-  if (parsed.error)
-    return NextResponse.json({
-      error: true,
-      message: "Invalid body",
-      issues: parsed.error.issues,
-    });
+  if (parsed.error) return ApiResponse.badRequestBodyValidation(parsed.error.issues);
 
   // verify that the user has the permissions he asks
   if (
     parsed.data.permissions &&
     !(await auth.api.userHasPermission({
       body: {
-        permissions: parsed.data.permissions,
+        permissions: parsed.data.permissions as Permissions,
       },
       headers,
     }))
   )
-    return NextResponse.json({
-      error: true,
-      message: "You can't request permissions you don't have",
-    });
+    return ApiResponse.unauthorized("You can't request permissions you don't have");
 
   const key = await auth.api.createApiKey({
     body: { ...parsed.data, userId: user?.user.id },
   });
 
-  return NextResponse.json({ error: false, data: key });
+  return ApiResponse.json(key);
 };

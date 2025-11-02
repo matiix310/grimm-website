@@ -1,13 +1,14 @@
 import { db } from "@/db";
 import { news, newsInsertSchema } from "@/db/schema/news";
+import ApiResponse from "@/lib/apiResponse";
 import { hasPermission } from "@/utils/auth";
 import { headers } from "next/headers";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 
 export const GET = async () => {
   const news = await db.query.news.findMany();
 
-  return NextResponse.json({ error: false, data: news });
+  return ApiResponse.json(news);
 };
 
 export const PUT = async (request: NextRequest) => {
@@ -17,33 +18,23 @@ export const PUT = async (request: NextRequest) => {
       permissions: { news: ["create"] },
     }))
   )
-    return NextResponse.json({
-      error: true,
-      message: "You don't have the required permissions to use this endpoint",
-    });
+    return ApiResponse.unauthorizedPermission({ news: ["create"] });
 
   // get the request body
   const json = await request.json().catch(() => null);
 
-  if (json === null)
-    return NextResponse.json({ error: true, message: "Invalid json body" });
+  if (json === null) return ApiResponse.badRequestBodyParsing();
 
   const parsed = newsInsertSchema
     .pick({ name: true, description: true, image: true })
     .safeParse(json);
 
-  if (parsed.error)
-    return NextResponse.json({
-      error: true,
-      message: "Invalid body",
-      issues: parsed.error.issues,
-    });
+  if (parsed.error) return ApiResponse.badRequestBodyValidation(parsed.error.issues);
 
   // insert the news
   const insertedNews = await db.insert(news).values(parsed.data).returning();
 
-  if (insertedNews.length === 0)
-    return NextResponse.json({ error: true, message: "Internal server error" });
+  if (insertedNews.length === 0) return ApiResponse.internalServerError();
 
-  return NextResponse.json({ error: false, data: insertedNews[0] });
+  return ApiResponse.json(insertedNews[0]);
 };

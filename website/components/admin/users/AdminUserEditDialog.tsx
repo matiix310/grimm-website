@@ -38,7 +38,7 @@ const formSchema = z.object({
 
 type AdminUserEditDialogProps = {
   userLogin?: string;
-  onUpdateUser: (user: ApiSchema["@post/api/users/:id"]["output"]["user"]) => unknown;
+  onUpdateUser: (user: ApiSchema["@post/api/users/:id"]["output"]) => unknown;
 } & React.ComponentProps<typeof Dialog>;
 
 const AdminUserEditDialog = ({
@@ -83,7 +83,7 @@ const AdminUserEditDialog = ({
       setLoading(false);
 
       if (error) throw new Error(error.message);
-      onUpdateUser(data.user);
+      onUpdateUser(data);
       if (onOpenChange) onOpenChange(false);
     },
   });

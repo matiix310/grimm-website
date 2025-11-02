@@ -1,11 +1,12 @@
 import { db } from "@/db";
 import { user as userSchema } from "@/db/schema/auth";
 import { minecraftUsernames } from "@/db/schema/minecraftUsernames";
+import ApiResponse from "@/lib/apiResponse";
 import { auth } from "@/lib/auth";
 import { hasPermission } from "@/utils/auth";
 import { eq } from "drizzle-orm";
 import { headers as nextHeaders } from "next/headers";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import z from "zod";
 
 export const GET = async (
@@ -22,19 +23,15 @@ export const GET = async (
     },
   });
 
-  if (!user) return NextResponse.json({ error: true, message: "User not found" });
+  if (!user) return ApiResponse.notFoundUser();
 
   const minecraftUsername = await db.query.minecraftUsernames.findFirst({
     where: eq(minecraftUsernames.userId, user.id),
   });
 
-  if (!minecraftUsername)
-    return NextResponse.json({
-      error: true,
-      message: "User not linked with a minecraft account",
-    });
+  if (!minecraftUsername) return ApiResponse.notFound("Minecraft account not found");
 
-  return NextResponse.json({ error: false, data: minecraftUsername });
+  return ApiResponse.json(minecraftUsername);
 };
 
 export const POST = async (
@@ -49,10 +46,7 @@ export const POST = async (
 
   if (!(await hasPermission({ headers, permissions: { minecraft: ["manage-link"] } }))) {
     if (!((await auth.api.getSession({ headers }))?.user.login === userLogin))
-      return NextResponse.json({
-        error: true,
-        message: "You don't have the required permissions to use this endpoint",
-      });
+      return ApiResponse.unauthorizedPermission({ minecraft: ["manage-link"] });
 
     isAdmin = false;
   }
@@ -60,21 +54,15 @@ export const POST = async (
   // validate the body content
   const json = await request.json().catch(() => null);
 
-  if (json === null)
-    return NextResponse.json({ error: true, message: "Invalid json body" });
+  if (json === null) return ApiResponse.badRequestBodyParsing();
 
   const parsed = z
     .object({
-      username: z.string(),
+      username: z.string().nonempty(),
     })
     .safeParse(json);
 
-  if (parsed.error)
-    return NextResponse.json({
-      error: true,
-      message: "Invalid body",
-      issues: parsed.error.issues,
-    });
+  if (parsed.error) return ApiResponse.badRequestBodyValidation(parsed.error.issues);
 
   const user = await db.query.user.findFirst({
     where: eq(userSchema.login, userLogin),
@@ -83,17 +71,14 @@ export const POST = async (
     },
   });
 
-  if (!user) return NextResponse.json({ error: true, message: "User not found" });
+  if (!user) return ApiResponse.notFoundUser();
 
   const minecraftUsername = await db.query.minecraftUsernames.findFirst({
     where: eq(minecraftUsernames.userId, user.id),
   });
 
   if (minecraftUsername && !isAdmin)
-    return NextResponse.json({
-      error: true,
-      message: "You are already linked to another minecraft account",
-    });
+    return ApiResponse.badRequest("You are already linked to another minecraft account"); // TODO: bad request?
 
   // edit or create depending on user permissions
   const newMinecraftUsername = await (minecraftUsername && isAdmin
@@ -107,10 +92,9 @@ export const POST = async (
         .values({ userId: user.id, username: parsed.data.username })
         .returning());
 
-  if (newMinecraftUsername.length === 0)
-    return NextResponse.json({ error: true, message: "Internal server error" });
+  if (newMinecraftUsername.length === 0) return ApiResponse.internalServerError();
 
-  return NextResponse.json({ error: false, data: newMinecraftUsername[0] });
+  return ApiResponse.json(newMinecraftUsername[0]);
 };
 
 // TODO Delete
