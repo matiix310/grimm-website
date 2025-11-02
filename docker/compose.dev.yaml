@@ -23,3 +23,9 @@ services:
           path: ../website/package.json
         - action: rebuild
           path: ../website/.env
+
+  reverse-proxy:
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx.dev.conf:/etc/nginx/nginx.conf:ro

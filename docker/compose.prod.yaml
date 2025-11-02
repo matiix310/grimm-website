@@ -1,0 +1,8 @@
+services:
+  reverse-proxy:
+    ports:
+      - 443:443
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./bde-grimm.com.pem:/etc/ssl/bde-grimm.com.pem
+      - ./bde-grimm.com.key:/etc/ssl/bde-grimm.com.key
