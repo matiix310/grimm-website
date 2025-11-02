@@ -77,7 +77,7 @@ const Ranking = ({ className, ...rest }: RankingProps) => {
             <div />
           </>
         ) : (
-          <div className="flex gap-0">
+          <div className="flex-col gap-0">
             {cache[currentPage].map((player) => (
               <Link key={player.user.login} href={`/users/${player.user.login}`}>
                 <div className="flex w-full font-paytone text-4xl items-center">
