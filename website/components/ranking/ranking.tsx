@@ -7,8 +7,10 @@ import Link from "next/link";
 import React from "react";
 import { FullPagination } from "../ui/FullPagination";
 import { $fetch } from "@/lib/betterFetch";
+import * as motion from "motion/react-client";
+import { AnimatePresence } from "motion/react";
 
-const defaultOffset = 3;
+const defaultOffset = 0;
 const playerPerPage = 10;
 
 type RankingProps = {} & React.ComponentProps<"div">;
@@ -25,6 +27,7 @@ const Ranking = ({ className, ...rest }: RankingProps) => {
   >([]);
   const [currentPage, setCurrentPage] = React.useState(0);
   const [totalPlayers, setTotalPlayers] = React.useState(0);
+  const [currentHover, setCurrentHover] = React.useState<number>();
 
   const totalPages = React.useMemo(
     () =>
@@ -78,13 +81,23 @@ const Ranking = ({ className, ...rest }: RankingProps) => {
           </>
         ) : (
           <div className="flex-col gap-0">
-            {cache[currentPage].map((player) => (
+            {cache[currentPage].map((player, i) => (
               <Link key={player.user.login} href={`/users/${player.user.login}`}>
-                <div className="flex w-full font-paytone text-4xl items-center hover:bg-accent rounded-md transition-colors ease-in-out p-1">
+                <motion.div
+                  className="relative flex w-full font-paytone text-4xl items-center p-1"
+                  onHoverStart={() => setCurrentHover(i)}
+                  onHoverEnd={() => setCurrentHover(undefined)}
+                >
                   <p className="w-30 text-5xl">{player.rank}.</p>
                   <p className="flex-1">{player.user.name}</p>
                   <p className="text-5xl">{player.points}</p>
-                </div>
+                  {currentHover === i && (
+                    <motion.div
+                      layoutId="ranking-bg-button"
+                      className="absolute size-full bg-accent -z-1 top-0 left-0 rounded-md"
+                    />
+                  )}
+                </motion.div>
               </Link>
             ))}
           </div>

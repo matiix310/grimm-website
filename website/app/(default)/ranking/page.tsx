@@ -1,10 +1,9 @@
+import BestPlayers from "@/components/ranking/BestPlayers";
 import { Ranking } from "@/components/ranking/ranking";
 import { RefreshRankingButton } from "@/components/ranking/refreshRankingButton";
 import { db } from "@/db";
-import { cn } from "@/lib/utils";
 import { hasPermission } from "@/utils/auth";
 import { headers } from "next/headers";
-import Link from "next/link";
 
 const RankingPage = async () => {
   const bestPlayers = await db.query.ranking.findMany({
@@ -36,28 +35,7 @@ const RankingPage = async () => {
         {canRefresh && <RefreshRankingButton className="mt-2" />}
       </div>
       <div className="flex gap-45 h-full">
-        <div className="flex-1 flex flex-col justify-center gap-3">
-          {bestPlayers.map((player) => (
-            <Link key={player.user.login} href={`/users/${player.user.login}`}>
-              <div
-                className={cn(
-                  "flex w-full font-paytone text-5xl items-center hover:bg-accent rounded-lg transition-colors ease-in-out p-2",
-                  player.rank === 1
-                    ? "text-primary"
-                    : player.rank === 2
-                    ? "text-blue"
-                    : player.rank == 3
-                    ? "text-green"
-                    : "text-foreground"
-                )}
-              >
-                <p className="w-20 text-6xl">{player.rank}.</p>
-                <p className="flex-1">{player.user.name}</p>
-                <p className="text-6xl">{player.points}</p>
-              </div>
-            </Link>
-          ))}
-        </div>
+        <BestPlayers players={bestPlayers} />
         <Ranking className="flex-1" />
       </div>
     </div>
