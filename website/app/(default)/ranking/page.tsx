@@ -33,15 +33,15 @@ const RankingPage = async () => {
     <div className="flex flex-col px-8 size-full">
       <div className="flex gap-2 items-center">
         <h1 className="font-paytone text-7xl">Classement</h1>
-        {canRefresh && <RefreshRankingButton className="mt-3" />}
+        {canRefresh && <RefreshRankingButton className="mt-2" />}
       </div>
-      <div className="flex gap-50 h-full">
-        <div className="flex-1 flex flex-col justify-center gap-6">
+      <div className="flex gap-45 h-full">
+        <div className="flex-1 flex flex-col justify-center gap-3">
           {bestPlayers.map((player) => (
             <Link key={player.user.login} href={`/users/${player.user.login}`}>
               <div
                 className={cn(
-                  "flex w-full font-paytone text-5xl items-center",
+                  "flex w-full font-paytone text-5xl items-center hover:bg-accent rounded-lg transition-colors ease-in-out p-2",
                   player.rank === 1
                     ? "text-primary"
                     : player.rank === 2
