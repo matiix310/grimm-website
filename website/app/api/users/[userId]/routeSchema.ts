@@ -2,6 +2,7 @@ import { user } from "@/db/schema/auth";
 import { rolesMetadata } from "@/lib/permissions";
 import { createSelectSchema } from "drizzle-zod";
 import z from "zod";
+import pointsSchema from "./points/routeSchema";
 
 const UserSelectSchema = createSelectSchema(user);
 
@@ -41,6 +42,7 @@ const schema = {
       }).and(z.object({ updatedAt: z.coerce.date(), createdAt: z.coerce.date() })),
     }),
   },
+  ...pointsSchema,
 };
 
 export default schema;

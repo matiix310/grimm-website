@@ -6,10 +6,11 @@ import {
   points as pointsSchema,
   pointsToTags,
 } from "@/db/schema/points";
+import ApiResponse from "@/lib/apiResponse";
 import { hasPermission } from "@/utils/auth";
 import { and, eq, sum } from "drizzle-orm";
 import { headers } from "next/headers";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import z from "zod";
 
 export const GET = async (
@@ -22,7 +23,7 @@ export const GET = async (
     where: eq(userSchema.login, params.userId),
   });
 
-  if (!user) return NextResponse.json({ error: true, message: "User not found" });
+  if (!user) return ApiResponse.notFoundUser();
 
   const points = await db
     .select({
@@ -31,28 +32,23 @@ export const GET = async (
     .from(pointsSchema)
     .where(eq(pointsSchema.userId, user.login));
 
-  if (points.length === 0)
-    return NextResponse.json({ error: true, message: "Internal error" });
+  if (points.length === 0) return ApiResponse.internalServerError();
 
-  return NextResponse.json({ error: false, data: parseInt(points[0].value ?? "0") });
+  return ApiResponse.json({ points: parseInt(points[0].value ?? "0") });
 };
 
-export const POST = async (
+export const PUT = async (
   request: NextRequest,
   ctx: RouteContext<"/api/users/[userId]/points">
 ) => {
   if (
     !(await hasPermission({ headers: await headers(), permissions: { points: ["add"] } }))
   )
-    return NextResponse.json({
-      error: true,
-      message: "You don't have the required permissions to use this endpoint",
-    });
+    return ApiResponse.unauthorizedPermission({ points: ["add"] });
 
   const json = await request.json().catch(() => null);
 
-  if (json === null)
-    return NextResponse.json({ error: true, message: "Invalid json body" });
+  if (json === null) return ApiResponse.badRequestBodyParsing();
 
   const params = await ctx.params;
 
@@ -60,7 +56,7 @@ export const POST = async (
     where: eq(userSchema.login, params.userId),
   });
 
-  if (!user) return NextResponse.json({ error: true, message: "User not found" });
+  if (!user) return ApiResponse.notFoundUser();
 
   // get the list of available tags
   const availableTags = await db.query.pointTags.findMany({
@@ -87,20 +83,14 @@ export const POST = async (
     )
     .safeParse(json);
 
-  if (parsed.error)
-    return NextResponse.json({
-      error: true,
-      message: "Invalid body",
-      issues: parsed.error.issues,
-    });
+  if (parsed.error) return ApiResponse.badRequestBodyValidation(parsed.error.issues);
 
   const insertedPoints = await db
     .insert(points)
     .values({ userId: user.id, name: parsed.data.name, amount: parsed.data.amount })
     .returning();
 
-  if (insertedPoints.length === 0)
-    return NextResponse.json({ error: true, message: "Internal server error" });
+  if (insertedPoints.length === 0) return ApiResponse.internalServerError();
 
   if (parsed.data.tags && parsed.data.tags.length > 0) {
     await db
@@ -108,26 +98,21 @@ export const POST = async (
       .values(parsed.data.tags.map((t) => ({ pointId: insertedPoints[0].id, tagId: t })));
   }
 
-  return NextResponse.json({ error: false, data: parsed.data });
+  return ApiResponse.json(insertedPoints[0]);
 };
 
 export const DELETE = async (
   request: NextRequest,
   ctx: RouteContext<"/api/users/[userId]/points">
 ) => {
-  // must have the admin role
   if (
     !(await hasPermission({ headers: await headers(), permissions: { points: ["add"] } }))
   )
-    return NextResponse.json({
-      error: true,
-      message: "You don't have the required permissions to use this endpoint",
-    });
+    return ApiResponse.unauthorizedPermission({ points: ["add"] });
 
   const json = await request.json().catch(() => null);
 
-  if (json === null)
-    return NextResponse.json({ error: true, message: "Invalid json body" });
+  if (json === null) return ApiResponse.badRequestBodyParsing();
 
   const params = await ctx.params;
 
@@ -135,7 +120,7 @@ export const DELETE = async (
     where: eq(userSchema.login, params.userId),
   });
 
-  if (!user) return NextResponse.json({ error: true, message: "User not found" });
+  if (!user) return ApiResponse.notFoundUser();
 
   const availablePointIds = await db.query.points.findMany({
     where: eq(pointsSchema.userId, user.id),
@@ -153,20 +138,14 @@ export const DELETE = async (
     })
     .safeParse(json);
 
-  if (parsed.error)
-    return NextResponse.json({
-      error: true,
-      message: "Invalid body",
-      issues: parsed.error.issues,
-    });
+  if (parsed.error) return ApiResponse.badRequestBodyValidation(parsed.error.issues);
 
   const deletedPoints = await db
     .delete(pointsSchema)
     .where(and(eq(pointsSchema.userId, user.id), eq(pointsSchema.id, parsed.data.id)))
     .returning();
 
-  if (deletedPoints.length === 0)
-    return NextResponse.json({ error: true, message: "Internal error" });
+  if (deletedPoints.length === 0) return ApiResponse.internalServerError();
 
-  return NextResponse.json({ error: false, data: deletedPoints[0] });
+  return ApiResponse.json(deletedPoints[0]);
 };

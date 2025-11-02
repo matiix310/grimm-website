@@ -3,13 +3,16 @@ import { PointsList } from "@/components/users/PointsList";
 import { db } from "@/db";
 import { points as pointsSchema } from "@/db/schema/points";
 import { auth } from "@/lib/auth";
+import { hasPermission } from "@/utils/auth";
 import { desc } from "drizzle-orm";
-import { headers } from "next/headers";
+import { headers as nextHeaders } from "next/headers";
 
 const UserPage = async ({ params }: PageProps<"/users/[userId]">) => {
   const userId = (await params).userId;
+
+  const headers = await nextHeaders();
   const session = await auth.api.getSession({
-    headers: await headers(),
+    headers,
   });
 
   const user =
@@ -33,9 +36,13 @@ const UserPage = async ({ params }: PageProps<"/users/[userId]">) => {
     orderBy: [desc(pointsSchema.createdAt)],
   });
 
-  const isAdmin = session?.user.role === "admin";
+  const canAddPoints = await hasPermission({ headers, permissions: { points: ["add"] } });
+  const canDeletePoints = await hasPermission({
+    headers,
+    permissions: { points: ["delete"] },
+  });
 
-  const availableTags = isAdmin ? await db.query.pointTags.findMany() : [];
+  const availableTags = canAddPoints ? await db.query.pointTags.findMany() : [];
 
   return (
     <div className="flex gap-30 mt-10 mx-30">
@@ -60,12 +67,16 @@ const UserPage = async ({ params }: PageProps<"/users/[userId]">) => {
               <p className="font-paytone text-3xl">
                 {points.reduce((sum, point) => sum + point.amount, 0)} points
               </p>
-              {isAdmin && (
+              {canAddPoints && (
                 <AddPointButton availableTags={availableTags} userLogin={user.login} />
               )}
             </div>
           </div>
-          <PointsList points={points} isAdmin={isAdmin} userLogin={user.login} />
+          <PointsList
+            defaultPoints={points}
+            canDeletePoints={canDeletePoints}
+            userLogin={user.login}
+          />
         </div>
       </div>
     </div>

@@ -3,7 +3,7 @@ import { InferSelectModel, relations } from "drizzle-orm";
 import { pgTable, varchar } from "drizzle-orm/pg-core";
 import { timestamps } from "../columns.helper";
 import { pointsToTags } from "./points";
-import { createSelectSchema } from "drizzle-zod";
+import { createInsertSchema, createSelectSchema, createUpdateSchema } from "drizzle-zod";
 
 export const pointTags = pgTable("point_tags", {
   id: cuid2("id").defaultRandom().primaryKey(),
@@ -14,7 +14,10 @@ export const pointTags = pgTable("point_tags", {
 });
 
 export type PointTags = InferSelectModel<typeof pointTags>;
+
+export const pointTagsInsertSchema = createInsertSchema(pointTags);
 export const pointTagsSelectSchema = createSelectSchema(pointTags);
+export const pointTagsUpdateSchema = createUpdateSchema(pointTags);
 
 export const pointTagsRelations = relations(pointTags, ({ many }) => ({
   points: many(pointsToTags),

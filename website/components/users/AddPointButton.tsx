@@ -27,6 +27,7 @@ import {
   CommandItem,
   CommandList,
 } from "../ui/Command";
+import { $fetch } from "@/lib/betterFetch";
 
 const formSchema = z.object({
   name: z.string().refine((name) => name.replaceAll(" ", "").length > 0, {
@@ -57,16 +58,15 @@ const AddPointButton = ({ availableTags, userLogin }: AddPointButtonProps) => {
     onSubmit: async ({ value }) => {
       if (loading) return;
       setLoading(true);
-      const res = await fetch(`/api/users/${userLogin}/points`, {
-        method: "POST",
-        body: JSON.stringify({ ...value, amount: parseInt(value.amount) }),
+
+      const { error } = await $fetch("@put/api/users/:id/points", {
+        params: { id: userLogin },
+        body: { ...value, amount: parseInt(value.amount) },
       });
+
       setLoading(false);
 
-      const json = await res.json();
-      if (res.status !== 200 || json.error) {
-        throw new Error("Error while adding the points");
-      }
+      if (error) throw new Error(error.message);
 
       window.location.reload();
     },

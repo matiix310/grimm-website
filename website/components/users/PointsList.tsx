@@ -6,35 +6,34 @@ import { Button } from "../ui/Button";
 import { X } from "lucide-react";
 import { InferQueryModel } from "@/db";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/Tooltip";
+import { $fetch } from "@/lib/betterFetch";
 
 type PointsListProps = {
-  points: InferQueryModel<"points", { tags: { with: { tag: true } } }>[];
-  isAdmin: boolean;
+  defaultPoints: InferQueryModel<"points", { tags: { with: { tag: true } } }>[];
+  canDeletePoints: boolean;
   userLogin: string;
 } & React.ComponentProps<"div">;
 
 const PointsList = ({
-  points,
-  isAdmin,
+  defaultPoints,
+  canDeletePoints,
   userLogin,
   className,
   ...rest
 }: PointsListProps) => {
+  const [points, setPoints] = React.useState(defaultPoints);
+
   const handlePointRemoval = async (pointId: string) => {
-    const res = await fetch(`/api/users/${userLogin}/points`, {
-      body: JSON.stringify({
+    const { data, error } = await $fetch("@delete/api/users/:id/points", {
+      params: { id: userLogin },
+      body: {
         id: pointId,
-      }),
-      method: "DELETE",
+      },
     });
 
-    const data = await res.json();
+    if (error) throw new Error(error.message);
 
-    if (res.status !== 200 || data.error) {
-      throw new Error("Error removing the points");
-    }
-
-    window.location.reload();
+    setPoints((old) => old.filter((p) => p.id !== data.id));
   };
 
   return (
@@ -44,7 +43,7 @@ const PointsList = ({
           key={p.id}
           className="relative w-full h-25 border-secondary border-3 rounded-3xl flex items-center justify-between"
         >
-          {isAdmin && (
+          {canDeletePoints && (
             <Button
               className="absolute top-0 right-0 translate-x-[30%] -translate-y-[30%]"
               size="icon"
