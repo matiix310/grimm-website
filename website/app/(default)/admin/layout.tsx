@@ -15,6 +15,7 @@ const AdminLayout = ({
             { name: "Évenements", path: "/admin/events" },
             { name: "Actualités", path: "/admin/news" },
             { name: "Utilisateurs", path: "/admin/users" },
+            { name: "Codes", path: "/admin/codes" },
           ]}
         />
       </div>
