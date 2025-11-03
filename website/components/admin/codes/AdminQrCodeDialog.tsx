@@ -5,20 +5,25 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/Dialog";
+import { RedeemCodes } from "@/db/schema/redeemCodes";
 import React from "react";
 import QRCode from "react-qr-code";
 
 type AdminQrCodeDialogProps = {
-  name?: string;
-  link?: string;
+  code?: RedeemCodes;
 } & React.ComponentProps<typeof Dialog>;
 
-const AdminQrCodeDialog = ({ name, link, ...rest }: AdminQrCodeDialogProps) => {
+const AdminQrCodeDialog = ({ code, ...rest }: AdminQrCodeDialogProps) => {
+  const link = React.useMemo(
+    () => (code ? `${window.location.origin}/redeem/${code.code}` : undefined),
+    [code]
+  );
+
   return (
     <Dialog {...rest}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{name ?? "QrCode"}</DialogTitle>
+          <DialogTitle>{code?.name ?? "QrCode"}</DialogTitle>
           <DialogDescription>Lien original: {link ?? "Chargements..."}</DialogDescription>
         </DialogHeader>
         {link && (

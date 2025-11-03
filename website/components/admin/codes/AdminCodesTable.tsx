@@ -42,7 +42,7 @@ type AdminCodesTableProps = {
 
 const AdminCodesTable = ({ codes, onRemoveCode, onUpdateCode }: AdminCodesTableProps) => {
   const [editValues, setEditValues] = React.useState<RedeemCodes>();
-  const [shownLink, setShownLink] = React.useState<string>();
+  const [shownCode, setShownCode] = React.useState<RedeemCodes>();
 
   const columnHelper = createColumnHelper<RedeemCodes>();
   const columns: ColumnDef<RedeemCodes>[] = [
@@ -76,7 +76,7 @@ const AdminCodesTable = ({ codes, onRemoveCode, onUpdateCode }: AdminCodesTableP
         const code = row.row.original;
 
         const handleShow = () => {
-          setShownLink(`${window.location.origin}/redeem/${code.code}`);
+          setShownCode(code);
         };
 
         const handleEdit = async () => {
@@ -133,11 +133,11 @@ const AdminCodesTable = ({ codes, onRemoveCode, onUpdateCode }: AdminCodesTableP
   return (
     <>
       <AdminQrCodeDialog
-        open={!!shownLink}
+        open={!!shownCode}
         onOpenChange={(open) => {
-          if (!open) setShownLink(undefined);
+          if (!open) setShownCode(undefined);
         }}
-        link={shownLink}
+        code={shownCode}
       />
       <AdminCodeEditDialog
         open={!!editValues}
