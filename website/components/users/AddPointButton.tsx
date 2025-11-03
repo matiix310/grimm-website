@@ -35,7 +35,7 @@ const formSchema = z.object({
   }),
   amount: z
     .string()
-    .regex(/^[0-9]+$/, { error: "Dois être de la forme: /^[0-9]+$/" })
+    .regex(/^\-?[0-9]+$/, { error: "Dois être de la forme: /^\\-?[0-9]+$/" })
     .refine((amount) => !isNaN(parseInt(amount)), { error: "Nombre invalide" }),
   tags: z.array(z.string()),
 });
