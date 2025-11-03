@@ -76,7 +76,7 @@ const AdminCodesTable = ({ codes, onRemoveCode, onUpdateCode }: AdminCodesTableP
         const code = row.row.original;
 
         const handleShow = () => {
-          setShownLink(`${window.location.host}/redeem/${code.code}`);
+          setShownLink(`${window.location.origin}/redeem/${code.code}`);
         };
 
         const handleEdit = async () => {
@@ -84,7 +84,7 @@ const AdminCodesTable = ({ codes, onRemoveCode, onUpdateCode }: AdminCodesTableP
         };
 
         const handleCopy = () => {
-          navigator.clipboard.writeText(`${window.location.host}/redeem/${code.code}`);
+          navigator.clipboard.writeText(`${window.location.origin}/redeem/${code.code}`);
         };
 
         const handleDelete = async () => {
