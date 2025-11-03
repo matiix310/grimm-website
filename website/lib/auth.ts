@@ -44,6 +44,7 @@ export const auth = betterAuth({
           clientSecret: process.env.FORGE_ID_CLIENT_SECRET!,
           discoveryUrl: "https://cri.epita.fr/.well-known/openid-configuration",
           scopes: ["openid", "profile"],
+          redirectURI: process.env.BASE_URL! + "/api/auth/oauth2/callback/forge-id",
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           mapProfileToUser: (profile) => {
