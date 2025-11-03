@@ -4,15 +4,19 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { authClient } from "@/lib/authClient";
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
+import { use } from "react";
 
-const LoginPage = () => {
-  const searchParams = useSearchParams();
+const LoginPage = ({
+  searchParams,
+}: {
+  searchParams: Promise<{ redirect?: string }>;
+}) => {
+  const params = use(searchParams);
 
   const handleForgeIdClick = async () => {
     const { error } = await authClient.signIn.oauth2({
       providerId: "forge-id",
-      callbackURL: searchParams.get("redirect") ?? "/",
+      callbackURL: params.redirect ?? "/",
       errorCallbackURL: "/",
       newUserCallbackURL: "/",
       disableRedirect: false,
