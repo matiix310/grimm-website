@@ -29,6 +29,7 @@ export const auth = betterAuth({
       },
     },
   },
+  trustedOrigins: ["https://liste.bde-grimm.com", "https://bde-grimm.com"],
   plugins: [
     adminPlugin({
       ac,
