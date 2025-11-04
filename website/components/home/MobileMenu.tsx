@@ -26,7 +26,7 @@ const MobileMenu = ({ buttons }: MobileMenuProps) => {
       {open && (
         <div className="fixed top-25 left-0 h-screen w-screen z-10 bg-background flex flex-col">
           {buttons.map((button) => (
-            <Link key={button.link} href={button.link}>
+            <Link key={button.link} href={button.link} onClick={() => setOpen(false)}>
               <Button
                 size="lg"
                 variant={button.variant}

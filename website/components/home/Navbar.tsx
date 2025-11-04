@@ -36,7 +36,10 @@ const Navbar = async ({ className, ...rest }: NavbarProps) => {
 
   return (
     <div
-      className={cn("flex items-center justify-between h-25 px-5 lg:px-8", className)}
+      className={cn(
+        "flex items-center justify-between h-25 min-h-25 px-5 lg:px-8",
+        className
+      )}
       {...rest}
     >
       <Link href="/">
