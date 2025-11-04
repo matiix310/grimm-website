@@ -27,7 +27,7 @@ const BestPlayers = ({ players, className, ...rest }: BestPlayersProps) => {
   return (
     <div
       className={cn(
-        "lg:flex-1 flex flex-col justify-center gap-1 my-2 lg:gap-3",
+        "lg:flex-1 flex flex-col justify-center gap-1 my-4 lg:gap-3",
         className
       )}
       {...rest}
