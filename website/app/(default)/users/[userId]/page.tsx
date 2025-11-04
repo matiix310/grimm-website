@@ -45,26 +45,26 @@ const UserPage = async ({ params }: PageProps<"/users/[userId]">) => {
   const availableTags = canAddPoints ? await db.query.pointTags.findMany() : [];
 
   return (
-    <div className="flex gap-30 mt-10 mx-30">
-      <div className="relative w-100 h-fit">
+    <div className="flex flex-col lg:flex-row gap-2 lg:gap-30 mt-2 lg:mt-0 mx-5 lg:mx-30 items-center">
+      <div className="relative w-[70vw] lg:w-100 h-fit">
         <svg className="w-full aspect-square">
           <circle cx="50%" cy="50%" r="50%" fill="#FEF3DA" />
         </svg>
         {user.image && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            className="absolute right-5 top-[50%] -translate-y-[50%] rounded-full w-[80%]"
+            className="absolute right-3 lg:right-5 top-[50%] -translate-y-[50%] rounded-full w-[80%]"
             alt="Image de profil"
             src={user.image}
           />
         )}
       </div>
-      <div className="flex-1">
-        <div className="flex flex-col gap-10">
+      <div className="flex-1 w-full">
+        <div className="flex flex-col gap-5 lg:gap-10">
           <div className="flex flex-col gap-2">
-            <h1 className="font-paytone text-7xl">{user.name}</h1>
-            <div className="flex gap-5">
-              <p className="font-paytone text-3xl">
+            <h1 className="font-paytone text-4xl lg:text-7xl">{user.name}</h1>
+            <div className="flex gap-2 lg:gap-5">
+              <p className="font-paytone text-xl lg:text-3xl">
                 {points.reduce((sum, point) => sum + point.amount, 0)} points
               </p>
               {canAddPoints && (
