@@ -9,7 +9,7 @@ import { FullPagination } from "../ui/FullPagination";
 import { $fetch } from "@/lib/betterFetch";
 import * as motion from "motion/react-client";
 
-const defaultOffset = 0;
+const defaultOffset = 3;
 const playerPerPage = 10;
 
 type RankingProps = {} & React.ComponentProps<"div">;
