@@ -37,7 +37,7 @@ const BestPlayers = ({ players, className, ...rest }: BestPlayersProps) => {
         <Link key={player.user.login} href={`/users/${player.user.login}`}>
           <div
             className={cn(
-              "flex w-full font-paytone text-3xl lg:text-5xl items-center rounded-lg transition-colors duration-300 ease-in-out lg:p-2 hover:bg-accent",
+              "flex w-full font-paytone text-2xl lg:text-5xl items-center rounded-lg transition-colors duration-300 ease-in-out lg:p-2 hover:bg-accent",
               player.rank === 1
                 ? "text-primary"
                 : player.rank === 2
@@ -47,9 +47,9 @@ const BestPlayers = ({ players, className, ...rest }: BestPlayersProps) => {
                 : "text-foreground"
             )}
           >
-            <p className="w-10 lg:w-20 text-4xl lg:text-6xl">{player.rank}.</p>
+            <p className="w-10 lg:w-20 text-3xl lg:text-6xl">{player.rank}.</p>
             <p className="flex-1">{player.user.name}</p>
-            <p className="text-4xl lg:text-6xl">{player.points}</p>
+            <p className="text-3xl lg:text-6xl">{player.points}</p>
           </div>
         </Link>
       ))}
