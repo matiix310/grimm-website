@@ -5,6 +5,13 @@ import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { User } from "lucide-react";
+import { MobileMenu } from "./MobileMenu";
+
+export type MenuButton = {
+  name: string;
+  variant: "primary" | "secondary" | "destructive";
+  link: string;
+};
 
 type NavbarProps = {} & React.ComponentProps<"div">;
 
@@ -13,9 +20,23 @@ const Navbar = async ({ className, ...rest }: NavbarProps) => {
     headers: await headers(),
   });
 
+  const buttons: MenuButton[] = [
+    {
+      name: "Le Classement",
+      variant: "secondary",
+      link: "/ranking",
+    },
+    ...(session
+      ? ([
+          { name: session.user.name, variant: "primary", link: "/users/me" },
+          { name: "Se Deconnecter", variant: "destructive", link: "/logout" },
+        ] as const)
+      : ([{ name: "Se Connecter", variant: "primary", link: "/login" }] as const)),
+  ];
+
   return (
     <div
-      className={cn("flex items-center justify-between py-4 px-8", className)}
+      className={cn("flex items-center justify-between h-25 px-8", className)}
       {...rest}
     >
       <Link href="/">
@@ -28,8 +49,8 @@ const Navbar = async ({ className, ...rest }: NavbarProps) => {
           priority
         />
       </Link>
-      <div className="flex gap-5">
-        <Link href="/#bureau">
+      <div className="gap-5 hidden lg:flex">
+        {/* <Link href="/#bureau">
           <Button size="lg" variant="secondary">
             Le Bureau
           </Button>
@@ -38,33 +59,17 @@ const Navbar = async ({ className, ...rest }: NavbarProps) => {
           <Button size="lg" variant="secondary">
             Les Events
           </Button>
-        </Link>
-        <Link href="/ranking">
-          <Button size="lg" variant="secondary">
-            Le Classement
-          </Button>
-        </Link>
-        {session ? (
-          <>
-            <Link href="/users/me">
-              <Button size="lg" variant="primary">
-                <User />
-                {session.user.name}
-              </Button>
-            </Link>
-            <Link href="/logout">
-              <Button size="lg" variant="destructive">
-                Se Deconnecter
-              </Button>
-            </Link>
-          </>
-        ) : (
-          <Link href="/login">
-            <Button size="lg" variant="primary">
-              Se Connecter
+        </Link> */}
+        {buttons.map((button) => (
+          <Link key={button.link} href={button.link}>
+            <Button size="lg" variant={button.variant}>
+              {button.name}
             </Button>
           </Link>
-        )}
+        ))}
+      </div>
+      <div className="inline lg:hidden">
+        <MobileMenu buttons={buttons} />
       </div>
     </div>
   );

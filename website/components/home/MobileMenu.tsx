@@ -1,0 +1,45 @@
+"use client";
+
+import { Menu, X } from "lucide-react";
+import { Button } from "../ui/Button";
+import React from "react";
+import { MenuButton } from "./Navbar";
+import Link from "next/link";
+
+type MobileMenuProps = {
+  buttons: MenuButton[];
+};
+
+const MobileMenu = ({ buttons }: MobileMenuProps) => {
+  const [open, setOpen] = React.useState(false);
+
+  return (
+    <>
+      <Button
+        size="icon"
+        variant="ghost"
+        className="size-15 z-20"
+        onClick={() => setOpen((o) => !o)}
+      >
+        {open ? <X size={40} /> : <Menu size={40} />}
+      </Button>
+      {open && (
+        <div className="fixed top-25 left-0 h-screen w-screen z-10 bg-background flex flex-col">
+          {buttons.map((button) => (
+            <Link key={button.link} href={button.link}>
+              <Button
+                size="lg"
+                variant={button.variant}
+                className="w-full rounded-none text-4xl py-10"
+              >
+                {button.name}
+              </Button>
+            </Link>
+          ))}
+        </div>
+      )}
+    </>
+  );
+};
+
+export { MobileMenu };
