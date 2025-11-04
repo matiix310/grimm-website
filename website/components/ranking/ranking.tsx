@@ -9,7 +9,7 @@ import { FullPagination } from "../ui/FullPagination";
 import { $fetch } from "@/lib/betterFetch";
 import * as motion from "motion/react-client";
 
-const defaultOffset = 3;
+const defaultOffset = 0;
 const playerPerPage = 10;
 
 type RankingProps = {} & React.ComponentProps<"div">;
@@ -74,22 +74,26 @@ const Ranking = ({ className, ...rest }: RankingProps) => {
           <>
             <div className="flex items-center gap-2 absolute top-[50%] left-[50%] -translate-[50%]">
               <SearchX size={20} />
-              <h1>Aucun joueurs (big flop)</h1>
+              <h1>Aucun joueurs (big flop et oli ?)</h1>
             </div>
             <div />
           </>
         ) : (
-          <div className="flex-col gap-0">
+          <div className="flex flex-col flex-1 justify-around">
             {cache[currentPage].map((player, i) => (
-              <Link key={player.user.login} href={`/users/${player.user.login}`}>
+              <Link
+                key={player.user.login}
+                href={`/users/${player.user.login}`}
+                className="flex-1"
+              >
                 <motion.div
-                  className="relative flex w-full font-paytone text-4xl items-center p-1"
+                  className="relative flex w-full font-paytone h-full text-2xl lg:text-4xl items-center lg:p-1"
                   onHoverStart={() => setCurrentHover(i)}
                   onHoverEnd={() => setCurrentHover(undefined)}
                 >
-                  <p className="w-30 text-5xl">{player.rank}.</p>
+                  <p className="w-18 lg:w-30 text-3xl lg:text-5xl">{player.rank}.</p>
                   <p className="flex-1">{player.user.name}</p>
-                  <p className="text-5xl">{player.points}</p>
+                  <p className="text-3xl lg:text-5xl">{player.points}</p>
                   {currentHover === i && (
                     <motion.div
                       layoutId="ranking-bg-button"
@@ -98,6 +102,9 @@ const Ranking = ({ className, ...rest }: RankingProps) => {
                   )}
                 </motion.div>
               </Link>
+            ))}
+            {[...new Array(playerPerPage - cache[currentPage].length).keys()].map((k) => (
+              <div key={k} className="h-full flex-1" />
             ))}
           </div>
         )
@@ -108,7 +115,7 @@ const Ranking = ({ className, ...rest }: RankingProps) => {
         </>
       )}
       <div className="flex justify-between items-center mb-5">
-        <p className="font-archivo">
+        <p className="font-archivo text-sm lg:text-lg">
           {totalPlayers} joueur{totalPlayers > 1 ? "s" : ""}
         </p>
         <FullPagination

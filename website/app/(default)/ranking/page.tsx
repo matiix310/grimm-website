@@ -29,12 +29,12 @@ const RankingPage = async () => {
   });
 
   return (
-    <div className="flex flex-col px-8 size-full">
+    <div className="flex flex-col px-5 lg-px-8 size-full">
       <div className="flex gap-2 items-center">
-        <h1 className="font-paytone text-7xl">Classement</h1>
+        <h1 className="font-paytone text-5xl lg:text-7xl">Classement</h1>
         {canRefresh && <RefreshRankingButton className="mt-2" />}
       </div>
-      <div className="flex gap-20 h-full">
+      <div className="flex flex-col lg:flex-row gap-2 lg:gap-20 h-full">
         <BestPlayers players={bestPlayers} />
         <Ranking className="flex-1" />
       </div>

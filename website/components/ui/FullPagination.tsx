@@ -38,10 +38,15 @@ const FullPagination = ({
             {selectedPage > 1 && (
               <>
                 <PaginationItem>
-                  <PaginationLink onClick={() => onPageChange(0)}>1</PaginationLink>
+                  <PaginationLink
+                    className="text-sm lg:text-lg size-8 lg:size-10"
+                    onClick={() => onPageChange(0)}
+                  >
+                    1
+                  </PaginationLink>
                 </PaginationItem>
 
-                <PaginationItem>
+                <PaginationItem className="hidden lg:inline">
                   <PaginationEllipsis />
                 </PaginationItem>
               </>
@@ -49,19 +54,27 @@ const FullPagination = ({
 
             {selectedPage > 0 && (
               <PaginationItem>
-                <PaginationLink onClick={() => onPageChange(selectedPage - 1)}>
+                <PaginationLink
+                  className="text-sm lg:text-lg size-8 lg:size-10"
+                  onClick={() => onPageChange(selectedPage - 1)}
+                >
                   {selectedPage}
                 </PaginationLink>
               </PaginationItem>
             )}
 
             <PaginationItem>
-              <PaginationLink isActive>{selectedPage + 1}</PaginationLink>
+              <PaginationLink className="text-sm lg:text-lg size-8 lg:size-10" isActive>
+                {selectedPage + 1}
+              </PaginationLink>
             </PaginationItem>
 
             {selectedPage + 1 < totalPages && (
               <PaginationItem>
-                <PaginationLink onClick={() => onPageChange(selectedPage + 1)}>
+                <PaginationLink
+                  className="text-sm lg:text-lg size-8 lg:size-10"
+                  onClick={() => onPageChange(selectedPage + 1)}
+                >
                   {selectedPage + 2}
                 </PaginationLink>
               </PaginationItem>
@@ -69,12 +82,15 @@ const FullPagination = ({
 
             {selectedPage < totalPages - 2 && (
               <>
-                <PaginationItem>
+                <PaginationItem className="hidden lg:inline">
                   <PaginationEllipsis />
                 </PaginationItem>
 
                 <PaginationItem>
-                  <PaginationLink onClick={() => onPageChange(totalPages - 1)}>
+                  <PaginationLink
+                    className="text-sm lg:text-lg size-8 lg:size-10"
+                    onClick={() => onPageChange(totalPages - 1)}
+                  >
                     {totalPages}
                   </PaginationLink>
                 </PaginationItem>
@@ -90,6 +106,7 @@ const FullPagination = ({
         )}
         <PaginationItem>
           <PaginationNext
+            className=""
             content="Suivant"
             onClick={() =>
               onPageChange(Math.min(Math.max(totalPages - 1, 0), selectedPage + 1))
