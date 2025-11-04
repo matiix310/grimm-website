@@ -58,7 +58,7 @@ const PointsList = ({
             {p.amount}
           </p>
           <div className="w-full flex flex-col gap-2">
-            <p className="font-paytone text-lg lg:text-3xl">{p.name}</p>
+            <p className="font-paytone text-lg lg:text-3xl leading-none">{p.name}</p>
             {p.tags.length > 0 && (
               <div className="flex gap-2">
                 {p.tags.map((tag) => (

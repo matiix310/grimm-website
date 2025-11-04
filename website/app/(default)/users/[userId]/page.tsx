@@ -45,7 +45,7 @@ const UserPage = async ({ params }: PageProps<"/users/[userId]">) => {
   const availableTags = canAddPoints ? await db.query.pointTags.findMany() : [];
 
   return (
-    <div className="flex flex-col lg:flex-row gap-2 lg:gap-30 mt-2 lg:mt-0 mx-5 lg:mx-30 items-center">
+    <div className="flex flex-col lg:flex-row gap-2 lg:gap-30 mt-2 lg:mt-5 mx-5 lg:mx-30 items-center">
       <div className="relative w-[70vw] lg:w-100 h-fit">
         <svg className="w-full aspect-square">
           <circle cx="50%" cy="50%" r="50%" fill="#FEF3DA" />
