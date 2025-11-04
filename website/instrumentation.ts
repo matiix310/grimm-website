@@ -10,6 +10,7 @@ export async function register() {
     "baptiste.durringer",
     "simon1.meloni",
     "arthur.gallier",
+    "nicolas.naegelen",
     "baptiste.cormorant",
   ];
   await db.update(user).set({ role: "admin" }).where(inArray(user.login, admins));
