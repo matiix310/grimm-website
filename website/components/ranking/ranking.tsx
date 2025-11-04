@@ -9,7 +9,7 @@ import { FullPagination } from "../ui/FullPagination";
 import { $fetch } from "@/lib/betterFetch";
 import * as motion from "motion/react-client";
 
-const defaultOffset = 0;
+const defaultOffset = 3;
 const playerPerPage = 10;
 
 type RankingProps = {} & React.ComponentProps<"div">;
@@ -92,7 +92,7 @@ const Ranking = ({ className, ...rest }: RankingProps) => {
                   onHoverEnd={() => setCurrentHover(undefined)}
                 >
                   <p className="w-14 lg:w-30 text-2xl lg:text-5xl">{player.rank}.</p>
-                  <p className="flex-1">{player.user.name}</p>
+                  <p className="flex-1 leading-none">{player.user.name}</p>
                   <p className="text-2xl lg:text-5xl">{player.points}</p>
                   {currentHover === i && (
                     <motion.div

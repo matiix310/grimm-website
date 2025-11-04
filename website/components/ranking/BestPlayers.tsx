@@ -4,7 +4,6 @@ import type { InferQueryModel } from "@/db";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import React from "react";
-import * as motion from "motion/react-client";
 
 type BestPlayersProps = {
   players: InferQueryModel<
@@ -48,7 +47,7 @@ const BestPlayers = ({ players, className, ...rest }: BestPlayersProps) => {
             )}
           >
             <p className="w-10 lg:w-20 text-3xl lg:text-6xl">{player.rank}.</p>
-            <p className="flex-1">{player.user.name}</p>
+            <p className="flex-1 leading-none">{player.user.name}</p>
             <p className="text-3xl lg:text-6xl">{player.points}</p>
           </div>
         </Link>
