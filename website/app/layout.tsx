@@ -21,10 +21,10 @@ const paytonOne = Paytone_One({
 
 export const metadata: Metadata = {
   title: "Liste BDE Grimm",
-  description: "Le site web du BDE GRIMM.",
+  description: "Le site web de la liste BDE Grimm.",
   openGraph: {
     title: "Liste BDE Grimm",
-    description: "Le site web du BDE GRIMM.",
+    description: "Le site web de la liste BDE Grimm.",
     type: "website",
     images: "https://bde-grimm.com/grimm-logo-round.png",
   },

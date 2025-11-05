@@ -4,7 +4,6 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { User } from "lucide-react";
 import { MobileMenu } from "./MobileMenu";
 
 export type MenuButton = {
@@ -20,7 +19,28 @@ const Navbar = async ({ className, ...rest }: NavbarProps) => {
     headers: await headers(),
   });
 
+  const isAdmin = session?.user.role === "admin";
+
   const buttons: MenuButton[] = [
+    ...(isAdmin
+      ? [
+          {
+            name: "Admin",
+            variant: "secondary",
+            link: "/admin",
+          } as const,
+        ]
+      : []),
+    {
+      name: "Les Events",
+      variant: "secondary",
+      link: "/#events",
+    },
+    {
+      name: "Le Bureau",
+      variant: "secondary",
+      link: "/#bureau",
+    },
     {
       name: "Le Classement",
       variant: "secondary",
@@ -37,35 +57,29 @@ const Navbar = async ({ className, ...rest }: NavbarProps) => {
   return (
     <div
       className={cn(
-        "flex items-center justify-between h-25 min-h-25 px-5 lg:px-8",
+        "flex items-center justify-between h-25 min-h-25 px-5 lg:px-8 bg-pink",
         className
       )}
       {...rest}
     >
-      <Link href="/">
+      <Link href="/" className="h-[60%]">
         <Image
-          className="h-[80%] w-auto cursor-pointer"
+          className="cursor-pointer h-full w-auto"
           src="/grimm.svg"
           alt="Logo Grimm Texte"
-          width={100}
-          height={100}
+          width={1000}
+          height={1000}
           priority
         />
       </Link>
       <div className="gap-5 hidden lg:flex">
-        {/* <Link href="/#bureau">
-          <Button size="lg" variant="secondary">
-            Le Bureau
-          </Button>
-        </Link>
-        <Link href="/#events">
-          <Button size="lg" variant="secondary">
-            Les Events
-          </Button>
-        </Link> */}
         {buttons.map((button) => (
           <Link key={button.link} href={button.link}>
-            <Button size="lg" variant={button.variant}>
+            <Button
+              size="default"
+              variant={button.variant}
+              className="border-3 border-background"
+            >
               {button.name}
             </Button>
           </Link>
