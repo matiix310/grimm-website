@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Overpass, Archivo_Narrow, Paytone_One } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/Sonner";
@@ -20,8 +20,18 @@ const paytonOne = Paytone_One({
 });
 
 export const metadata: Metadata = {
-  title: "BDE GRIMM",
+  title: "Liste BDE Grimm",
   description: "Le site web du BDE GRIMM.",
+  openGraph: {
+    title: "Liste BDE Grimm",
+    description: "Le site web du BDE GRIMM.",
+    type: "website",
+    images: "https://bde-grimm.com/grimm-logo-round.png",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#D55F30",
 };
 
 export default function RootLayout({
