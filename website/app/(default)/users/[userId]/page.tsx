@@ -45,10 +45,10 @@ const UserPage = async ({ params }: PageProps<"/users/[userId]">) => {
   const availableTags = canAddPoints ? await db.query.pointTags.findMany() : [];
 
   return (
-    <div className="flex flex-col lg:flex-row gap-2 lg:gap-30 mt-2 lg:mt-5 mx-5 lg:mx-30 items-center">
-      <div className="relative w-[70vw] lg:w-100 h-fit">
+    <div className="flex flex-col lg:flex-row gap-2 lg:gap-30 mt-2 lg:mt-5 mx-5 lg:mx-30 items-center h-full">
+      <div className="relative w-[70vw] lg:w-100 lg:-mt-30 h-fit">
         <svg className="w-full aspect-square">
-          <circle cx="50%" cy="50%" r="50%" fill="#FEF3DA" />
+          <circle cx="50%" cy="50%" r="50%" fill="var(--primary)" />
         </svg>
         {user.image && (
           // eslint-disable-next-line @next/next/no-img-element
@@ -59,7 +59,7 @@ const UserPage = async ({ params }: PageProps<"/users/[userId]">) => {
           />
         )}
       </div>
-      <div className="flex-1 w-full">
+      <div className="flex-1 w-full flex flex-col h-full">
         <div className="flex flex-col gap-5 lg:gap-10">
           <div className="flex flex-col gap-2">
             <h1 className="font-paytone text-4xl lg:text-7xl">{user.name}</h1>
@@ -76,6 +76,7 @@ const UserPage = async ({ params }: PageProps<"/users/[userId]">) => {
             defaultPoints={points}
             canDeletePoints={canDeletePoints}
             userLogin={user.login}
+            className="flex-1 h-full"
           />
         </div>
       </div>

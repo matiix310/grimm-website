@@ -111,8 +111,8 @@ const AdminApiKeyCreateButton = ({ onNewApiKey }: AdminApiKeyCreateButtonProps) 
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Creer un token</DialogTitle>
-          <DialogDescription>Le nom du token doit être explicite</DialogDescription>
+          <DialogTitle>Créer une clé API</DialogTitle>
+          <DialogDescription>Le nom de la clé API doit être explicite</DialogDescription>
         </DialogHeader>
         <form
           id="create-token-form"
@@ -225,7 +225,7 @@ const AdminApiKeyCreateButton = ({ onNewApiKey }: AdminApiKeyCreateButtonProps) 
                 return (
                   <Field>
                     <FieldLabel htmlFor={field.name}>Permissions</FieldLabel>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       {Object.keys(field.state.value).length === 0 && (
                         <p>Aucune permission séléctionée</p>
                       )}
@@ -233,9 +233,11 @@ const AdminApiKeyCreateButton = ({ onNewApiKey }: AdminApiKeyCreateButtonProps) 
                         v.map((v) => {
                           const permissionName = `${k}/${v}`;
                           return (
-                            <p
+                            <Button
+                              variant="secondary"
+                              size="sm"
                               key={permissionName}
-                              className="rounded-full px-2 py-0.5 cursor-pointer border-2 border-transparent hover:border-background"
+                              className="hover:bg-red hover:text-red-foreground"
                               onClick={() =>
                                 field.handleChange((old) => {
                                   const copy = Object.fromEntries(
@@ -253,7 +255,7 @@ const AdminApiKeyCreateButton = ({ onNewApiKey }: AdminApiKeyCreateButtonProps) 
                               }
                             >
                               {permissionName}
-                            </p>
+                            </Button>
                           );
                         })
                       )}
