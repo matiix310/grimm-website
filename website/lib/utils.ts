@@ -1,18 +1,17 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import z, { ZodDate, ZodIntersection, ZodObject } from "zod";
+import z from "zod";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export const fixApiDate = <
-  T extends ZodObject<{ updatedAt: ZodDate; createdAt: ZodDate }>
->(
-  zodeObject: T
+export const fixApiDate = <T extends z.ZodObject>(
+  zodeObject: T,
+  keys = ["createdAt", "updatedAt"]
 ) =>
   zodeObject
-    .omit({ updatedAt: true, createdAt: true })
+    .omit(Object.fromEntries(keys.map((k) => [k, true])))
     .and(
-      z.object({ updatedAt: z.coerce.date(), createdAt: z.coerce.date() })
+      z.object(Object.fromEntries(keys.map((k) => [k, z.coerce.date(k)])))
     ) as unknown as T;

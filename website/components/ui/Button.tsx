@@ -17,6 +17,7 @@ const buttonVariants = cva(
           "bg-transparent text-foreground hover:bg-accent/90 disabled:hover:bg-accent",
         outline:
           "bg-background text-foreground border-1 border-secondary hover:bg-accent/90 disabled:hover:bg-accent", // TODO
+        link: "",
       },
       size: {
         lg: "px-9 py-5 text-xl",

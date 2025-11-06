@@ -21,6 +21,7 @@ export const statement = {
   grimmUser: ["update"],
   points: ["add", "delete"],
   news: ["create", "delete", "update"],
+  events: ["create", "delete", "update"],
   "api-keys": ["create"],
   ranking: ["force-refresh"],
   minecraft: ["manage-link"],
@@ -33,10 +34,12 @@ export type Permissions = {
   -readonly [statement in keyof FullPermissions]?: FullPermissions[statement][number][];
 };
 
+// Only these permissions are allowed in an api key
 export const apiSafeStatement: Permissions = {
   user: ["update"],
   points: ["add", "delete"],
   news: ["create", "delete", "update"],
+  events: ["create", "delete", "update"],
   ranking: ["force-refresh"],
   minecraft: ["manage-link"],
   codes: ["list", "create", "delete", "update"],
