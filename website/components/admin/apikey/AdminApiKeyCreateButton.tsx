@@ -96,9 +96,9 @@ const AdminApiKeyCreateButton = ({ onNewApiKey }: AdminApiKeyCreateButtonProps) 
   React.useEffect(() => {
     setTime(Date.now());
 
-    setInterval(() => {
-      setTime(Date.now());
-    }, 1000);
+    // setInterval(() => {
+    //   setTime(Date.now());
+    // }, 1000);
   }, [form]);
 
   return (
