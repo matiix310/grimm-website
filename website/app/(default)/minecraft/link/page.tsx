@@ -12,7 +12,13 @@ const MinecraftLinkPage = async (props: PageProps<"/minecraft/link">) => {
     headers: await headers(),
   });
 
-  if (!user) return redirect("/login");
+  const query = await props.searchParams;
+  const username = query["username"];
+
+  if (!user)
+    return redirect(
+      "/login?redirect=/minecraft/link" + (username ? "?username=" + username : "")
+    );
 
   // check if the user is already linked with another account
   const dbUser = await db.query.minecraftUsernames.findFirst({
@@ -20,9 +26,6 @@ const MinecraftLinkPage = async (props: PageProps<"/minecraft/link">) => {
   });
 
   if (dbUser) return redirect("/");
-
-  const query = await props.searchParams;
-  const username = query["username"];
 
   // TODO: error page?
   if (username === undefined || typeof username !== "string") return redirect("/");

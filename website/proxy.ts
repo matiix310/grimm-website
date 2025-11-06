@@ -8,7 +8,9 @@ export async function proxy(request: NextRequest) {
   });
 
   if (!session) {
-    return NextResponse.redirect(new URL("/login", request.url));
+    return NextResponse.redirect(
+      new URL("/login?redirect=" + request.nextUrl.pathname, request.url)
+    );
   }
 
   // To access "/admin" you must have "admin" role
