@@ -25,6 +25,8 @@
     "drizzle-cuid2": "^2.1.0",
     "drizzle-orm": "^0.44.7",
     "drizzle-zod": "^0.8.3",
+    "embla-carousel-autoplay": "^8.6.0",
+    "embla-carousel-react": "^8.6.0",
     "lucide-react": "^0.548.0",
     "motion": "^12.23.24",
     "next": "16.0.0",

@@ -3,9 +3,10 @@ import { Button } from "@/components/ui/Button";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { db } from "@/db";
 import { events as eventsSchema } from "@/db/schema/events";
-import { desc, gt } from "drizzle-orm";
+import { desc } from "drizzle-orm";
 import Image from "next/image";
 import { connection } from "next/server";
+import { BureauCarousel } from "@/components/home/BureauCarousel";
 
 const Home = async () => {
   // prevent nextjs from prerendering this page
@@ -23,39 +24,41 @@ const Home = async () => {
   return (
     <div>
       <Navbar className="fixed top-0 left-0 w-full z-10" />
-      <section className="relative w-screen h-110 mt-25 bg-pink">
-        <div className="flex flex-col gap-10 text-pink-foreground w-[60%] px-15 h-full justify-center">
-          <h1 className="font-paytone text-7xl">
+      <section className="relative w-screen lg:h-110 mt-25 lg:bg-pink flex flex-col items-center lg:block">
+        <div className="relative lg:absolute top-0 lg:right-20 h-auto lg:h-130 w-[80%] lg:w-130 bg-blue p-10 pb-12 rounded-b-full outline-10 outline-black/10">
+          <div className="h-full aspect-square">
+            <Image
+              className="size-full p-4 lg:p-8 ml-2.5 lg:ml-4"
+              alt="on vous veut!"
+              src="/on-vous-veut.svg"
+              fill={true}
+              objectPosition="center"
+              objectFit="contain"
+            />
+          </div>
+        </div>
+        <div className="flex flex-col gap-5 lg:gap-10 text-foreground lg:text-pink-foreground lg:w-[60%] mt-8 lg:mt-0 px-5 lg:px-15 h-full justify-center text-center lg:text-start">
+          <h1 className="font-paytone text-3xl lg:text-7xl">
             Votez votre nouveau BDE! Votez GRIMM !!
           </h1>
-          <p className="text-3xl">
+          <p className="text-xl lg:text-3xl">
             La campagne BDE est officiellement ouverte ! Du 10 novembre au 15 novembre,
             rendez-vous sur les sites de Villejuif et Kremlin-Bicêtre pour participer aux
             évévenements organisés par les listes pour le BDE de l’année 2025-2026 !
           </p>
         </div>
-        <div className="absolute top-0 right-20 h-[130%] bg-blue p-10 pb-12 rounded-b-full outline-10 outline-black/10">
-          <Image
-            className="size-full ml-4"
-            alt="on vous veut!"
-            src="/on-vous-veut.svg"
-            width={1000}
-            height={1000}
-          />
-        </div>
       </section>
-      <section id="events" className="w-screen pt-30 flex flex-col px-20">
+      <section
+        id="events"
+        className="w-screen pt-28 -mt-15 lg:mt-0 flex flex-col px-5 lg:px-20"
+      >
         <div className="flex gap-2 items-center">
-          <Image
-            className="w-15"
-            alt="étoile"
-            src="/star.svg"
-            height={1000}
-            width={1000}
-          />
-          <h1 className="font-paytone text-7xl">Les Events</h1>
+          <div className="relative w-10 h-15 lg:w-20 lg:h-25">
+            <Image alt="étoile" src="/star.svg" fill={true} objectPosition="center" />
+          </div>
+          <h1 className="font-paytone text-3xl lg:text-7xl">Les Events</h1>
         </div>
-        <div className="grid grid-cols-3 gap-10 mt-10">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 lg:gap-10 mt-5 lg:mt-10">
           {events.map((event) => (
             <div
               key={event.id}
@@ -76,29 +79,31 @@ const Home = async () => {
                 <span className="text-2xl">{event.date.toLocaleTimeString()}</span>
               </div>
               <div className="flex flex-col gap-2 items-end absolute bottom-5 right-5 font-paytone z-2">
-                <p className="bg-red text-red-foreground px-5 py-2 rounded-full text-lg">
+                <p className="bg-red text-red-foreground px-5 py-2 rounded-full text-sm lg:text-lg">
                   A venir
                 </p>
-                <p className="bg-secondary text-secondary-foreground px-5 py-2 rounded-full text-lg">
+                <p className="bg-secondary text-secondary-foreground px-5 py-2 rounded-full text-sm lg:text-lg">
                   {event.name}
+                </p>
+                <p className="static lg:hidden bg-secondary text-secondary-foreground px-5 py-2 rounded-full text-sm">
+                  {event.date.toLocaleDateString()} {event.date.toLocaleTimeString()}
                 </p>
               </div>
             </div>
           ))}
         </div>
       </section>
-      <section id="bureau" className="w-screen pt-30 flex flex-col px-20">
+      <section
+        id="bureau"
+        className="w-screen pt-28 -mt-15 lg:mt-0 flex flex-col px-5 lg:px-20"
+      >
         <div className="flex gap-2 items-center">
-          <Image
-            className="w-15"
-            alt="étoile"
-            src="/star.svg"
-            height={1000}
-            width={1000}
-          />
-          <h1 className="font-paytone text-7xl">Le Bureau</h1>
+          <div className="relative w-10 h-15 lg:w-20 lg:h-25">
+            <Image alt="étoile" src="/star.svg" fill={true} objectPosition="center" />
+          </div>
+          <h1 className="font-paytone text-3xl lg:text-7xl">Le Bureau</h1>
         </div>
-        <div className="flex gap-4 w-full mt-10">
+        <div className="hidden lg:flex gap-4 w-full mt-10">
           {bureau.map((b) => (
             <div
               key={b.login}
@@ -123,9 +128,10 @@ const Home = async () => {
             </div>
           ))}
         </div>
+        <BureauCarousel bureau={bureau} />
       </section>
-      <section className="pt-30 w-screen flex flex-col overflow-hidden">
-        <div className="relative w-full h-130 ">
+      <section className="pt-30 w-screen -mt-15 lg:mt-0 flex flex-col overflow-hidden">
+        <div className="relative w-full aspect-[3]">
           <Image
             className="scale-105"
             alt="Loup hurlant à la lune"
@@ -135,8 +141,8 @@ const Home = async () => {
             objectPosition="center"
           />
         </div>
-        <div className="bg-black w-screen h-30 pt-5 px-20 text-background flex items-center justify-between">
-          <div className="flex gap-6">
+        <div className="bg-black w-screen h-30 pt-5 px-5 lg:px-20 text-background flex items-center justify-between">
+          <div className="flex gap-3 lg:gap-6">
             <Button size="icon" variant="link">
               <svg
                 className="transition-colors duration-300 hover:fill-[#FF0069]"

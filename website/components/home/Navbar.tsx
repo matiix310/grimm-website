@@ -62,13 +62,14 @@ const Navbar = async ({ className, ...rest }: NavbarProps) => {
       )}
       {...rest}
     >
-      <Link href="/" className="h-[60%]">
+      <Link href="/" className="relative h-[70%] aspect-[3]">
         <Image
-          className="cursor-pointer h-full w-auto"
+          className="cursor-pointer w-full"
           src="/grimm.svg"
           alt="Logo Grimm Texte"
-          width={1000}
-          height={1000}
+          fill={true}
+          objectPosition="center"
+          objectFit="contain"
           priority
         />
       </Link>
