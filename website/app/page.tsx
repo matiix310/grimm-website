@@ -29,7 +29,7 @@ const Home = async () => {
           </h1>
           <p className="text-3xl">
             La campagne BDE est officiellement ouverte ! Du 10 novembre au 15 novembre,
-            rendez-vous sur les sites de Villejuif et Kremlin-Biceptre pour participer aux
+            rendez-vous sur les sites de Villejuif et Kremlin-Bicêtre pour participer aux
             évévenements organisés par les listes pour le BDE de l’année 2025-2026 !
           </p>
         </div>
