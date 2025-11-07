@@ -23,17 +23,14 @@ const MinecraftAuthorize = async (
     where: eq(minecraftUsernames.userId, session.user.id),
   });
 
-  if (
-    minecraftUsername === undefined ||
-    minecraftUsername.username !== params.minecraftUsername
-  )
-    // TODO: error page
-    return redirect("/");
-
   if (minecraftUsername === undefined)
     return redirect(
       `/minecraft/${params.minecraftUsername}/link?redirect=${authorizeRedirectPath}`
     );
+
+  if (minecraftUsername.username !== params.minecraftUsername)
+    // TODO: error page
+    return redirect("/");
 
   return <MinecraftAuthorizeCard username={minecraftUsername.username} />;
 };
