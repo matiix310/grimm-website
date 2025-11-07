@@ -3,9 +3,10 @@ import { pgTable, text } from "drizzle-orm/pg-core";
 import { timestamps } from "../columns.helper";
 import { user } from "./auth";
 import { createInsertSchema, createSelectSchema, createUpdateSchema } from "drizzle-zod";
+import { minecraftAuthorizations } from "./minecraftAuthorizations";
 
 export const minecraftUsernames = pgTable("minecraft_usernames", {
-  username: text("username").notNull(),
+  username: text("username").notNull().unique(),
   userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" })
@@ -19,9 +20,13 @@ export const minecraftUsernamesInsertSchema = createInsertSchema(minecraftUserna
 export const minecraftUsernamesSelectSchema = createSelectSchema(minecraftUsernames);
 export const minecraftUsernamesUpdateSchema = createUpdateSchema(minecraftUsernames);
 
-export const minecraftUsernamesRelations = relations(minecraftUsernames, ({ one }) => ({
-  tags: one(user, {
-    fields: [minecraftUsernames.userId],
-    references: [user.id],
-  }),
-}));
+export const minecraftUsernamesRelations = relations(
+  minecraftUsernames,
+  ({ one, many }) => ({
+    tags: one(user, {
+      fields: [minecraftUsernames.userId],
+      references: [user.id],
+    }),
+    authorizations: many(minecraftAuthorizations),
+  })
+);

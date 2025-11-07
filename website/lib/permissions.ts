@@ -24,7 +24,7 @@ export const statement = {
   events: ["create", "delete", "update"],
   "api-keys": ["create"],
   ranking: ["force-refresh"],
-  minecraft: ["manage-link"],
+  minecraft: ["manage-link", "check-authorization"],
   codes: ["list", "create", "delete", "update"],
 } as const;
 
@@ -41,7 +41,7 @@ export const apiSafeStatement: Permissions = {
   news: ["create", "delete", "update"],
   events: ["create", "delete", "update"],
   ranking: ["force-refresh"],
-  minecraft: ["manage-link"],
+  minecraft: ["manage-link", "check-authorization"],
   codes: ["list", "create", "delete", "update"],
 };
 

@@ -15,6 +15,7 @@ import * as ranking from "./schema/ranking";
 import * as redeemCodes from "./schema/redeemCodes";
 import * as redeemUsers from "./schema/redeemUsers";
 import * as bureau from "./schema/bureau";
+import * as minecraftAuthorizations from "./schema/minecraftAuthorizations";
 
 if (process.env.DB_URL === undefined)
   throw new Error("Environement variable DB_URL is not defined!");
@@ -30,6 +31,7 @@ const schema = {
   ...redeemCodes,
   ...redeemUsers,
   ...bureau,
+  ...minecraftAuthorizations,
 } as const;
 
 export const db = drizzle(process.env.DB_URL, {
