@@ -19,7 +19,8 @@ const MinecraftAuthorize = async (
     where: eq(minecraftUsernames.userId, session.user.id),
   });
 
-  if (minecraftUsername === undefined) return redirect("/minecraft/link");
+  if (minecraftUsername === undefined)
+    return redirect(`/minecraft/${params.minecraftUsername}/link`);
 
   return <MinecraftAuthorizeCard username={minecraftUsername.username} />;
 };
