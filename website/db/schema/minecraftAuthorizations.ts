@@ -7,7 +7,7 @@ import { minecraftUsernames } from "./minecraftUsernames";
 export const minecraftAuthorizations = pgTable("minecraft_authorizations", {
   username: text("username")
     .notNull()
-    .references(() => minecraftUsernames.username, { onDelete: "no action" }),
+    .references(() => minecraftUsernames.username, { onDelete: "cascade" }),
   used: boolean("used").default(false).notNull(),
   ...timestamps,
 });

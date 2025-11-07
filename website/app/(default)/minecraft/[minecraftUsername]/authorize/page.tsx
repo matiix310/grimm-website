@@ -10,17 +10,23 @@ const MinecraftAuthorize = async (
   props: PageProps<"/minecraft/[minecraftUsername]/authorize">
 ) => {
   const params = await props.params;
+
+  const authorizeRedirectPath = encodeURIComponent(
+    `/minecraft/${params.minecraftUsername}/authorize`
+  );
+
   const session = await auth.api.getSession({ headers: await headers() });
 
-  if (!session)
-    redirect(`/login?redirect=/minecraft/${params.minecraftUsername}/authorize`);
+  if (!session) redirect(`/login?redirect=${authorizeRedirectPath}`);
 
   const minecraftUsername = await db.query.minecraftUsernames.findFirst({
     where: eq(minecraftUsernames.userId, session.user.id),
   });
 
   if (minecraftUsername === undefined)
-    return redirect(`/minecraft/${params.minecraftUsername}/link`);
+    return redirect(
+      `/minecraft/${params.minecraftUsername}/link?redirect=${authorizeRedirectPath}`
+    );
 
   return <MinecraftAuthorizeCard username={minecraftUsername.username} />;
 };

@@ -16,8 +16,11 @@ const MinecraftLinkPage = async (
 
   const params = await props.params;
 
-  if (!user)
-    return redirect(`/login?redirect=/minecraft/${params.minecraftUsername}/link`);
+  const linkRedirectPath = encodeURIComponent(
+    `/minecraft/${params.minecraftUsername}/link`
+  );
+
+  if (!user) return redirect(`/login?redirect=${linkRedirectPath}`);
 
   // check if the user is already linked with another account
   const dbUser = await db.query.minecraftUsernames.findFirst({

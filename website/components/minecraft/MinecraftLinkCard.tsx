@@ -3,7 +3,7 @@
 import React from "react";
 import { Button } from "../ui/Button";
 import { Card } from "../ui/Card";
-import { redirect } from "next/navigation";
+import { redirect, useSearchParams } from "next/navigation";
 import { RefreshCw } from "lucide-react";
 import { $fetch } from "@/lib/betterFetch";
 
@@ -19,6 +19,7 @@ const MinecraftLinkCard = ({
   alreadyLinked = false,
 }: MinecraftLinkCardProps) => {
   const [loading, setLoading] = React.useState(false);
+  const searchParams = useSearchParams();
 
   const handleLinkClick = async () => {
     setLoading(true);
@@ -35,7 +36,7 @@ const MinecraftLinkCard = ({
     if (error) throw new Error(error.message);
 
     // TODO: success page
-    redirect("/");
+    return redirect(searchParams.get("redirect") ?? "/");
   };
 
   return (
