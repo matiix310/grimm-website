@@ -24,6 +24,8 @@
   --muted: #9c9484;
   --on-muted: #655e4f;
   --card: #d0c6b0;
+  --popover: var(--background);
+  --popover-foreground: var(--foreground);
   --radius: 1em;
   --border: var(--secondary);
 }
@@ -53,8 +55,8 @@
   --color-muted-foreground: var(--on-muted);
   --color-destructive: var(--red);
   --color-destructive-doreground: var(--background);
-  --color-popover: var(--card);
-  --color-popover-foreground: var(--foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
   --color-border: var(--border);
   --font-archivo: "Archivo Narrow", "Archivo Narrow Fallback";
   --font-overpass: "Overpass", "Overpass Fallback";

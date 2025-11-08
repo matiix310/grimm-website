@@ -7,7 +7,7 @@ const Card = ({ className, ...rest }: CardProps) => {
   return (
     <div
       className={cn(
-        "bg-secondary flex flex-col gap-10 w-150 rounded-4xl p-10 text-secondary-foreground",
+        "bg-secondary flex flex-col gap-10 w-[90%] lg:w-150 rounded-2xl lg:rounded-4xl p-10 text-secondary-foreground",
         className
       )}
       {...rest}
