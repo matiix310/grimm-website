@@ -18,7 +18,7 @@ import { Input } from "../ui/Input";
 import { PointTags } from "@/db/schema/pointTags";
 import React from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/Popover";
-import { Plus } from "lucide-react";
+import { CheckIcon, ChevronsUpDownIcon, Plus } from "lucide-react";
 import {
   Command,
   CommandEmpty,
@@ -28,6 +28,16 @@ import {
   CommandList,
 } from "../ui/Command";
 import { $fetch } from "@/lib/betterFetch";
+import { cn } from "@/lib/utils";
+
+const presets: (z.infer<typeof formSchema> & { presetName: string })[] = [
+  {
+    presetName: "test",
+    name: "test",
+    amount: "10",
+    tags: [],
+  },
+];
 
 const formSchema = z.object({
   name: z.string().refine((name) => name.replaceAll(" ", "").length > 0, {
@@ -74,6 +84,8 @@ const AddPointButton = ({ availableTags, userLogin }: AddPointButtonProps) => {
 
   const [tagSelectOpen, setTagSelectOpen] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
+  const [presetOpen, setPresetOpen] = React.useState(false);
+  const [presetValue, setPresetValue] = React.useState("Custom");
 
   const tagFromId = React.useCallback(
     (tagId: string) => {
@@ -81,6 +93,16 @@ const AddPointButton = ({ availableTags, userLogin }: AddPointButtonProps) => {
     },
     [availableTags]
   );
+
+  React.useEffect(() => {
+    if (presetValue === "custom") return;
+
+    // apply the preset
+    const preset = presets.find((p) => p.presetName === presetValue)!;
+    form.setFieldValue("name", preset.name);
+    form.setFieldValue("amount", preset.amount);
+    form.setFieldValue("tags", preset.tags);
+  }, [presetValue, form]);
 
   return (
     <Dialog>
@@ -94,6 +116,47 @@ const AddPointButton = ({ availableTags, userLogin }: AddPointButtonProps) => {
             Vous pouvez entrer une valeur négative pour retirer des points
           </DialogDescription>
         </DialogHeader>
+        <Popover open={presetOpen} onOpenChange={setPresetOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              aria-expanded={presetOpen}
+              className="w-[200px] justify-between font-archivo"
+            >
+              {presetValue}
+              <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-[200px] p-0">
+            <Command>
+              <CommandInput placeholder="Chercher un preset..." />
+              <CommandList>
+                <CommandEmpty>Aucun preset trouvé.</CommandEmpty>
+                <CommandGroup>
+                  {[...presets, { presetName: "custom" }].map((preset) => (
+                    <CommandItem
+                      key={preset.presetName}
+                      value={preset.presetName}
+                      onSelect={(currentValue) => {
+                        setPresetValue(currentValue);
+                        setPresetOpen(false);
+                      }}
+                    >
+                      <CheckIcon
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          presetValue === preset.presetName ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                      {preset.presetName}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
         <form
           id="add-points-form"
           onSubmit={(e) => {
