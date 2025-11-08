@@ -22,7 +22,6 @@ type AnswerCardProps = {
 
 const AnswerCard = ({ answerId, answerName }: AnswerCardProps) => {
   const [loading, setLoading] = React.useState(false);
-  const [success, setSuccess] = React.useState(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
 
   const form = useForm({
@@ -57,7 +56,7 @@ const AnswerCard = ({ answerId, answerName }: AnswerCardProps) => {
 
       toast.success("La réponse est correct, les points ont été ajouté à votre compte");
       form.reset();
-      setSuccess(true);
+      window.location.reload();
     },
   });
 
