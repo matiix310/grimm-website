@@ -1,12 +1,4 @@
 services:
-  adminer:
-    image: adminer
-    restart: unless-stopped
-    ports:
-      - 8080:8080
-    networks:
-      - grimm-db
-
   website:
     build:
       target: dev
@@ -27,5 +19,6 @@ services:
   reverse-proxy:
     ports:
       - 8000:8000
+      - 4983:4983
     volumes:
       - ./nginx.dev.conf:/etc/nginx/nginx.conf:ro
