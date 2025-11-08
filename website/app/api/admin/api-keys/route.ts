@@ -69,7 +69,12 @@ export const PUT = async (request: NextRequest) => {
     return ApiResponse.unauthorized("You can't request permissions you don't have");
 
   const key = await auth.api.createApiKey({
-    body: { ...parsed.data, userId: user?.user.id },
+    body: {
+      ...parsed.data,
+      userId: user?.user.id,
+      rateLimitEnabled: false,
+      remaining: null,
+    },
   });
 
   return ApiResponse.json(key);

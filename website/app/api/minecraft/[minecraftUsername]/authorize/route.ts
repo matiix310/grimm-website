@@ -6,7 +6,6 @@ import { auth } from "@/lib/auth";
 import { rateLimiter } from "@/lib/rateLimiter";
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 import { NextRequest } from "next/server";
 
 export const POST = async (
