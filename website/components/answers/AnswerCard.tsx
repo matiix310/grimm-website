@@ -23,6 +23,7 @@ type AnswerCardProps = {
 const AnswerCard = ({ answerId, answerName }: AnswerCardProps) => {
   const [loading, setLoading] = React.useState(false);
   const [success, setSuccess] = React.useState(false);
+  const inputRef = React.useRef<HTMLInputElement>(null);
 
   const form = useForm({
     defaultValues: {
@@ -34,6 +35,8 @@ const AnswerCard = ({ answerId, answerName }: AnswerCardProps) => {
     onSubmit: async ({ value }) => {
       if (loading) return;
       setLoading(true);
+
+      inputRef.current?.blur();
 
       const { data, error } = await $fetch("@post/api/answers/:answerId", {
         params: { answerId },
@@ -78,6 +81,7 @@ const AnswerCard = ({ answerId, answerName }: AnswerCardProps) => {
                 <Field data-invalid={isInvalid}>
                   <FieldLabel htmlFor={field.name}>Réponse</FieldLabel>
                   <Input
+                    ref={inputRef}
                     id={field.name}
                     name={field.name}
                     value={field.state.value}
