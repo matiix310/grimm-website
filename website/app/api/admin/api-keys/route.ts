@@ -37,8 +37,9 @@ export const PUT = async (request: NextRequest) => {
       z.array(z.string()).nonempty()
     )
     .refine((perms) => {
+      console.log(perms);
       for (const perm in perms) {
-        for (const subPerm in perms[perm as keyof typeof apiSafeStatement])
+        for (const subPerm of perms[perm as keyof typeof apiSafeStatement]!)
           if (!(apiSafeStatement as Record<string, string[]>)[perm].includes(subPerm))
             return false;
       }
