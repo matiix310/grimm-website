@@ -5,9 +5,8 @@ import eventsSchema from "./events/routeSchema";
 import apiKeysSchema from "./admin/api-keys/routeSchema";
 import codesSchema from "./admin/codes/routeSchema";
 import adminAnswersSchema from "./admin/answers/routeSchema";
-import minecraftAuthorizeSchema from "./minecraft/[minecraftUsername]/authorize/routeSchema";
-import minecraftIsAuthorizeSchema from "./minecraft/[minecraftUsername]/is-authorized/routeSchema";
 import answersSchema from "./answers/[answerId]/routeSchema";
+import minecraftSchema from "./minecraft/[minecraftUsername]/routeSchema";
 
 const schema = {
   ...usersSchema,
@@ -17,9 +16,8 @@ const schema = {
   ...apiKeysSchema,
   ...codesSchema,
   ...adminAnswersSchema,
-  ...minecraftAuthorizeSchema,
-  ...minecraftIsAuthorizeSchema,
   ...answersSchema,
+  ...minecraftSchema,
 };
 
 export default schema;

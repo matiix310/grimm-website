@@ -23,7 +23,7 @@ export const minecraftUsernamesUpdateSchema = createUpdateSchema(minecraftUserna
 export const minecraftUsernamesRelations = relations(
   minecraftUsernames,
   ({ one, many }) => ({
-    tags: one(user, {
+    user: one(user, {
       fields: [minecraftUsernames.userId],
       references: [user.id],
     }),
