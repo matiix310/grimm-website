@@ -26,6 +26,7 @@ export const statement = {
   ranking: ["force-refresh"],
   minecraft: ["manage-link", "check-authorization"],
   codes: ["list", "create", "delete", "update"],
+  answers: ["list", "create", "delete", "update"],
 } as const;
 
 export type FullPermissions = typeof statement;
@@ -43,6 +44,7 @@ export const apiSafeStatement: Permissions = {
   ranking: ["force-refresh"],
   minecraft: ["manage-link", "check-authorization"],
   codes: ["list", "create", "delete", "update"],
+  answers: ["list", "create", "delete", "update"],
 };
 
 // roles
