@@ -6,7 +6,6 @@ import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { NextRequest } from "next/server";
 import z from "zod";
-import { createId } from "@paralleldrive/cuid2";
 
 export const POST = async (
   request: NextRequest,
@@ -49,6 +48,7 @@ export const POST = async (
     .set({
       ...parsed.data,
     })
+    .where(eq(redeemCodes.id, params.codeId))
     .returning();
 
   if (newCode.length < 1) return ApiResponse.internalServerError();

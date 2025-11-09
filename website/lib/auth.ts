@@ -30,10 +30,14 @@ export const auth = betterAuth({
     },
   },
   advanced: {
-    crossSubDomainCookies: {
-      enabled: true,
-      domain: "bde-grimm.com",
-    },
+    ...(process.env.NODE_ENV === "production"
+      ? {
+          crossSubDomainCookies: {
+            enabled: true,
+            domain: "bde-grimm.com",
+          },
+        }
+      : {}),
   },
   trustedOrigins: [
     "https://bde-grimm.com",

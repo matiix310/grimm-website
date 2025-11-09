@@ -6,7 +6,9 @@ import { redeemCodes } from "./redeemCodes";
 import { user } from "./auth";
 
 export const redeemUsers = pgTable("redeem_users", {
-  codeId: text("code_id").references(() => redeemCodes.id),
+  codeId: text("code_id")
+    .notNull()
+    .references(() => redeemCodes.id, { onDelete: "cascade" }),
   userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
