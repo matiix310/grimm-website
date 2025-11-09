@@ -10,7 +10,7 @@ export async function proxy(request: NextRequest) {
   if (!session) {
     return NextResponse.redirect(
       new URL(
-        "https://bde-grimm.com/login?redirect=" +
+        "https://liste.bde-grimm.com/login?redirect=" +
           request.nextUrl.protocol +
           "//" +
           request.headers.get("host") +
@@ -19,13 +19,13 @@ export async function proxy(request: NextRequest) {
     );
   }
 
-  if (session.user.banned) return NextResponse.redirect("https://bde-grimm.com");
+  if (session.user.banned) return NextResponse.redirect("https://liste.bde-grimm.com");
 
   if (request.headers.get("host") === "db.bde-grimm.com")
     if (session.user.role !== "admin")
       return NextResponse.redirect(
         new URL(
-          "https://bde-grim.com/login?redirect=https://db.bde-grimm.com" +
+          "https://liste.bde-grim.com/login?redirect=https://db.bde-grimm.com" +
             request.nextUrl.pathname
         )
       );
