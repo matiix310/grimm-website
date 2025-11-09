@@ -42,10 +42,12 @@ const LoginPage = ({
         priority
       />
       <Card>
-        <h1 className="text-4xl font-paytone">Se connecter au site web du BDE GRIMM</h1>
+        <h1 className="text-4xl font-paytone">
+          Vous allez être redirigé vers la page de connexion de la forge...
+        </h1>
         <div className="w-full flex justify-center">
           <Button className="w-[80%]" onClick={() => handleForgeIdClick()}>
-            Se connecter avec ForgeID
+            Forcer la redirection
           </Button>
         </div>
       </Card>
