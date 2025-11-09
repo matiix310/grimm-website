@@ -33,6 +33,11 @@ export const auth = betterAuth({
     enabled: true,
     domain: "bde-grimm.com",
   },
+  trustedOrigins: [
+    "https://liste.bde-grimm.com",
+    "https://db.bde-grimm.com",
+    "https://bde-grimm.com",
+  ],
   plugins: [
     adminPlugin({
       ac,
