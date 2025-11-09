@@ -32,7 +32,7 @@ export const auth = betterAuth({
   advanced: {
     crossSubDomainCookies: {
       enabled: true,
-      domain: "liste.bde-grimm.com",
+      domain: "bde-grimm.com",
     },
   },
   trustedOrigins: [
