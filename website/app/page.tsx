@@ -3,10 +3,11 @@ import { Button } from "@/components/ui/Button";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { db } from "@/db";
 import { events as eventsSchema } from "@/db/schema/events";
-import { desc } from "drizzle-orm";
+import { asc, desc } from "drizzle-orm";
 import Image from "next/image";
 import { connection } from "next/server";
 import { BureauCarousel } from "@/components/home/BureauCarousel";
+import { bureau as bureauSchema } from "@/db/schema/bureau";
 
 const Home = async () => {
   // prevent nextjs from prerendering this page
@@ -18,7 +19,7 @@ const Home = async () => {
       orderBy: desc(eventsSchema.date),
       limit: 3,
     }),
-    db.query.bureau.findMany(),
+    db.query.bureau.findMany({ orderBy: asc(bureauSchema.index) }),
   ]);
 
   return (
