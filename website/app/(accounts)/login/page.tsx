@@ -4,16 +4,16 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { authClient } from "@/lib/authClient";
 import Image from "next/image";
-import { use } from "react";
+import React from "react";
 
 const LoginPage = ({
   searchParams,
 }: {
   searchParams: Promise<{ redirect?: string }>;
 }) => {
-  const params = use(searchParams);
+  const params = React.use(searchParams);
 
-  const handleForgeIdClick = async () => {
+  const handleForgeIdClick = React.useCallback(async () => {
     const { error } = await authClient.signIn.oauth2({
       providerId: "forge-id",
       callbackURL: params.redirect ?? "/",
@@ -25,7 +25,11 @@ const LoginPage = ({
     });
 
     if (error) throw new Error(error.message);
-  };
+  }, [params.redirect]);
+
+  React.useEffect(() => {
+    handleForgeIdClick();
+  }, [handleForgeIdClick]);
 
   return (
     <div className="relative w-screen h-screen flex items-center justify-center">
