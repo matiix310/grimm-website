@@ -29,15 +29,7 @@ import {
 } from "../ui/Command";
 import { $fetch } from "@/lib/betterFetch";
 import { cn } from "@/lib/utils";
-
-const presets: (z.infer<typeof formSchema> & { presetName: string })[] = [
-  {
-    presetName: "test",
-    name: "test",
-    amount: "10",
-    tags: [],
-  },
-];
+import { Presets } from "@/db/schema/presets";
 
 const formSchema = z.object({
   name: z.string().refine((name) => name.replaceAll(" ", "").length > 0, {
@@ -86,6 +78,7 @@ const AddPointButton = ({ availableTags, userLogin }: AddPointButtonProps) => {
   const [loading, setLoading] = React.useState(false);
   const [presetOpen, setPresetOpen] = React.useState(false);
   const [presetValue, setPresetValue] = React.useState("Custom");
+  const [presets, setPresets] = React.useState<Presets[]>([]);
 
   const tagFromId = React.useCallback(
     (tagId: string) => {
@@ -93,6 +86,13 @@ const AddPointButton = ({ availableTags, userLogin }: AddPointButtonProps) => {
     },
     [availableTags]
   );
+
+  React.useEffect(() => {
+    $fetch("/api/points/presets").then(({ data, error }) => {
+      if (error) throw new Error(error.message);
+      setPresets(data);
+    });
+  }, []);
 
   React.useEffect(() => {
     if (presetValue === "custom") return;
@@ -103,9 +103,10 @@ const AddPointButton = ({ availableTags, userLogin }: AddPointButtonProps) => {
     if (preset === undefined) return;
 
     form.setFieldValue("name", preset.name);
-    form.setFieldValue("amount", preset.amount);
-    form.setFieldValue("tags", preset.tags);
-  }, [presetValue, form]);
+    form.setFieldValue("amount", preset.points.toString());
+    // form.setFieldValue("tags", preset.tags);
+    form.setFieldValue("tags", []);
+  }, [presetValue, form, presets]);
 
   return (
     <Dialog>

@@ -7,6 +7,7 @@ import codesSchema from "./admin/codes/routeSchema";
 import adminAnswersSchema from "./admin/answers/routeSchema";
 import answersSchema from "./answers/[answerId]/routeSchema";
 import minecraftSchema from "./minecraft/[minecraftUsername]/routeSchema";
+import presetsSchema from "./points/presets/routeSchema";
 
 const schema = {
   ...usersSchema,
@@ -18,6 +19,7 @@ const schema = {
   ...adminAnswersSchema,
   ...answersSchema,
   ...minecraftSchema,
+  ...presetsSchema,
 };
 
 export default schema;

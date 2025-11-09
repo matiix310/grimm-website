@@ -18,6 +18,7 @@ import * as bureau from "./schema/bureau";
 import * as minecraftAuthorizations from "./schema/minecraftAuthorizations";
 import * as answers from "./schema/answers";
 import * as answerUsers from "./schema/answerUsers";
+import * as presets from "./schema/presets";
 
 if (process.env.DB_URL === undefined)
   throw new Error("Environement variable DB_URL is not defined!");
@@ -36,6 +37,7 @@ const schema = {
   ...minecraftAuthorizations,
   ...answers,
   ...answerUsers,
+  ...presets,
 } as const;
 
 export const db = drizzle(process.env.DB_URL, {

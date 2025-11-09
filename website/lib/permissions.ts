@@ -27,6 +27,7 @@ export const statement = {
   minecraft: ["manage-link", "check-authorization"],
   codes: ["list", "create", "delete", "update"],
   answers: ["list", "create", "delete", "update"],
+  presets: ["view"],
 } as const;
 
 export type FullPermissions = typeof statement;
