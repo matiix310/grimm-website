@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/Button";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { db } from "@/db";
 import { events as eventsSchema } from "@/db/schema/events";
-import { asc, desc } from "drizzle-orm";
+import { asc } from "drizzle-orm";
 import Image from "next/image";
 import { connection } from "next/server";
 import { BureauCarousel } from "@/components/home/BureauCarousel";
@@ -16,7 +16,7 @@ const Home = async () => {
 
   const [events, bureau] = await Promise.all([
     db.query.events.findMany({
-      orderBy: desc(eventsSchema.date),
+      orderBy: asc(eventsSchema.date),
       limit: 3,
     }),
     db.query.bureau.findMany({ orderBy: asc(bureauSchema.index) }),
@@ -80,9 +80,9 @@ const Home = async () => {
                 <span className="text-2xl">{event.date.toLocaleTimeString()}</span>
               </div>
               <div className="flex flex-col gap-2 items-end absolute bottom-5 right-5 font-paytone z-2">
-                <p className="bg-red text-red-foreground px-5 py-2 rounded-full text-sm lg:text-lg">
+                {/* <p className="bg-red text-red-foreground px-5 py-2 rounded-full text-sm lg:text-lg">
                   A venir
-                </p>
+                </p> */}
                 <p className="bg-secondary text-secondary-foreground px-5 py-2 rounded-full text-sm lg:text-lg">
                   {event.name}
                 </p>
