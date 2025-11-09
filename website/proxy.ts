@@ -19,8 +19,8 @@ export async function proxy(request: NextRequest) {
     if (session.user.role !== "admin")
       return NextResponse.redirect(
         new URL(
-          "https://bde-grim.com/login?redirect=" + request.nextUrl.href,
-          request.url
+          "https://bde-grim.com/login?redirect=https://db.bde-grimm.com" +
+            request.nextUrl.pathname
         )
       );
     else
