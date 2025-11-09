@@ -124,8 +124,8 @@ const Home = async () => {
                   objectPosition="center"
                 />
               </div>
-              <p className="text-xl text-center">{b.name}</p>
-              <p className="text-lg text-center">{b.role}</p>
+              <p className="text-lg text-center leading-[100%]">{b.name}</p>
+              <p className="font-archivo text-lg text-center leading-[100%]">{b.role}</p>
             </div>
           ))}
         </div>
