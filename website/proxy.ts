@@ -11,6 +11,8 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(
       new URL(
         "https://bde-grimm.com/login?redirect=" +
+          request.nextUrl.protocol +
+          "//" +
           request.headers.get("host") +
           request.nextUrl.pathname
       )
