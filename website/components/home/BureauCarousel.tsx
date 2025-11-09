@@ -47,8 +47,8 @@ const BureauCarousel = ({ bureau, className, ...rest }: BureauCarouselProps) => 
                   objectPosition="center"
                 />
               </div>
-              <p className="text-2xl text-center">{b.name}</p>
-              <p className="text-xl text-center">{b.role}</p>
+              <p className="text-2xl text-center leading-[100%]">{b.name}</p>
+              <p className="text-xl font-archivo text-center leading-[100%]">{b.role}</p>
             </div>
           </CarouselItem>
         ))}
