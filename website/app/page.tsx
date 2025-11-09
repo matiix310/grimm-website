@@ -108,7 +108,7 @@ const Home = async () => {
           {bureau.map((b) => (
             <div
               key={b.login}
-              className="rounded-3xl flex flex-col gap-2 justify-around items-center font-paytone size-full overflow-hidden p-5 h-100"
+              className="rounded-3xl flex flex-col gap-2 justify-around items-center font-paytone size-full overflow-hidden p-5 aspect-[0.7]"
               style={{
                 backgroundColor: `var(--${b.color})`,
                 color: `var(--on-${b.color})`,
