@@ -13,6 +13,8 @@ export async function proxy(request: NextRequest) {
     );
   }
 
+  if (session.user.banned) return NextResponse.redirect(new URL("/", request.url));
+
   // To access "/admin" you must have "admin" role
   if (request.nextUrl.pathname.startsWith("/admin") && session.user.role !== "admin") {
     return NextResponse.redirect(new URL("/", request.url));

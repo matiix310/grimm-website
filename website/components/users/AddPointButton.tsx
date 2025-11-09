@@ -98,7 +98,10 @@ const AddPointButton = ({ availableTags, userLogin }: AddPointButtonProps) => {
     if (presetValue === "custom") return;
 
     // apply the preset
-    const preset = presets.find((p) => p.presetName === presetValue)!;
+    const preset = presets.find((p) => p.presetName === presetValue);
+
+    if (preset === undefined) return;
+
     form.setFieldValue("name", preset.name);
     form.setFieldValue("amount", preset.amount);
     form.setFieldValue("tags", preset.tags);

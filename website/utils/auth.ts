@@ -22,7 +22,7 @@ const hasPermission = async (options: {
     return !error && valid;
   } else {
     const user = await auth.api.getSession({ headers: options.headers });
-    if (!user) return false;
+    if (!user || user.user.banned) return false;
 
     const { error, success } = await auth.api.userHasPermission({
       body: {
