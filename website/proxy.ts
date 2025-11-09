@@ -9,11 +9,15 @@ export async function proxy(request: NextRequest) {
 
   if (!session) {
     return NextResponse.redirect(
-      new URL("https://bde-grimm.com/login?redirect=" + request.nextUrl.href)
+      new URL(
+        "https://bde-grimm.com/login?redirect=" +
+          request.headers.get("host") +
+          request.nextUrl.pathname
+      )
     );
   }
 
-  if (session.user.banned) return NextResponse.redirect(new URL("/", request.url));
+  if (session.user.banned) return NextResponse.redirect("https://bde-grimm.com");
 
   if (request.nextUrl.host === "db.bde-grimm.com")
     if (session.user.role !== "admin")
