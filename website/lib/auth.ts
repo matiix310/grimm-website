@@ -29,9 +29,11 @@ export const auth = betterAuth({
       },
     },
   },
-  crossSubDomainCookies: {
-    enabled: true,
-    domain: "bde-grimm.com",
+  advanced: {
+    crossSubDomainCookies: {
+      enabled: true,
+      domain: "bde-grimm.com",
+    },
   },
   trustedOrigins: [
     "https://liste.bde-grimm.com",

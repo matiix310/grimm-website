@@ -21,7 +21,7 @@ export async function proxy(request: NextRequest) {
 
   if (session.user.banned) return NextResponse.redirect("https://bde-grimm.com");
 
-  if (request.nextUrl.host === "db.bde-grimm.com")
+  if (request.headers.get("host") === "db.bde-grimm.com")
     if (session.user.role !== "admin")
       return NextResponse.redirect(
         new URL(
