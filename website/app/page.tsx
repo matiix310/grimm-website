@@ -26,7 +26,7 @@ const Home = async () => {
   return (
     <div>
       <Navbar className="fixed top-0 left-0 w-full z-10" />
-      <section className="relative w-screen lg:h-110 mt-25 lg:bg-pink flex flex-col items-center lg:block">
+      <section className="relative w-full lg:h-110 mt-25 lg:bg-pink flex flex-col items-center lg:block">
         <div className="relative lg:absolute top-0 lg:right-20 h-auto lg:h-130 w-[80%] lg:w-130 bg-blue p-10 pb-12 rounded-b-full outline-10 outline-black/10">
           <div className="h-full aspect-square">
             <Image
@@ -52,7 +52,7 @@ const Home = async () => {
       </section>
       <section
         id="socials"
-        className="w-screen pt-28 -mt-15 lg:mt-0 flex flex-col px-5 lg:px-20"
+        className="w-full pt-28 -mt-15 lg:mt-0 flex flex-col px-5 lg:px-20"
       >
         <div className="flex gap-2 items-center">
           <div className="relative w-10 h-15 lg:w-20 lg:h-25">
@@ -91,7 +91,7 @@ const Home = async () => {
       </section>
       <section
         id="events"
-        className="w-screen pt-28 -mt-15 lg:mt-0 flex flex-col px-5 lg:px-20"
+        className="w-full pt-28 -mt-15 lg:mt-0 flex flex-col px-5 lg:px-20"
       >
         <div className="flex gap-2 items-center">
           <div className="relative w-10 h-15 lg:w-20 lg:h-25">
@@ -136,7 +136,7 @@ const Home = async () => {
       </section>
       <section
         id="bureau"
-        className="w-screen pt-28 -mt-15 lg:mt-0 flex flex-col px-5 lg:px-20"
+        className="w-full pt-28 -mt-15 lg:mt-0 flex flex-col px-5 lg:px-20"
       >
         <div className="flex gap-2 items-center">
           <div className="relative w-10 h-15 lg:w-20 lg:h-25">
@@ -171,7 +171,7 @@ const Home = async () => {
         </div>
         <BureauCarousel bureau={bureau} />
       </section>
-      <section className="pt-30 w-screen -mt-15 lg:mt-0 flex flex-col overflow-hidden">
+      <section className="pt-30 w-full -mt-15 lg:mt-0 flex flex-col overflow-hidden">
         <div className="relative w-full aspect-[3]">
           <Image
             className="scale-105"
@@ -182,7 +182,7 @@ const Home = async () => {
             objectPosition="center"
           />
         </div>
-        <div className="bg-black w-screen h-30 pt-5 px-5 lg:px-20 text-background flex items-center justify-between">
+        <div className="bg-black w-full h-30 pt-5 px-5 lg:px-20 text-background flex items-center justify-between">
           <div className="flex gap-3 lg:gap-6">
             <Link href="/to/instagram" target="_blank">
               <Button size="icon" variant="link">
