@@ -100,7 +100,12 @@ const FullPagination = ({
         ) : (
           [...Array(totalPages).keys()].map((i) => (
             <PaginationItem key={i}>
-              <PaginationLink isActive={selectedPage === i}>{i + 1}</PaginationLink>
+              <PaginationLink
+                onClick={() => onPageChange(i)}
+                isActive={selectedPage === i}
+              >
+                {i + 1}
+              </PaginationLink>
             </PaginationItem>
           ))
         )}
