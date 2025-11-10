@@ -32,11 +32,11 @@ const AdminApiKeyTable = ({ apiKeys, onRemoveApiKey }: AdminApiKeyTableProps) =>
     }),
     columnHelper.accessor("expiresAt", {
       header: "Expiration",
-      cell: (row) => row.getValue()?.toLocaleString() ?? "infinite",
+      cell: (row) => row.getValue()?.toLocaleString("fr-FR") ?? "infinite",
     }),
     columnHelper.accessor("createdAt", {
       header: "Création",
-      cell: (row) => row.getValue().toLocaleString(),
+      cell: (row) => row.getValue().toLocaleString("fr-FR"),
     }),
     {
       id: "actions",

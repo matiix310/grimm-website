@@ -64,11 +64,11 @@ const AdminCodesTable = ({ codes, onRemoveCode, onUpdateCode }: AdminCodesTableP
     }),
     columnHelper.accessor("createdAt", {
       header: "Date de création",
-      cell: (row) => row.getValue()?.toLocaleString() ?? "infinite",
+      cell: (row) => row.getValue()?.toLocaleString("fr-FR") ?? "infinite",
     }),
     columnHelper.accessor("updatedAt", {
       header: "Dernière modification",
-      cell: (row) => row.getValue()?.toLocaleString() ?? "infinite",
+      cell: (row) => row.getValue()?.toLocaleString("fr-FR") ?? "infinite",
     }),
     {
       id: "actions",

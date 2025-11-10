@@ -48,15 +48,15 @@ const AdminEventsTable = ({
     }),
     columnHelper.accessor("date", {
       header: "Date",
-      cell: (row) => row.getValue().toLocaleString(),
+      cell: (row) => row.getValue().toLocaleString("fr-FR"),
     }),
     columnHelper.accessor("createdAt", {
       header: "Date de création",
-      cell: (row) => row.getValue().toLocaleString(),
+      cell: (row) => row.getValue().toLocaleString("fr-FR"),
     }),
     columnHelper.accessor("updatedAt", {
       header: "Dernière modification",
-      cell: (row) => row.getValue().toLocaleString(),
+      cell: (row) => row.getValue().toLocaleString("fr-FR"),
     }),
     {
       id: "actions",

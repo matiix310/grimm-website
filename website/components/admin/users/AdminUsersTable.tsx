@@ -75,7 +75,7 @@ const AdminUsersTable = ({}: AdminUsersTableProps) => {
     }),
     columnHelper.accessor("createdAt", {
       header: "Création",
-      cell: (row) => row.getValue()?.toLocaleString() ?? "infinite",
+      cell: (row) => row.getValue()?.toLocaleString("fr-FR") ?? "infinite",
     }),
     {
       id: "actions",
