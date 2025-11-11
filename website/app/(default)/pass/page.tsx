@@ -14,7 +14,7 @@ const PassPage = async () => {
 
   return (
     <CardContainer
-      className="w-90 lg:w-150 aspect-[0.7] bg-accent rounded-4xl border-orange border-4"
+      className="max-w-[90%] w-90 lg:w-150 aspect-[0.7] bg-accent rounded-4xl border-orange border-4"
       containerClassName="relative size-full flex items-center justify-center"
     >
       <CardBody className="flex flex-col gap-5 lg:gap-9 size-full p-4 lg:p-8 pr-7 lg:pr-12">

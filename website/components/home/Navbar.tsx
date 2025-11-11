@@ -37,11 +37,6 @@ const Navbar = async ({ className, ...rest }: NavbarProps) => {
       link: "/#events",
     },
     {
-      name: "Le Bureau",
-      variant: "secondary",
-      link: "/#bureau",
-    },
-    {
       name: "Le Classement",
       variant: "secondary",
       link: "/ranking",
