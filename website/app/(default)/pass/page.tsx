@@ -30,7 +30,7 @@ const PassPage = async () => {
             Soutient Grimm depuis le {session.user.createdAt.toLocaleDateString("fr-FR")}
           </p>
         </CardItem>
-        <div className="absolute size-full top-0 left-0 scale-[100.5%] rounded-4xl overflow-hidden">
+        <div className="absolute size-full top-0 left-0 rounded-4xl overflow-hidden">
           <p className="absolute right-0 top-[50%] -translate-y-[50%] translate-x-[50%] origin-bottom -rotate-90 bg-orange text-orange-foreground font-paytone text-xl lg:text-5xl text-nowrap">
             VOTEZ GRIMM * VOTEZ GRIMM * VOTEZ GRIMM * VOTEZ GRIMM * VOTEZ GRIMM * VOTEZ
             GRIMM * VOTEZ GRIMM * VOTEZ GRIMM * VOTEZ GRIMM
