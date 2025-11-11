@@ -104,8 +104,7 @@ const AddPointButton = ({ availableTags, userLogin }: AddPointButtonProps) => {
 
     form.setFieldValue("name", preset.name);
     form.setFieldValue("amount", preset.points.toString());
-    // form.setFieldValue("tags", preset.tags);
-    form.setFieldValue("tags", []);
+    form.setFieldValue("tags", preset.tags);
   }, [presetValue, form, presets]);
 
   return (

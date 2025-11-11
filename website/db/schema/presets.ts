@@ -1,5 +1,5 @@
 import { cuid2 } from "drizzle-cuid2/postgres";
-import { InferSelectModel } from "drizzle-orm";
+import { InferSelectModel, sql } from "drizzle-orm";
 import { integer, pgTable, text, varchar } from "drizzle-orm/pg-core";
 import { timestamps } from "../columns.helper";
 import { createInsertSchema, createSelectSchema, createUpdateSchema } from "drizzle-zod";
@@ -9,6 +9,10 @@ export const presets = pgTable("presets", {
   presetName: text("preset_name").notNull(),
   name: varchar("name", { length: 100 }).notNull(),
   points: integer("points").notNull(),
+  tags: text("tags")
+    .array()
+    .notNull()
+    .default(sql`'{}'::text[]`),
   ...timestamps,
 });
 
