@@ -7,26 +7,30 @@ export async function proxy(request: NextRequest) {
     headers: await headers(),
   });
 
+  const host =
+    request.headers.get("host") === "localhost"
+      ? "localhost:8000"
+      : request.headers.get("host");
+
   if (!session) {
     return NextResponse.redirect(
       new URL(
-        "https://liste.bde-grimm.com/login?redirect=" +
-          request.nextUrl.protocol +
-          "//" +
-          request.headers.get("host") +
+        `${process.env.BASE_URL!}/login?redirect=${request.nextUrl.protocol}//${host}${
           request.nextUrl.pathname
+        }`
       )
     );
   }
 
-  if (session.user.banned) return NextResponse.redirect("https://liste.bde-grimm.com");
+  if (session.user.banned) return NextResponse.redirect(process.env.BASE_URL!);
 
   if (request.headers.get("host") === "db.bde-grimm.com")
     if (session.user.role !== "admin")
       return NextResponse.redirect(
         new URL(
-          "https://liste.bde-grim.com/login?redirect=https://db.bde-grimm.com" +
+          `${process.env.BASE_URL!}/login?redirect=https://db.bde-grimm.com${
             request.nextUrl.pathname
+          }`
         )
       );
     else
@@ -44,6 +48,7 @@ export const config: ProxyConfig = {
   matcher: [
     "/users/me",
     "/admin/:path*",
+    "/pass",
     { source: "/:path*", has: [{ type: "host", value: "db.bde-grimm.com" }] },
   ],
 };

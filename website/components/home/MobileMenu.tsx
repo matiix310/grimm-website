@@ -30,7 +30,7 @@ const MobileMenu = ({ buttons }: MobileMenuProps) => {
               <Button
                 size="lg"
                 variant={button.variant}
-                className="w-full rounded-none text-4xl py-10"
+                className="w-full rounded-none text-2xl py-7"
               >
                 {button.name}
               </Button>

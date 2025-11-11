@@ -48,6 +48,7 @@ const Navbar = async ({ className, ...rest }: NavbarProps) => {
     },
     ...(session
       ? ([
+          { name: "Grimm Pass", variant: "secondary", link: "/pass" },
           { name: session.user.name, variant: "primary", link: "/users/me" },
           { name: "Se Deconnecter", variant: "destructive", link: "/logout" },
         ] as const)
