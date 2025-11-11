@@ -14,7 +14,7 @@ const PassPage = async () => {
 
   return (
     <CardContainer
-      className="max-w-[90%] w-90 lg:w-150 aspect-[0.7] bg-accent rounded-4xl border-orange border-4"
+      className="max-w-[90%] w-90 lg:w-150 aspect-[0.7] bg-accent rounded-4xl"
       containerClassName="relative size-full flex items-center justify-center"
     >
       <CardBody className="flex flex-col gap-5 lg:gap-9 size-full p-4 lg:p-8 pr-7 lg:pr-12">
@@ -30,7 +30,7 @@ const PassPage = async () => {
             Soutient Grimm depuis le {session.user.createdAt.toLocaleDateString("fr-FR")}
           </p>
         </CardItem>
-        <div className="absolute size-full top-0 left-0 rounded-4xl overflow-hidden">
+        <div className="absolute size-full top-0 left-0 rounded-4xl border-orange border-4 overflow-hidden">
           <p className="absolute right-0 top-[50%] -translate-y-[50%] translate-x-[50%] origin-bottom -rotate-90 bg-orange text-orange-foreground font-paytone text-xl lg:text-5xl text-nowrap">
             VOTEZ GRIMM * VOTEZ GRIMM * VOTEZ GRIMM * VOTEZ GRIMM * VOTEZ GRIMM * VOTEZ
             GRIMM * VOTEZ GRIMM * VOTEZ GRIMM * VOTEZ GRIMM
