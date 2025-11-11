@@ -37,6 +37,11 @@ const Navbar = async ({ className, ...rest }: NavbarProps) => {
       link: "/#events",
     },
     {
+      name: "Comment gagner des points?",
+      variant: "secondary",
+      link: "/howto/points",
+    },
+    {
       name: "Le Classement",
       variant: "secondary",
       link: "/ranking",
