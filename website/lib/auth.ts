@@ -2,7 +2,12 @@ import { db } from "@/db";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
-import { admin as adminPlugin, apiKey, genericOAuth } from "better-auth/plugins";
+import {
+  admin as adminPlugin,
+  apiKey,
+  genericOAuth,
+  username,
+} from "better-auth/plugins";
 import { createAccessControl } from "better-auth/plugins/access";
 import { adminRole, managerRole, statement, userRole } from "./permissions";
 
@@ -76,6 +81,7 @@ export const auth = betterAuth({
     apiKey({
       requireName: true,
     }),
+    username(),
     nextCookies(), // Should always be the last plugin in the array
   ],
 });
