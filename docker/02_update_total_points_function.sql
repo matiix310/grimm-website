@@ -5,20 +5,29 @@ BEGIN
     INSERT INTO ranking (rank, user_id, points)
     SELECT 
         0 AS rank, 
-        u.user_id, 
+        u.id as user_id, 
         COALESCE(SUM(p.amount), 0) AS total_points
     FROM 
-        (SELECT DISTINCT user_id FROM points) u
+        (SELECT id FROM public.user) u
     LEFT JOIN 
-        points p ON u.user_id = p.user_id
+        points p ON u.id = p.user_id
     GROUP BY 
-        u.user_id
+        u.id
     ON CONFLICT (user_id)
     DO UPDATE SET points = COALESCE(EXCLUDED.points, 0);
 
+    DELETE FROM ranking r WHERE r.user_id IN (SELECT id FROM public.user u WHERE u.banned OR u.username IS NOT NULL);
+
     WITH ranked_points AS (
-        SELECT user_id, DENSE_RANK() OVER (ORDER BY points DESC, user_id ASC) AS rank_value
-        FROM ranking
+        SELECT 
+            user_id, 
+            DENSE_RANK() OVER (
+                ORDER BY 
+                    points DESC, 
+                    (SELECT MAX(created_at) FROM points WHERE user_id = ranking.user_id) ASC
+            ) AS rank_value
+        FROM 
+            ranking
     )
     UPDATE ranking
     SET rank = ranked_points.rank_value
