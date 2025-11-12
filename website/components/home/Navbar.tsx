@@ -32,11 +32,6 @@ const Navbar = async ({ className, ...rest }: NavbarProps) => {
         ]
       : []),
     {
-      name: "Les Events",
-      variant: "secondary",
-      link: "/#events",
-    },
-    {
       name: "Comment gagner des points?",
       variant: "secondary",
       link: "/howto/points",
