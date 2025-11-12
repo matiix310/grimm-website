@@ -57,14 +57,14 @@ const PointsList = ({
             {p.amount >= 0 && "+ "}
             {p.amount}
           </p>
-          <div className="w-full flex flex-col gap-2">
+          <div className="w-full flex flex-col gap-1 lg:gap-2">
             <p className="font-paytone text-lg lg:text-3xl leading-none">{p.name}</p>
             {p.tags.length > 0 && (
               <div className="flex gap-2">
                 {p.tags.map((tag) => (
                   <p
                     key={tag.tagId}
-                    className="w-fit rounded-full px-3 font-paytone pb-1"
+                    className="w-fit rounded-full px-2 lg:px-3 font-paytone pb-1 text-sm lg:text-base"
                     style={{
                       backgroundColor: tag.tag.color,
                       color: tag.tag.textColor,
