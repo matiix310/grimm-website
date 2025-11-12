@@ -164,7 +164,9 @@ const AdminUsersTable = ({}: AdminUsersTableProps) => {
   React.useEffect(() => {
     authClient.admin
       .listUsers({
-        query: {},
+        query: {
+          limit: 1000,
+        },
       })
       .then(({ data, error }) => {
         if (error) throw new Error(error.message);
