@@ -57,6 +57,7 @@ export const userRole = {
 export const managerRole = {
   ...userRole,
   points: ["add", "delete"],
+  presets: ["view"],
 } satisfies Permissions;
 
 export const adminRole = Object.fromEntries(
