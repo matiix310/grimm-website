@@ -13,6 +13,10 @@ const PassPage = async () => {
 
   if (!session) return redirect("/");
 
+  // "C'est chill frérot"
+  if (["damien.place"].includes(session.user.login))
+    return redirect("https://liste-pegasus.fr/");
+
   return (
     <CardContainer
       className="max-w-[90%] w-90 lg:w-150 aspect-[0.7] bg-accent rounded-4xl"
