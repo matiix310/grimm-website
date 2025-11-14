@@ -16,7 +16,6 @@ const data = {
     "Concours de fanart (victoire)": 150,
   },
   Défis: {
-    "Photo Redbull": "sticker redbull",
     "Tampon main": 20,
     "Tampon crâne": 50,
     'Écrire "Votez Grimm" sur un tableau': 15,
@@ -39,6 +38,7 @@ const data = {
     "Concours build victoire": 150,
   },
   Stickers: {
+    "Photo Redbull": "sticker redbull",
     "O’Zaman": "sticker kebab",
     "Achat Lateb": "sticker vert",
     "Achat La Cave": "sticker vert",
