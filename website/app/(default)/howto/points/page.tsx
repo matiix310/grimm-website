@@ -46,6 +46,12 @@ const data = {
     Distribution: "sticker de base",
     "Collection complète de stickers": 100,
   },
+  "Mini-jeux": {
+    participation: 5,
+    "jklm (victoire)": 50,
+    "skribbl (victoire)": 50,
+    "blindtest (victoire)": 50,
+  },
 };
 
 const HowToPointsPage = () => {
