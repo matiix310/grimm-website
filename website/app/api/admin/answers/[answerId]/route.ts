@@ -20,6 +20,8 @@ export const POST = async (
   )
     return ApiResponse.unauthorizedPermission({ answers: ["update"] });
 
+  return ApiResponse.unauthorized("Campain week has ended");
+
   // check that the answer exists
   const params = await ctx.params;
   const answer = await db.query.answers.findFirst({

@@ -26,6 +26,8 @@ export const POST = async (
 
   if (session === null) return ApiResponse.unauthorized();
 
+  return ApiResponse.unauthorized("Campain week has ended");
+
   // check the rate limit
   if (rateLimiter.isLimited("answer", session.user.id)) return ApiResponse.unauthorized();
   rateLimiter.limit("answer", session.user.id, 2000);
