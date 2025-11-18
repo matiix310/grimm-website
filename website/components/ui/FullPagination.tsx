@@ -46,9 +46,11 @@ const FullPagination = ({
                   </PaginationLink>
                 </PaginationItem>
 
-                <PaginationItem className="hidden lg:inline">
-                  <PaginationEllipsis />
-                </PaginationItem>
+                {selectedPage > 2 && (
+                  <PaginationItem className="hidden lg:inline">
+                    <PaginationEllipsis />
+                  </PaginationItem>
+                )}
               </>
             )}
 
@@ -82,9 +84,11 @@ const FullPagination = ({
 
             {selectedPage < totalPages - 2 && (
               <>
-                <PaginationItem className="hidden lg:inline">
-                  <PaginationEllipsis />
-                </PaginationItem>
+                {selectedPage < totalPages - 3 && (
+                  <PaginationItem className="hidden lg:inline">
+                    <PaginationEllipsis />
+                  </PaginationItem>
+                )}
 
                 <PaginationItem>
                   <PaginationLink
