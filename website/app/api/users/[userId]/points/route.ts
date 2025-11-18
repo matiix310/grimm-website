@@ -46,8 +46,6 @@ export const PUT = async (
   )
     return ApiResponse.unauthorizedPermission({ points: ["add"] });
 
-  return ApiResponse.unauthorized("Campain week has ended");
-
   const json = await request.json().catch(() => null);
 
   if (json === null) return ApiResponse.badRequestBodyParsing();
@@ -111,8 +109,6 @@ export const DELETE = async (
     !(await hasPermission({ headers: await headers(), permissions: { points: ["add"] } }))
   )
     return ApiResponse.unauthorizedPermission({ points: ["add"] });
-
-  return ApiResponse.unauthorized("Campain week has ended");
 
   const json = await request.json().catch(() => null);
 
