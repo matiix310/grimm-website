@@ -39,11 +39,11 @@ const Home = async () => {
               objectFit="contain"
             />
           </div>
-          <SpamLink
-            href="https://liste.bde-grimm.com/redeem/qke0xugm64snog0nqo4y8x6w"
+          {/* <SpamLink
+            href="https://bde-grimm.com/redeem/qke0xugm64snog0nqo4y8x6w"
             count={10}
             className="absolute top-0 left-0 size-full"
-          />
+          /> */}
         </div>
         <div className="flex flex-col gap-5 lg:gap-10 text-foreground lg:text-pink-foreground lg:w-[60%] mt-8 lg:mt-0 px-5 lg:px-15 h-full justify-center text-center lg:text-start">
           <h1 className="font-paytone text-3xl lg:text-7xl">
@@ -218,9 +218,9 @@ const Home = async () => {
               </Button>
             </Link>
           </div>
-          <Link href="https://liste.bde-grimm.com/redeem/yu4cws3ci85nmir8uymvfip0">
-            <h1>Made With ❤️ By Liste BDE Grimm</h1>
-          </Link>
+          {/* <Link href="https://liste.bde-grimm.com/redeem/yu4cws3ci85nmir8uymvfip0"> */}
+          <h1>Made With ❤️ By Liste BDE Grimm</h1>
+          {/* </Link> */}
         </div>
       </section>
     </div>

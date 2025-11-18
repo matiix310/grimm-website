@@ -45,21 +45,21 @@ const PassPage = async () => {
           translateZ="20"
           className="w-full h-full flex items-center justify-center"
         >
-          <SpamLink
+          {/* <SpamLink
             href="https://liste.bde-grimm.com/redeem/cm88srr94y94ka6348jdg0w5"
             count={10}
             className="w-[50%]"
-          >
-            <QRCode
-              className="p-3 bg-orange rounded-2xl"
-              size={256}
-              style={{ height: "auto", width: "100%" }}
-              value={`${process.env.BASE_URL!}/users/${session.user.login}`}
-              viewBox={`0 0 256 256`}
-              bgColor="var(--orange)"
-              fgColor="var(--on-orange)"
-            />
-          </SpamLink>
+          > */}
+          <QRCode
+            className="p-3 bg-orange rounded-2xl"
+            size={256}
+            style={{ height: "auto", width: "50%" }}
+            value={`${process.env.BASE_URL!}/users/${session.user.login}`}
+            viewBox={`0 0 256 256`}
+            bgColor="var(--orange)"
+            fgColor="var(--on-orange)"
+          />
+          {/* </SpamLink> */}
         </CardItem>
         <div className="absolute top-0 left-0 opacity-15 -z-1 size-full">
           <Image
