@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import ApiResponse from "@/lib/apiResponse";
+import path from "path";
 
 const s3 = new S3Client({
   credentials: {
@@ -11,6 +12,7 @@ const s3 = new S3Client({
   },
   region: "garage",
   endpoint: process.env.S3_URL!,
+  forcePathStyle: true,
 });
 
 export async function GET(request: NextRequest, ctx: RouteContext<"/api/s3/[assetId]">) {
