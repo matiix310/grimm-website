@@ -24,6 +24,7 @@ build
 .DS_Store
 *.pem
 *.key
+*.crt
 
 # debug
 npm-debug.log*
