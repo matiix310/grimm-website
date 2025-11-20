@@ -19,8 +19,8 @@ services:
   reverse-proxy:
     ports:
       - 127.0.0.1:4983:4983
-      - 127.0.0.1:443:443
+      - 127.0.0.1:80:80
     volumes:
       - ./nginx.dev.conf:/etc/nginx/nginx.conf:ro
-      - ./localhost.crt:/etc/ssl/localhost.crt:ro
-      - ./localhost.key:/etc/ssl/localhost.key:ro
+      # - ./localhost.crt:/etc/ssl/localhost.crt:ro
+      # - ./localhost.key:/etc/ssl/localhost.key:ro
