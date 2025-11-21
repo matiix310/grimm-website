@@ -59,7 +59,7 @@ const MainCarousel = ({ carouselContent, className }: MainCarouselProps) => {
             </div>
             <Image
               className="h-[70%] mr-10 w-auto flex-4"
-              src="/grimm-logo-round.png"
+              src="/grimm-logo-round.svg"
               alt="Logo Grimm Texte"
               width={1080}
               height={1080}
