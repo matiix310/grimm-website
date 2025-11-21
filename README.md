@@ -4,31 +4,7 @@ This repository host the Grimm BDE docker infrastructure. Grimm is a list for th
 
 ## Environment Variables
 
-To run this project, you will need to add the following environment variables
-
-### `./docker/.env`
-
-| Variable                        | Description                    | Example value |
-| :------------------------------ | :----------------------------- | :------------ |
-| POSTGRES_DB                     | Name of the database           | grimm         |
-| POSTGRES_USER                   | Default admin user             | postgres      |
-| POSTGRES_PASSWORD               | Default admin password         | password      |
-| DRIZZLE_GATEWAY_MASTER_PASSWORD | Drizzle Gateway admin password | password      |
-
-### `./website/.env`
-
-| Variable               | Description                                         | Example value                                                    |
-| :--------------------- | :-------------------------------------------------- | :--------------------------------------------------------------- |
-| DB_URL                 | Url to connect to the database (from the container) | postgresql://postgres:password@db:5432/grimm                     |
-| DEV_DB_URL             | Url to connect to the database (from the host)      | postgresql://postgres:password@localhost:5432/grimm              |
-| BETTER_AUTH_SECRET     | Internal Better-auth random secret                  | 1234                                                             |
-| BASE_URL               | Public URL of the website                           | http://localhost                                                 |
-| FORGE_ID_CLIENT_ID     | Forge OIDC client id                                | 125070                                                           |
-| FORGE_ID_CLIENT_SECRET | Forge OIDC client secret                            | f6ff8d394e6185d41834b19210979b897852680cf34700ae4ecb24ea         |
-| S3_URL                 | URL of the S3 server                                | http://s3.localhost                                              |
-| S3_ACCESS_KEY_ID       | S3 access key ID                                    | GKa5e5593902d055847e554e03                                       |
-| S3_SECRET_ACCESS_KEY   | S3 secrect access key                               | eaa2448604c954a7b6721874ed0ec4a0397dd093c0199258d12a991f169aec82 |
-| S3_BUCKET_NAME         | S3 bucket name                                      | grimm-bucket                                                     |
+To run this project, you will need to create `./website/.env` and `./docker/.env`. An example is named `env.template` for both of them. Read its content and copy it to `.env` before starting the containers.
 
 ## Deployment
 
