@@ -4,6 +4,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { redirect } from "next/navigation";
 
 const data = {
   "Vie du Campus": {
@@ -55,6 +56,8 @@ const data = {
 };
 
 const HowToPointsPage = () => {
+  if (process.env.DISABLE_HOWTO_POINTS) return redirect("/");
+
   return (
     <div className="px-5 lg:px-8">
       <Accordion type="single" collapsible>

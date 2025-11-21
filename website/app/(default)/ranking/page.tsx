@@ -4,8 +4,11 @@ import { RefreshRankingButton } from "@/components/ranking/refreshRankingButton"
 import { db } from "@/db";
 import { hasPermission } from "@/utils/auth";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 const RankingPage = async () => {
+  if (process.env.DISABLE_RANKING_PAGE) return redirect("/");
+
   const bestPlayers = await db.query.ranking.findMany({
     limit: 3,
     orderBy: (ranking, { asc }) => [asc(ranking.rank)],

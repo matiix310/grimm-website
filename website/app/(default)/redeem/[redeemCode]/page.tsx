@@ -9,6 +9,8 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 const RedeemCodePage = async (props: PageProps<"/redeem/[redeemCode]">) => {
+  if (process.env.DISABLE_EDIT_POINTS) return redirect("/");
+
   // check if the user is logged in
   const user = await auth.api.getSession({ headers: await headers() });
 

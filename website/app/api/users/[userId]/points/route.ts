@@ -41,6 +41,11 @@ export const PUT = async (
   request: NextRequest,
   ctx: RouteContext<"/api/users/[userId]/points">
 ) => {
+  if (process.env.DISABLE_EDIT_POINTS_ADMIN)
+    return ApiResponse.unauthorized(
+      "Point system is currently disabled for editing (even for admins)"
+    );
+
   if (
     !(await hasPermission({ headers: await headers(), permissions: { points: ["add"] } }))
   )
@@ -105,6 +110,11 @@ export const DELETE = async (
   request: NextRequest,
   ctx: RouteContext<"/api/users/[userId]/points">
 ) => {
+  if (process.env.DISABLE_EDIT_POINTS_ADMIN)
+    return ApiResponse.unauthorized(
+      "Point system is currently disabled for editing (even for admins)"
+    );
+
   if (
     !(await hasPermission({ headers: await headers(), permissions: { points: ["add"] } }))
   )
