@@ -1,6 +1,6 @@
 # Grimm Docker infrastructure
 
-This repository host the Grimm BDE docker infrastructure. Grimm is a list for the [EPITA](https://epita.fr) BDE. You can find the website at https://bde-grimm.com.
+This repository host the Grimm Student Union docker infrastructure. Grimm is the current Student Union for the [EPITA](https://epita.fr) school. You can find the website at https://bde-grimm.com.
 
 ## Environment Variables
 
