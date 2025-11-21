@@ -31,16 +31,24 @@ const Navbar = async ({ className, ...rest }: NavbarProps) => {
           } as const,
         ]
       : []),
-    {
-      name: "Comment gagner des points?",
-      variant: "secondary",
-      link: "/howto/points",
-    },
-    {
-      name: "Le Classement",
-      variant: "secondary",
-      link: "/ranking",
-    },
+    ...(!process.env.DISABLE_HOWTO_POINTS
+      ? ([
+          {
+            name: "Comment gagner des points?",
+            variant: "secondary",
+            link: "/howto/points",
+          },
+        ] as const)
+      : []),
+    ...(!process.env.DISABLE_RANKING_PAGE
+      ? ([
+          {
+            name: "Le Classement",
+            variant: "secondary",
+            link: "/ranking",
+          },
+        ] as const)
+      : []),
     ...(session
       ? ([
           { name: "Grimm Pass", variant: "secondary", link: "/pass" },

@@ -22,6 +22,9 @@ export const POST = async (
   request: NextRequest,
   ctx: RouteContext<"/api/answers/[answerId]">
 ) => {
+  if (process.env.DISABLE_EDIT_POINTS)
+    return ApiResponse.unauthorized("Point system is currently disabled for editing");
+
   const session = await auth.api.getSession({ headers: await headers() });
 
   if (session === null) return ApiResponse.unauthorized();
