@@ -116,10 +116,10 @@ const Home = async () => {
                 data-slot="overlay"
                 className="opacity-0 absolute z-2 top-[50%] left-[50%] -translate-[50%] font-paytone text-primary-foreground flex flex-col items-center"
               >
-                <span className="text-4xl xl:text-5xl">
+                <span className="text-3xl xl:text-5xl">
                   {event.date.toLocaleDateString("fr-FR")}
                 </span>
-                <span className="text-xl xl:text-2xl">
+                <span className="text-lg xl:text-2xl">
                   {event.date.toLocaleTimeString("fr-FR")}
                 </span>
               </div>
@@ -127,7 +127,7 @@ const Home = async () => {
                 {/* <p className="bg-red text-red-foreground px-5 py-2 rounded-full text-sm lg:text-lg">
                   A venir
                 </p> */}
-                <p className="bg-secondary text-secondary-foreground px-5 py-2 rounded-full text-base xl:text-lg">
+                <p className="bg-secondary text-secondary-foreground px-5 py-2 rounded-full text-sm xl:text-lg">
                   {event.name}
                 </p>
                 <p className="static lg:hidden bg-secondary text-secondary-foreground px-5 py-2 rounded-full text-sm">
