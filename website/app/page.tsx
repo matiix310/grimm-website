@@ -218,7 +218,7 @@ const Home = async () => {
               </Button>
             </Link>
           </div>
-          <h1 className="text-sm lg:text-sm">Made With ❤️ By Liste BDE Grimm</h1>
+          <h1 className="text-sm lg:text-sm">Made With ❤️ By BDE Grimm</h1>
         </div>
       </section>
     </div>

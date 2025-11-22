@@ -33,7 +33,7 @@ const MinecraftAuthorizeCard = ({ username }: MinecraftAuthorizeCardProps) => {
     <Card className="absolute top-[50%] left-[50%] -translate-[50%]">
       <p className="font-paytone text-4xl">
         Voulez vous vraiment autoriser la connexion de votre compte minecraft &quot;
-        {username}&quot; au serveur de la liste BDE Grimm
+        {username}&quot; au serveur du BDE Grimm
       </p>
       <Button disabled={loading} size="lg" onClick={() => handleAuthorizeClick()}>
         {loading && <RefreshCw className="animate-spin" />}
