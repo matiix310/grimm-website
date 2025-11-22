@@ -52,7 +52,7 @@ const Home = async () => {
       </section>
       <section
         id="socials"
-        className="w-full pt-28 mt-15 lg:mt-0 flex flex-col px-5 lg:px-10 xl:px-20"
+        className="w-full pt-28 -mt-15 lg:mt-0 flex flex-col px-5 lg:px-10 xl:px-20"
       >
         <div className="flex gap-2 items-center">
           <div className="relative w-10 h-15 lg:w-13 lg:h-18 xl:w-20 xl:h-25">
@@ -62,7 +62,7 @@ const Home = async () => {
         </div>
         <div className="flex flex-col lg:flex-row justify-around items-center gap-2 mt-5 lg:mt-10">
           <Link href="/to/instagram" target="_blank">
-            <Button variant="secondary" size="lg" className="flex gap-2 items-center">
+            <Button variant="secondary" size="lg">
               <svg
                 className="w-8"
                 fill="var(--on-secondary)"
@@ -75,7 +75,7 @@ const Home = async () => {
             </Button>
           </Link>
           <Link href="/to/discord" target="_blank">
-            <Button variant="secondary" size="lg" className="flex gap-2 items-center">
+            <Button variant="secondary" size="lg">
               <svg
                 className="w-8"
                 fill="var(--on-secondary)"

@@ -24,7 +24,7 @@ const MobileMenu = ({ buttons }: MobileMenuProps) => {
         {open ? <X size={40} /> : <Menu size={40} />}
       </Button>
       {open && (
-        <div className="fixed top-25 left-0 h-screen w-screen z-10 bg-background flex flex-col">
+        <div className="fixed top-20 left-0 h-screen w-screen z-10 bg-background flex flex-col">
           {buttons.map((button) => (
             <Link key={button.link} href={button.link} onClick={() => setOpen(false)}>
               <Button

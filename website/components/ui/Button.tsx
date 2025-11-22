@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import { cva, type VariantProps } from "class-variance-authority";
 
 const buttonVariants = cva(
-  "font-paytone rounded-full flex justify-center items-center cursor-pointer transition-all ease-in-out gap-2 select-none disabled:opacity-70 disabled:cursor-default",
+  "font-paytone rounded-full flex justify-center items-center cursor-pointer transition-all ease-in-out select-none disabled:opacity-70 disabled:cursor-default",
   {
     variants: {
       variant: {
@@ -20,9 +20,10 @@ const buttonVariants = cva(
         link: "",
       },
       size: {
-        lg: "px-8 xl:px-9 py-4 xl:py-5 text-lg xl:text-xl",
-        default: "px-4 xl:px-5 py-1 xl:py-2 text-sm xl:text-base pb-2 xl:pb-3",
-        sm: "px-3 py-1 text-xs xl:text-sm pb-1.5",
+        lg: "px-7 xl:px-9 py-3 xl:py-5 text-lg lg:text-base xl:text-xl [&>svg]:size-7 xl:[&>svg]:size-10 gap-2 xl:gap-3",
+        default:
+          "px-4 xl:px-5 py-1 xl:py-2 text-sm lg:text-xs xl:text-base pb-2 xl:pb-3 [&>svg]:size-5 gap-2",
+        sm: "px-3 py-1 text-xs xl:text-sm pb-1.5 [&>svg]:size-5 gap-2",
         icon: "size-8 xl:size-10",
       },
     },

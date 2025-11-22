@@ -77,7 +77,7 @@ const Navbar = async ({ className, ...rest }: NavbarProps) => {
           priority
         />
       </Link>
-      <div className="gap-5 hidden lg:flex">
+      <div className="gap-3 xl:gap-5 hidden lg:flex">
         {buttons.map((button) => (
           <Link key={button.link} href={button.link}>
             <Button
