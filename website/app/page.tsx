@@ -26,11 +26,11 @@ const Home = async () => {
   return (
     <div>
       <Navbar className="fixed top-0 left-0 w-full z-10" />
-      <section className="relative w-full lg:h-110 mt-25 lg:bg-pink flex flex-col items-center lg:block">
-        <div className="relative lg:absolute top-0 lg:right-20 h-auto lg:h-130 w-[80%] lg:w-130 bg-blue p-10 pb-12 rounded-b-full outline-10 outline-black/10">
+      <section className="relative w-full lg:h-90 xl:h-110 mt-20 xl:mt-25 lg:bg-pink flex flex-col items-center lg:block">
+        <div className="relative lg:absolute top-0 lg:right-10 xl:right-20 h-auto lg:h-100 xl:h-130 w-[80%] lg:w-100 xl:w-130 bg-blue p-10 pb-12 rounded-b-full outline-8 xl:outline-10 outline-black/10">
           <div className="h-full aspect-square">
             <Image
-              className="size-full p-4 lg:p-8 ml-2.5 lg:ml-4"
+              className="size-full p-4 lg:p-6 xl:p-8 ml-2.5 lg:ml-3 xl:ml-4"
               alt="on vous veut!"
               src="/on-vous-veut.svg"
               fill={true}
@@ -39,11 +39,11 @@ const Home = async () => {
             />
           </div>
         </div>
-        <div className="flex flex-col gap-5 lg:gap-10 text-foreground lg:text-pink-foreground lg:w-[60%] mt-8 lg:mt-0 px-5 lg:px-15 h-full justify-center text-center lg:text-start">
-          <h1 className="font-paytone text-3xl lg:text-7xl">
+        <div className="flex flex-col gap-5 lg:gap-8 xl:gap-10 text-foreground lg:text-pink-foreground lg:w-[60%] mt-8 lg:mt-0 px-5 lg:px-10 xl:px-15 h-full justify-center text-center lg:text-start">
+          <h1 className="font-paytone text-3xl lg:text-5xl xl:text-7xl">
             Votez votre nouveau BDE! Votez GRIMM !!
           </h1>
-          <p className="text-xl lg:text-3xl">
+          <p className="text-xl lg:text-2xl xl:text-3xl">
             La campagne BDE est officiellement ouverte ! Du 10 novembre au 15 novembre,
             rendez-vous sur les sites de Villejuif et Kremlin-Bicêtre pour participer aux
             évévenements organisés par les listes pour le BDE de l’année 2025-2026 !
@@ -52,13 +52,13 @@ const Home = async () => {
       </section>
       <section
         id="socials"
-        className="w-full pt-28 -mt-15 lg:mt-0 flex flex-col px-5 lg:px-20"
+        className="w-full pt-28 mt-15 lg:mt-0 flex flex-col px-5 lg:px-10 xl:px-20"
       >
         <div className="flex gap-2 items-center">
-          <div className="relative w-10 h-15 lg:w-20 lg:h-25">
+          <div className="relative w-10 h-15 lg:w-13 lg:h-18 xl:w-20 xl:h-25">
             <Image alt="étoile" src="/star.svg" fill={true} objectPosition="center" />
           </div>
-          <h1 className="font-paytone text-3xl lg:text-7xl">Nos réseaux</h1>
+          <h1 className="font-paytone text-3xl lg:text-5xl xl:text-7xl">Nos réseaux</h1>
         </div>
         <div className="flex flex-col lg:flex-row justify-around items-center gap-2 mt-5 lg:mt-10">
           <Link href="/to/instagram" target="_blank">
@@ -91,13 +91,13 @@ const Home = async () => {
       </section>
       <section
         id="events"
-        className="w-full pt-28 -mt-15 lg:mt-0 flex flex-col px-5 lg:px-20"
+        className="w-full pt-28 -mt-15 lg:mt-0 flex flex-col px-5 lg:px-10 xl:px-20"
       >
         <div className="flex gap-2 items-center">
-          <div className="relative w-10 h-15 lg:w-20 lg:h-25">
+          <div className="relative w-10 h-15 lg:w-13 lg:h-18 xl:w-20 xl:h-25">
             <Image alt="étoile" src="/star.svg" fill={true} objectPosition="center" />
           </div>
-          <h1 className="font-paytone text-3xl lg:text-7xl">Les Events</h1>
+          <h1 className="font-paytone text-3xl lg:text-5xl xl:text-7xl">Les Events</h1>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 lg:gap-10 mt-5 lg:mt-10">
           {events.map((event) => (
@@ -137,19 +137,19 @@ const Home = async () => {
       </section>
       <section
         id="bureau"
-        className="w-full pt-28 -mt-15 lg:mt-0 flex flex-col px-5 lg:px-20"
+        className="w-full pt-28 -mt-15 lg:mt-0 flex flex-col px-5 lg:px-10 xl:px-20"
       >
         <div className="flex gap-2 items-center">
-          <div className="relative w-10 h-15 lg:w-20 lg:h-25">
+          <div className="relative w-10 h-15 lg:w-15 lg:h-20 xl:w-20 xl:h-25">
             <Image alt="étoile" src="/star.svg" fill={true} objectPosition="center" />
           </div>
-          <h1 className="font-paytone text-3xl lg:text-7xl">Le Bureau</h1>
+          <h1 className="font-paytone text-3xl lg:text-5xl xl:text-7xl">Le Bureau</h1>
         </div>
         <div className="hidden lg:flex gap-4 w-full mt-10">
           {bureau.map((b) => (
             <div
               key={b.login}
-              className="rounded-3xl flex flex-col gap-2 justify-around items-center font-paytone size-full overflow-hidden p-5 aspect-[0.7]"
+              className="rounded-3xl flex flex-col gap-2 justify-around items-center font-paytone size-full overflow-hidden p-3 xl:p-5 aspect-[0.7]"
               style={{
                 backgroundColor: `var(--${b.color})`,
                 color: `var(--on-${b.color})`,
@@ -183,7 +183,7 @@ const Home = async () => {
             objectPosition="center"
           />
         </div>
-        <div className="bg-black w-full h-30 pt-5 px-5 lg:px-20 text-background flex items-center justify-between">
+        <div className="bg-black w-full h-25 xl:h-30 pt-5 px-5 lg:px-10 xl:px-20 text-background flex items-center justify-between">
           <div className="flex gap-3 lg:gap-6">
             <Link href="/to/instagram" target="_blank">
               <Button size="icon" variant="link">
@@ -212,7 +212,7 @@ const Home = async () => {
               </Button>
             </Link>
           </div>
-          <h1>Made With ❤️ By Liste BDE Grimm</h1>
+          <h1 className="text-sm lg:text-sm">Made With ❤️ By Liste BDE Grimm</h1>
         </div>
       </section>
     </div>

@@ -61,7 +61,7 @@ const Navbar = async ({ className, ...rest }: NavbarProps) => {
   return (
     <div
       className={cn(
-        "flex items-center justify-between h-25 min-h-25 px-5 lg:px-8 bg-pink",
+        "flex items-center justify-between h-20 xl:h-25 min-h-20 xl:min-h-25 px-5 lg:px-8 bg-pink",
         className
       )}
       {...rest}
@@ -83,7 +83,7 @@ const Navbar = async ({ className, ...rest }: NavbarProps) => {
             <Button
               size="default"
               variant={button.variant}
-              className="border-3 border-background"
+              className="border-2 xl:border-3 border-background"
             >
               {button.name}
             </Button>
