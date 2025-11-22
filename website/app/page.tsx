@@ -114,16 +114,20 @@ const Home = async () => {
               <Skeleton className="absolute left-0 top-0 size-full -z-1" />
               <div
                 data-slot="overlay"
-                className="opacity-0 absolute z-2 top-[50%] left-[50%] -translate-[50%] font-paytone text-5xl text-primary-foreground flex flex-col items-center"
+                className="opacity-0 absolute z-2 top-[50%] left-[50%] -translate-[50%] font-paytone text-primary-foreground flex flex-col items-center"
               >
-                <span>{event.date.toLocaleDateString("fr-FR")}</span>
-                <span className="text-2xl">{event.date.toLocaleTimeString("fr-FR")}</span>
+                <span className="text-4xl xl:text-5xl">
+                  {event.date.toLocaleDateString("fr-FR")}
+                </span>
+                <span className="text-xl xl:text-2xl">
+                  {event.date.toLocaleTimeString("fr-FR")}
+                </span>
               </div>
               <div className="flex flex-col gap-2 items-end absolute bottom-5 right-5 font-paytone z-2">
                 {/* <p className="bg-red text-red-foreground px-5 py-2 rounded-full text-sm lg:text-lg">
                   A venir
                 </p> */}
-                <p className="bg-secondary text-secondary-foreground px-5 py-2 rounded-full text-sm lg:text-lg">
+                <p className="bg-secondary text-secondary-foreground px-5 py-2 rounded-full text-base xl:text-lg">
                   {event.name}
                 </p>
                 <p className="static lg:hidden bg-secondary text-secondary-foreground px-5 py-2 rounded-full text-sm">
@@ -165,8 +169,10 @@ const Home = async () => {
                   objectPosition="center"
                 />
               </div>
-              <p className="text-lg text-center leading-[100%]">{b.name}</p>
-              <p className="font-archivo text-lg text-center leading-[100%]">{b.role}</p>
+              <p className="text-sm xl:text-lg text-center leading-[100%]">{b.name}</p>
+              <p className="font-archivo text-sm xl:text-lg text-center leading-[100%]">
+                {b.role}
+              </p>
             </div>
           ))}
         </div>
