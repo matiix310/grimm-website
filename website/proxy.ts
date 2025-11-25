@@ -20,10 +20,9 @@ export async function proxy(request: NextRequest) {
     headers: await headers(),
   });
 
-  const host =
-    request.headers.get("host") === "localhost"
+  const host = request.headers.get("host"); /* === "localhost"
       ? "localhost:8000"
-      : request.headers.get("host");
+      : request.headers.get("host");*/
 
   if (!session) {
     return NextResponse.redirect(
