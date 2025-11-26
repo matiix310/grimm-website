@@ -1,10 +1,15 @@
-import { AddPointButton } from "@/components/users/AddPointButton";
-import { PointsList } from "@/components/users/PointsList";
+import DiscordIcon from "@/components/icons/DiscordIcon";
+import ForgeIcon from "@/components/icons/ForgeIcon";
+import MinecraftIcon from "@/components/icons/MinecraftIcon";
+import { AddSocialButton } from "@/components/users/AddSocialButton";
+import { UserProfilePicture } from "@/components/users/UserProfilePicture";
 import { db } from "@/db";
-import { points as pointsSchema } from "@/db/schema/points";
-import { auth } from "@/lib/auth";
-import { hasPermission } from "@/utils/auth";
-import { desc } from "drizzle-orm";
+import { minecraftUsernames } from "@/db/schema/minecraftUsernames";
+import { ranking } from "@/db/schema/ranking";
+import { auth, Roles } from "@/lib/auth";
+import { rolesMetadata } from "@/lib/permissions";
+import { eq } from "drizzle-orm";
+import { GlobeIcon, Plus } from "lucide-react";
 import { headers as nextHeaders } from "next/headers";
 
 const UserPage = async ({ params }: PageProps<"/users/[userId]">) => {
@@ -24,60 +29,130 @@ const UserPage = async ({ params }: PageProps<"/users/[userId]">) => {
 
   if (!user) return <h1>User not found</h1>;
 
-  const points = await db.query.points.findMany({
-    where: (points, { eq }) => eq(points.userId, user.id),
-    with: {
-      tags: {
-        with: {
-          tag: true,
+  const external = user.username !== null;
+
+  const roles = (
+    (user.role?.split(",").filter((r) => r !== "user") ?? []) as Roles[]
+  ).toSorted((a, b) => rolesMetadata[b].priority - rolesMetadata[a].priority);
+
+  const owner = session?.user.id === user.id;
+
+  const accounts = owner
+    ? await auth.api.listUserAccounts({ headers }).catch(() => [])
+    : [];
+
+  let minecraftAccount: string | undefined = undefined;
+  let discordAccount: string | undefined = undefined;
+
+  if (owner) {
+    minecraftAccount = (
+      await db.query.minecraftUsernames.findFirst({
+        where: eq(minecraftUsernames.userId, user.id),
+        columns: {
+          username: true,
         },
-      },
-    },
-    orderBy: [desc(pointsSchema.createdAt)],
-  });
+      })
+    )?.username;
 
-  const canAddPoints = await hasPermission({ headers, permissions: { points: ["add"] } });
-  const canDeletePoints = await hasPermission({
-    headers,
-    permissions: { points: ["delete"] },
-  });
+    const discordAccountId = accounts.find((a) => a.providerId === "discord")?.accountId;
+    if (discordAccountId) {
+      discordAccount =
+        (
+          await auth.api.accountInfo({
+            body: {
+              accountId: discordAccountId,
+            },
+            headers,
+          })
+        )?.user.name ?? "unknown";
+    }
+  }
 
-  const availableTags = canAddPoints ? await db.query.pointTags.findMany() : [];
+  const season1 = await db.query.ranking.findFirst({
+    where: eq(ranking.userId, user.id),
+  });
 
   return (
-    <div className="flex flex-col lg:flex-row gap-2 lg:gap-30 mt-2 lg:mt-5 mx-5 lg:mx-30 items-center h-full">
-      <div className="relative w-[70vw] lg:w-100 lg:-mt-30 h-fit">
-        <svg className="w-full aspect-square">
-          <circle cx="50%" cy="50%" r="50%" fill="var(--primary)" />
-        </svg>
-        {user.image && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            className="absolute right-3 lg:right-5 top-[50%] -translate-y-[50%] rounded-full w-[80%]"
-            alt="Image de profil"
-            src={user.image}
-          />
-        )}
-      </div>
-      <div className="flex-1 w-full flex flex-col h-full">
-        <div className="flex flex-col gap-5 lg:gap-10">
-          <div className="flex flex-col gap-2">
-            <h1 className="font-paytone text-4xl lg:text-7xl">{user.name}</h1>
-            <div className="flex gap-2 lg:gap-5">
-              <p className="font-paytone text-xl lg:text-3xl">
-                {points.reduce((sum, point) => sum + point.amount, 0)} points
-              </p>
-              {canAddPoints && (
-                <AddPointButton availableTags={availableTags} userLogin={user.login} />
-              )}
+    <div className="flex flex-col w-full px-5 lg:px-12 xl:px-20 pt-12 lg:pt-8 xl:pt-12 gap-8 lg:gap-8 xl:gap-12">
+      <div className="flex flex-col lg:flex-row gap-12 lg:gap-8 xl:gap-12 items-center">
+        <UserProfilePicture
+          className="w-[80%] lg:w-50 xl:w-70"
+          src={user.image ?? "/grimm-logo-round.svg"}
+        />
+        <div className="flex flex-col w-full justify-center gap-2 lg:gap-1 xl:gap-2">
+          <div className="flex flex-col lg:flex-row gap-2 lg:items-center">
+            <p className="text-5xl lg:text-5xl xl:text-6xl">{user.name}</p>
+            <div>
+              {roles.map((r) => (
+                <p
+                  key={r}
+                  className="text-xl lg:text-xl xl:text-2xl px-3 lg:px-3 xl:px-4 py-1 lg:py-1 xl:py-2 rounded-full w-fit"
+                  style={{
+                    backgroundColor: rolesMetadata[r].backgroundColor,
+                    color: rolesMetadata[r].foregroundColor,
+                  }}
+                >
+                  {r}
+                </p>
+              ))}
             </div>
           </div>
-          <PointsList
-            defaultPoints={points}
-            canDeletePoints={canDeletePoints}
-            userLogin={user.login}
-            className="flex-1 h-full"
-          />
+          <div className="flex gap-1 lg:gap-1 xl:gap-2 items-center">
+            <div className="aspect-square w-7 lg:w-7 xl:w-8 opacity-80">
+              {external ? (
+                <GlobeIcon className="size-full" />
+              ) : (
+                <ForgeIcon className="size-full" />
+              )}
+            </div>
+            <p className="text-3xl lg:text-3xl xl:text-4xl opacity-80">{user.login}</p>
+          </div>
+          <p className="text-3xl lg:text-3xl xl:text-4xl opacity-80">
+            Inscrit depuis le {user.createdAt.toLocaleDateString("fr-FR")}
+          </p>
+        </div>
+      </div>
+      {owner && (
+        <div className="flex flex-col gap-5 lg:gap-5 xl:gap-8">
+          <div className="flex flex-col lg:flex-row lg:gap-4 lg:items-center">
+            <h1 className="font-paytone text-5xl lg:text-5xl xl:text-6xl">
+              Mes connexions
+            </h1>
+            <AddSocialButton
+              state={{ discord: !!discordAccount, minecraft: !!minecraftAccount }}
+            >
+              <p>Ajouter</p> <Plus className="mt-1" />
+            </AddSocialButton>
+          </div>
+          <div className="flex flex-col gap-2">
+            {minecraftAccount !== undefined && (
+              <div className="flex gap-2 items-center">
+                <div className="aspect-square w-8 lg:w-8 xl:w-10 p-2 rounded-lg bg-secondary fill-secondary-foreground">
+                  <MinecraftIcon />
+                </div>
+                <p className="text-2xl lg:text-2xl xl:text-3xl">{minecraftAccount}</p>
+              </div>
+            )}
+            {discordAccount !== undefined && (
+              <div className="flex gap-2 items-center">
+                <div className="aspect-square w-8 lg:w-8 xl:w-10 p-2 rounded-lg bg-secondary fill-secondary-foreground">
+                  <DiscordIcon />
+                </div>
+                <p className="text-2xl lg:text-2xl xl:text-3xl">{discordAccount}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+      <div className="flex flex-col gap-5 lg:gap-5 xl:gap-8">
+        <h1 className="font-paytone text-5xl lg:text-5xl xl:text-6xl">Recap</h1>
+        <div className="flex flex-col gap-2">
+          {season1 && (
+            <p className="text-2xl lg:text-2xl xl:text-3xl">
+              Tome I, le commencement (#{season1.rank} avec {season1.points} point
+              {Math.abs(season1.points) > 1 ? "s" : ""})
+            </p>
+          )}
         </div>
       </div>
     </div>

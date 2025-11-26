@@ -70,11 +70,20 @@ export type AdminRole = typeof adminRole;
 export const rolesMetadata = {
   admin: {
     priority: 99,
+    backgroundColor: "var(--yellow)",
+    foregroundColor: "var(--on-yellow)",
   },
   manager: {
     priority: 10,
+    backgroundColor: "var(--red)",
+    foregroundColor: "var(--on-red)",
   },
   user: {
     priority: 0,
+    backgroundColor: "var(--secondary)",
+    foregroundColor: "var(--on-secondary)",
   },
-} as const satisfies Record<string, { priority: number }>;
+} as const satisfies Record<
+  string,
+  { priority: number; backgroundColor: string; foregroundColor: string }
+>;

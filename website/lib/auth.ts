@@ -49,6 +49,17 @@ export const auth = betterAuth({
     "https://liste.bde-grimm.com",
     "https://db.bde-grimm.com",
   ],
+  account: {
+    accountLinking: {
+      allowDifferentEmails: true,
+    },
+  },
+  socialProviders: {
+    discord: {
+      clientId: process.env.DISCORD_CLIENT_ID!,
+      clientSecret: process.env.DISCORD_CLIENT_SECRET!,
+    },
+  },
   plugins: [
     adminPlugin({
       ac,
