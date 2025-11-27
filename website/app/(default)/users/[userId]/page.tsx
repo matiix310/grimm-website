@@ -82,7 +82,7 @@ const UserPage = async ({ params }: PageProps<"/users/[userId]">) => {
         <div className="flex flex-col w-full justify-center gap-2 lg:gap-1 xl:gap-2">
           <div className="flex flex-col lg:flex-row gap-2 lg:items-center">
             <p className="text-5xl lg:text-5xl xl:text-6xl">{user.name}</p>
-            <div>
+            <div className="flex flex-row gap-2">
               {roles.map((r) => (
                 <p
                   key={r}

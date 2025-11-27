@@ -36,15 +36,17 @@ export async function proxy(request: NextRequest) {
 
   if (session.user.banned) return NextResponse.redirect(process.env.BASE_URL!);
 
+  const roles = session.user.role?.split(",") ?? [];
+
   if (request.headers.get("host") === "db.bde-grimm.com")
-    if (session.user.role !== "admin")
+    if (!roles.includes("admin"))
       return NextResponse.redirect(
         new URL(`${process.env.BASE_URL!}/login?redirect=https://db.bde-grimm.com${path}`)
       );
     else return NextResponse.rewrite("http://drizzle-gate:4983" + path);
 
   // To access "/admin" you must have "admin" role
-  if (path.startsWith("/admin") && session.user.role !== "admin") {
+  if (path.startsWith("/admin") && !roles.includes("admin")) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 

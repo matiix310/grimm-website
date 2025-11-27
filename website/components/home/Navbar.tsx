@@ -19,7 +19,7 @@ const Navbar = async ({ className, ...rest }: NavbarProps) => {
     headers: await headers(),
   });
 
-  const isAdmin = session?.user.role === "admin";
+  const isAdmin = session?.user.role?.split(",").includes("admin") ?? false;
 
   const buttons: MenuButton[] = [
     ...(isAdmin
