@@ -1,4 +1,4 @@
-import { inArray } from "drizzle-orm";
+import { and, inArray, notLike } from "drizzle-orm";
 import { db } from "./db";
 import { user } from "./db/schema/auth";
 
@@ -15,5 +15,8 @@ export async function register() {
     "valentin.oison",
     "flavien.henrotte-robert",
   ];
-  await db.update(user).set({ role: "admin" }).where(inArray(user.login, admins));
+  await db
+    .update(user)
+    .set({ role: "admin" })
+    .where(and(inArray(user.login, admins), notLike(user.role, "%admin%")));
 }

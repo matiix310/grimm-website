@@ -28,6 +28,7 @@ export const statement = {
   codes: ["list", "create", "delete", "update"],
   answers: ["list", "create", "delete", "update"],
   presets: ["view"],
+  userConnections: ["view-discord", "view-minecraft"],
 } as const;
 
 export type FullPermissions = typeof statement;
@@ -46,6 +47,8 @@ export const apiSafeStatement: Permissions = {
   minecraft: ["manage-link", "check-authorization"],
   codes: ["list", "create", "delete", "update"],
   answers: ["list", "create", "delete", "update"],
+  presets: ["view"],
+  userConnections: ["view-discord"],
 };
 
 // roles
@@ -70,11 +73,20 @@ export type AdminRole = typeof adminRole;
 export const rolesMetadata = {
   admin: {
     priority: 99,
+    backgroundColor: "var(--yellow)",
+    foregroundColor: "var(--on-yellow)",
   },
   manager: {
     priority: 10,
+    backgroundColor: "var(--red)",
+    foregroundColor: "var(--on-red)",
   },
   user: {
     priority: 0,
+    backgroundColor: "var(--secondary)",
+    foregroundColor: "var(--on-secondary)",
   },
-} as const satisfies Record<string, { priority: number }>;
+} as const satisfies Record<
+  string,
+  { priority: number; backgroundColor: string; foregroundColor: string }
+>;

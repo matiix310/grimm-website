@@ -15,20 +15,43 @@ const schema = {
         id: true,
         name: true,
         image: true,
-        role: true,
         banned: true,
         login: true,
-      }).and(z.object({ updatedAt: z.coerce.date(), createdAt: z.coerce.date() })),
-      canGiveRoles: z.array(z.string()),
+      }).and(
+        z.object({
+          updatedAt: z.coerce.date(),
+          createdAt: z.coerce.date(),
+          roles: z.array(
+            z.union(
+              Object.keys(rolesMetadata).map((r) =>
+                z.literal(r as keyof typeof rolesMetadata)
+              )
+            )
+          ),
+        })
+      ),
+      connections: z.object({
+        discord: z.string().optional(),
+        minecraft: z.string().optional(),
+      }),
+      canEditRoles: z.array(
+        z.union(
+          Object.keys(rolesMetadata).map((r) =>
+            z.literal(r as keyof typeof rolesMetadata)
+          )
+        )
+      ),
     }),
   },
   "@post/api/users/:id": {
     input: z.object({
       name: z.optional(z.string()),
-      role: z.optional(
-        z.union(
-          Object.keys(rolesMetadata).map((r) =>
-            z.literal(r as keyof typeof rolesMetadata)
+      roles: z.optional(
+        z.array(
+          z.union(
+            Object.keys(rolesMetadata).map((r) =>
+              z.literal(r as keyof typeof rolesMetadata)
+            )
           )
         )
       ),
@@ -37,10 +60,21 @@ const schema = {
       id: true,
       name: true,
       image: true,
-      role: true,
       banned: true,
       login: true,
-    }).and(z.object({ updatedAt: z.coerce.date(), createdAt: z.coerce.date() })),
+    }).and(
+      z.object({
+        updatedAt: z.coerce.date(),
+        createdAt: z.coerce.date(),
+        roles: z.array(
+          z.union(
+            Object.keys(rolesMetadata).map((r) =>
+              z.literal(r as keyof typeof rolesMetadata)
+            )
+          )
+        ),
+      })
+    ),
   },
   ...pointsSchema,
   ...minecraftLinkSchema,

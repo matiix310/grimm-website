@@ -40,7 +40,7 @@ type AdminUsersTableProps = {
   _?: string;
 };
 
-type User = UserWithRole & { login: string };
+type User = Omit<UserWithRole & { login: string }, "email" | "emailVerified">;
 
 const AdminUsersTable = ({}: AdminUsersTableProps) => {
   const [users, setUsers] = React.useState<User[]>([]);

@@ -1,5 +1,6 @@
 import { db } from "@/db";
-import { user, user as userSchema } from "@/db/schema/auth";
+import { account, user, user as userSchema } from "@/db/schema/auth";
+import { minecraftUsernames } from "@/db/schema/minecraftUsernames";
 import ApiResponse from "@/lib/apiResponse";
 import { auth } from "@/lib/auth";
 import { rolesMetadata } from "@/lib/permissions";
@@ -15,45 +16,83 @@ export const GET = async (
 ) => {
   const params = await ctx.params;
 
-  const userResponse = await db.query.user.findFirst({
+  const target = await db.query.user.findFirst({
     where: eq(userSchema.login, params.userId),
   });
 
-  if (!userResponse) return ApiResponse.notFoundUser();
+  if (!target) return ApiResponse.notFoundUser();
 
-  const user = await auth.api.getSession({ headers: await nextHeaders() });
+  const headers = await nextHeaders();
+
+  const user = await auth.api.getSession({ headers });
 
   // By default, users can manage users with a role that has a lower priority
-  // If a user is not logged in it gets a priority of -1 (aka can't do anything)
-  const userPriority = !user?.user.role
-    ? -1
-    : rolesMetadata[user?.user.role as keyof typeof rolesMetadata].priority;
+  // If a user is not logged in it gets a priority of -Infinity (aka can't do anything)
 
-  const targetPriority = !userResponse.role
-    ? -1
-    : rolesMetadata[userResponse.role as keyof typeof rolesMetadata].priority;
+  const userRoles = user?.user.role?.split(",").filter((r) => r in rolesMetadata) ?? [];
+  const userPriority = Math.max(
+    ...userRoles.map((r) => rolesMetadata[r as keyof typeof rolesMetadata].priority)
+  );
 
-  const canGiveRoles =
-    userPriority <= targetPriority
-      ? userResponse.role === null
-        ? []
-        : [userResponse.role]
+  const targetRoles = target.role?.split(",").filter((r) => r in rolesMetadata) ?? [];
+  const targetPriority = Math.max(
+    ...targetRoles.map((r) => rolesMetadata[r as keyof typeof rolesMetadata].priority)
+  );
+
+  const canEditRoles =
+    userPriority <= targetPriority && userPriority < rolesMetadata.admin.priority
+      ? []
       : Object.entries(rolesMetadata)
-          .filter(([, { priority }]) => priority < userPriority)
+          .filter(([r, { priority }]) => priority < userPriority && r !== "user")
           .map(([roleName]) => roleName);
+
+  const connections: { discord?: string; minecraft?: string } = {};
+
+  // get the user connections
+  const accounts = await db.query.account.findMany({
+    where: eq(account.userId, target.id),
+  });
+
+  // discord connection
+  if (
+    user?.user.id === target.id ||
+    (await hasPermission({ headers, permissions: { userConnections: ["view-discord"] } }))
+  ) {
+    const discordAccount = accounts.find((a) => a.providerId === "discord");
+    if (discordAccount !== undefined) {
+      connections.discord = discordAccount.accountId;
+    }
+  }
+
+  // minecraft connection
+  if (
+    user?.user.id === target.id ||
+    (await hasPermission({
+      headers,
+      permissions: { userConnections: ["view-minecraft"] },
+    }))
+  ) {
+    const minecraftAccount = await db.query.minecraftUsernames.findFirst({
+      where: eq(minecraftUsernames.userId, target.id),
+    });
+    if (minecraftAccount !== undefined) {
+      connections.minecraft = minecraftAccount.username;
+    }
+  }
 
   return ApiResponse.json({
     user: {
-      id: userResponse.id,
-      name: userResponse.name,
-      image: userResponse.image,
-      role: userResponse.role,
-      banned: userResponse.banned,
-      login: userResponse.login,
-      updatedAt: userResponse.updatedAt,
-      createdAt: userResponse.createdAt,
+      id: target.id,
+      name: target.name,
+      image: target.image,
+      roles: targetRoles,
+      banned: target.banned,
+      login: target.login,
+      updatedAt: target.updatedAt,
+      createdAt: target.createdAt,
     },
-    canGiveRoles,
+    connections,
+    canEditRoles,
   });
 };
 
@@ -90,8 +129,12 @@ export const POST = async (
         .refine((arg) => arg.replaceAll(" ", "").length > 0, {
           error: "Should not be empty",
         }),
-      role: z.union(
-        Object.keys(rolesMetadata).map((r) => z.literal(r as keyof typeof rolesMetadata))
+      roles: z.array(
+        z.union(
+          Object.keys(rolesMetadata).map((r) =>
+            z.literal(r as keyof typeof rolesMetadata)
+          )
+        )
       ),
     })
     .partial()
@@ -102,37 +145,66 @@ export const POST = async (
   if (Object.keys(parsed.data).length === 0)
     return ApiResponse.badRequest("Body should not be empty");
 
-  if (parsed.data.role !== undefined) {
+  if (parsed.data.roles !== undefined) {
     const originUser = await auth.api.getSession({ headers });
 
     if (!originUser)
       return ApiResponse.unauthorized("Only a user can change the role of another user");
 
-    // check that the user as the permission to assign this role
-    const targetUserPriority = !targetUser.role
-      ? -1
-      : rolesMetadata[targetUser.role as keyof typeof rolesMetadata].priority;
+    const originUserRoles = (originUser.user.role
+      ?.split(",")
+      .filter((r) => r in rolesMetadata) ?? []) as (keyof typeof rolesMetadata)[];
+    const targetUserRoles = (targetUser.role
+      ?.split(",")
+      .filter((r) => r in rolesMetadata) ?? []) as (keyof typeof rolesMetadata)[];
 
-    const originUserPriority = !originUser.user.role
-      ? -1
-      : rolesMetadata[originUser.user.role as keyof typeof rolesMetadata].priority;
+    // check that the target user has a lower priority than the origin user
+    const originUserMaxPriority = Math.max(
+      ...originUserRoles.map(
+        (r) => rolesMetadata[r as keyof typeof rolesMetadata].priority
+      )
+    );
 
-    if (originUserPriority <= targetUserPriority)
+    const targetUserMaxPriority = Math.max(
+      ...targetUserRoles.map(
+        (r) => rolesMetadata[r as keyof typeof rolesMetadata].priority
+      )
+    );
+
+    if (
+      targetUserMaxPriority >= originUserMaxPriority &&
+      originUserMaxPriority < rolesMetadata.admin.priority
+    )
       return ApiResponse.unauthorized(
-        "You don't have the required permissions to edit the role of this user"
+        "The target user has a greater priority than yours. You can't edit their roles"
       );
 
-    const rolePriority = rolesMetadata[parsed.data.role].priority;
+    // check that the origin user can give / remove the roles he has given / removed
+    const newRoles = parsed.data.roles.filter((r) => !targetUserRoles.includes(r));
+    const removedRoles = targetUserRoles.filter((r) => !parsed.data.roles!.includes(r));
 
-    if (originUserPriority <= rolePriority)
-      return ApiResponse.unauthorized(
-        "You don't have the required permissions to assign this role"
-      );
+    const editedRoles = [...newRoles, ...removedRoles];
+
+    if (removedRoles.includes("user"))
+      return ApiResponse.unauthorized(`You can't remove the defautl role: ${user}`);
+
+    for (const role of editedRoles) {
+      const priority = rolesMetadata[role].priority;
+      if (priority >= originUserMaxPriority)
+        return ApiResponse.unauthorized(
+          `You can't edit the role ${role}. You don't have the required permissions.`
+        );
+    }
+
+    // order the role with their priority
+    parsed.data.roles.toSorted(
+      (a, b) => rolesMetadata[b].priority - rolesMetadata[a].priority
+    );
   }
 
   const updatedUser = await db
     .update(user)
-    .set(parsed.data)
+    .set({ ...parsed.data, role: parsed.data.roles?.join(",") })
     .where(eq(user.id, targetUser.id))
     .returning();
 
@@ -142,7 +214,7 @@ export const POST = async (
     id: updatedUser[0].id,
     name: updatedUser[0].name,
     image: updatedUser[0].image,
-    role: updatedUser[0].role,
+    roles: updatedUser[0].role?.split(",").filter((r) => r in rolesMetadata) ?? [],
     banned: updatedUser[0].banned,
     login: updatedUser[0].login,
     updatedAt: updatedUser[0].updatedAt,

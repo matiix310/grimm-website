@@ -23,9 +23,8 @@ import { Input } from "@/components/ui/Input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/Popover";
 import { $fetch, ApiSchema } from "@/lib/betterFetch";
 import { rolesMetadata } from "@/lib/permissions";
-import { cn } from "@/lib/utils";
 import { useForm } from "@tanstack/react-form";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Plus } from "lucide-react";
 import React from "react";
 import z from "zod";
 
@@ -33,7 +32,11 @@ const formSchema = z.object({
   name: z.string().refine((name) => name.replaceAll(" ", "").length > 0, {
     error: "Ne dois pas être vide",
   }),
-  role: z.string(),
+  roles: z.array(
+    z.union(
+      Object.keys(rolesMetadata).map((r) => z.literal(r as keyof typeof rolesMetadata))
+    )
+  ),
 });
 
 type AdminUserEditDialogProps = {
@@ -49,12 +52,12 @@ const AdminUserEditDialog = ({
 }: AdminUserEditDialogProps) => {
   const [loading, setLoading] = React.useState(false);
   const [user, setUser] = React.useState<ApiSchema["/api/users/:id"]["output"]>();
-  const [roleOpen, setRoleOpen] = React.useState(false);
+  const [rolesOpen, setRolesOpen] = React.useState(false);
 
   const form = useForm({
     defaultValues: {
-      name: "",
-      role: "",
+      name: "" as z.infer<typeof formSchema>["name"],
+      roles: [] as z.infer<typeof formSchema>["roles"],
     },
     validators: {
       onSubmit: formSchema,
@@ -62,21 +65,13 @@ const AdminUserEditDialog = ({
     onSubmit: async ({ value }) => {
       if (loading || !userLogin) return;
 
-      const name = value.name === user!.user.name ? undefined : value.name;
-      const role =
-        value.role === user!.user.role
-          ? undefined
-          : (value.role as keyof typeof rolesMetadata);
-
-      if (!name && !role) return;
-
       setLoading(true);
 
       const { data, error } = await $fetch("@post/api/users/:id", {
         params: { id: userLogin },
         body: {
-          name,
-          role,
+          name: value.name,
+          roles: value.roles,
         },
       });
 
@@ -100,7 +95,7 @@ const AdminUserEditDialog = ({
       if (error) throw new Error(error.message);
       setUser(data);
       form.setFieldValue("name", data.user.name);
-      form.setFieldValue("role", data.user.role as string);
+      form.setFieldValue("roles", data.user.roles);
     });
   }, [userLogin, form]);
 
@@ -144,62 +139,65 @@ const AdminUserEditDialog = ({
               }}
             />
             <form.Field
-              name="role"
+              name="roles"
               // eslint-disable-next-line react/no-children-prop
               children={(field) => {
-                const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
                 return (
-                  <Field data-invalid={isInvalid}>
-                    <FieldLabel htmlFor={field.name}>Role</FieldLabel>
-                    <Popover open={roleOpen} onOpenChange={setRoleOpen}>
-                      <PopoverTrigger asChild>
+                  <Field>
+                    <FieldLabel htmlFor={field.name}>Roles</FieldLabel>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {Object.keys(field.state.value).length === 0 && (
+                        <p>Aucun role séléctioné</p>
+                      )}
+                      {field.state.value.map((r) => (
                         <Button
-                          aria-invalid={isInvalid}
-                          disabled={user === undefined}
-                          variant="outline"
-                          role="combobox"
-                          aria-expanded={roleOpen}
-                          className="w-[200px]! justify-between font-archivo"
+                          variant="secondary"
+                          size="sm"
+                          key={r}
+                          className="hover:bg-red hover:text-red-foreground"
+                          onClick={() =>
+                            field.handleChange((old) => old.filter((oldR) => oldR !== r))
+                          }
+                          disabled={!user?.canEditRoles.includes(r)}
                         >
-                          {field.state.value}
-                          <ChevronsUpDown className="opacity-50" />
+                          {r}
                         </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-[200px] p-0">
-                        <Command>
-                          <CommandInput
-                            placeholder="Chercher un role..."
-                            className="h-9"
-                          />
-                          <CommandList>
-                            <CommandEmpty>Aucun role trouvé</CommandEmpty>
-                            <CommandGroup>
-                              {user?.canGiveRoles?.map((roleName) => (
-                                <CommandItem
-                                  key={roleName}
-                                  value={roleName}
-                                  onSelect={(currentValue) => {
-                                    field.handleChange(currentValue);
-                                    setRoleOpen(false);
-                                  }}
-                                >
-                                  {roleName}
-                                  <Check
-                                    className={cn(
-                                      "ml-auto",
-                                      field.state.value === roleName
-                                        ? "opacity-100"
-                                        : "opacity-0"
-                                    )}
-                                  />
-                                </CommandItem>
-                              ))}
-                            </CommandGroup>
-                          </CommandList>
-                        </Command>
-                      </PopoverContent>
-                    </Popover>
-                    {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                      ))}
+                      <Popover modal={true} open={rolesOpen} onOpenChange={setRolesOpen}>
+                        <PopoverTrigger asChild>
+                          <Button variant="secondary" size="icon" className="size-8">
+                            <Plus size={20} />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[200px] p-0" align="start">
+                          <Command>
+                            <CommandInput placeholder="Rechercher une permission..." />
+                            <CommandList>
+                              <CommandEmpty>Aucun role disponible</CommandEmpty>
+                              <CommandGroup>
+                                {user?.canEditRoles
+                                  .filter((r) => !field.state.value.includes(r))
+                                  .map((r) => (
+                                    <CommandItem
+                                      className="cursor-pointer"
+                                      key={r}
+                                      value={r}
+                                      onSelect={() => {
+                                        field.handleChange((old) => {
+                                          return [...old, r];
+                                        });
+                                        setRolesOpen(false);
+                                      }}
+                                    >
+                                      {r}
+                                    </CommandItem>
+                                  ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                    </div>
                   </Field>
                 );
               }}
