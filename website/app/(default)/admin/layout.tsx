@@ -7,7 +7,7 @@ const AdminLayout = ({
 }>) => {
   return (
     <div className="flex flex-col gap-5">
-      <div className="flex flex-col gap-2 ml-8">
+      <div className="flex flex-col gap-2 px-5 lg:px-8">
         <h1 className="font-paytone text-7xl">Admin</h1>
         <Navbar
           routes={[
@@ -18,9 +18,10 @@ const AdminLayout = ({
             { name: "Codes", path: "/admin/codes" },
             { name: "Réponses", path: "/admin/answers" },
           ]}
+          className="max-w-full overflow-x-scroll"
         />
+        <div className="mt-3">{children}</div>
       </div>
-      <div>{children}</div>
     </div>
   );
 };

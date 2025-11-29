@@ -23,7 +23,7 @@ const AnswersPage = () => {
   }, []);
 
   return (
-    <div className="mx-8 flex flex-col gap-4">
+    <div className="flex flex-col gap-4">
       <AdminAnswerCreateButton
         onNewAnswer={(answer) => setAnswers((old) => [...old, { ...answer, users: [] }])}
       />

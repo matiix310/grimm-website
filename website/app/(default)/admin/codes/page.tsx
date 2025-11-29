@@ -23,7 +23,7 @@ const CodesPage = () => {
   }, []);
 
   return (
-    <div className="mx-8 flex flex-col gap-4">
+    <div className="flex flex-col gap-4">
       <AdminCodeCreateButton
         onNewCode={(code) => setCodes((old) => [...old, { ...code, users: [] }])}
       />
