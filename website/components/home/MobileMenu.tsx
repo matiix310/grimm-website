@@ -18,10 +18,10 @@ const MobileMenu = ({ buttons }: MobileMenuProps) => {
       <Button
         size="icon"
         variant="ghost"
-        className="size-15 z-20"
+        className="size-10 [&>svg]:size-8 z-20"
         onClick={() => setOpen((o) => !o)}
       >
-        {open ? <X size={40} /> : <Menu size={40} />}
+        {open ? <X /> : <Menu />}
       </Button>
       {open && (
         <div className="fixed top-20 left-0 h-screen w-screen z-10 bg-background flex flex-col">
