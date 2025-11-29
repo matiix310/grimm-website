@@ -7,6 +7,7 @@ import codesSchema from "./admin/codes/routeSchema";
 import adminAnswersSchema from "./admin/answers/routeSchema";
 import answersSchema from "./answers/[answerId]/routeSchema";
 import minecraftSchema from "./minecraft/[minecraftUsername]/routeSchema";
+import discordSchema from "./discord/[discordId]/routeSchema";
 import presetsSchema from "./points/presets/routeSchema";
 
 const schema = {
@@ -19,6 +20,7 @@ const schema = {
   ...adminAnswersSchema,
   ...answersSchema,
   ...minecraftSchema,
+  ...discordSchema,
   ...presetsSchema,
 };
 

@@ -30,6 +30,10 @@ const schema = {
           ),
         })
       ),
+      connections: z.object({
+        discord: z.string().optional(),
+        minecraft: z.string().optional(),
+      }),
       canEditRoles: z.array(
         z.union(
           Object.keys(rolesMetadata).map((r) =>

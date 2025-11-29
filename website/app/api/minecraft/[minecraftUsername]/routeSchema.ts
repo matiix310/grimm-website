@@ -6,7 +6,6 @@ const schema = {
   "/api/minecraft/:username": {
     output: z.object({
       login: z.string(),
-      username: z.string(),
       updatedAt: z.coerce.date(),
       createdAt: z.coerce.date(),
     }),

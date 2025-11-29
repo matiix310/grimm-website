@@ -28,6 +28,7 @@ export const statement = {
   codes: ["list", "create", "delete", "update"],
   answers: ["list", "create", "delete", "update"],
   presets: ["view"],
+  userConnections: ["view-discord", "view-minecraft"],
 } as const;
 
 export type FullPermissions = typeof statement;
@@ -46,6 +47,8 @@ export const apiSafeStatement: Permissions = {
   minecraft: ["manage-link", "check-authorization"],
   codes: ["list", "create", "delete", "update"],
   answers: ["list", "create", "delete", "update"],
+  presets: ["view"],
+  userConnections: ["view-discord"],
 };
 
 // roles

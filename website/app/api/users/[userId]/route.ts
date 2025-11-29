@@ -1,5 +1,6 @@
 import { db } from "@/db";
-import { user, user as userSchema } from "@/db/schema/auth";
+import { account, user, user as userSchema } from "@/db/schema/auth";
+import { minecraftUsernames } from "@/db/schema/minecraftUsernames";
 import ApiResponse from "@/lib/apiResponse";
 import { auth } from "@/lib/auth";
 import { rolesMetadata } from "@/lib/permissions";
@@ -15,13 +16,15 @@ export const GET = async (
 ) => {
   const params = await ctx.params;
 
-  const userResponse = await db.query.user.findFirst({
+  const target = await db.query.user.findFirst({
     where: eq(userSchema.login, params.userId),
   });
 
-  if (!userResponse) return ApiResponse.notFoundUser();
+  if (!target) return ApiResponse.notFoundUser();
 
-  const user = await auth.api.getSession({ headers: await nextHeaders() });
+  const headers = await nextHeaders();
+
+  const user = await auth.api.getSession({ headers });
 
   // By default, users can manage users with a role that has a lower priority
   // If a user is not logged in it gets a priority of -Infinity (aka can't do anything)
@@ -31,8 +34,7 @@ export const GET = async (
     ...userRoles.map((r) => rolesMetadata[r as keyof typeof rolesMetadata].priority)
   );
 
-  const targetRoles =
-    userResponse.role?.split(",").filter((r) => r in rolesMetadata) ?? [];
+  const targetRoles = target.role?.split(",").filter((r) => r in rolesMetadata) ?? [];
   const targetPriority = Math.max(
     ...targetRoles.map((r) => rolesMetadata[r as keyof typeof rolesMetadata].priority)
   );
@@ -44,17 +46,52 @@ export const GET = async (
           .filter(([r, { priority }]) => priority < userPriority && r !== "user")
           .map(([roleName]) => roleName);
 
+  const connections: { discord?: string; minecraft?: string } = {};
+
+  // get the user connections
+  const accounts = await db.query.account.findMany({
+    where: eq(account.userId, target.id),
+  });
+
+  // discord connection
+  if (
+    user?.user.id === target.id ||
+    (await hasPermission({ headers, permissions: { userConnections: ["view-discord"] } }))
+  ) {
+    const discordAccount = accounts.find((a) => a.providerId === "discord");
+    if (discordAccount !== undefined) {
+      connections.discord = discordAccount.accountId;
+    }
+  }
+
+  // minecraft connection
+  if (
+    user?.user.id === target.id ||
+    (await hasPermission({
+      headers,
+      permissions: { userConnections: ["view-minecraft"] },
+    }))
+  ) {
+    const minecraftAccount = await db.query.minecraftUsernames.findFirst({
+      where: eq(minecraftUsernames.userId, target.id),
+    });
+    if (minecraftAccount !== undefined) {
+      connections.minecraft = minecraftAccount.username;
+    }
+  }
+
   return ApiResponse.json({
     user: {
-      id: userResponse.id,
-      name: userResponse.name,
-      image: userResponse.image,
+      id: target.id,
+      name: target.name,
+      image: target.image,
       roles: targetRoles,
-      banned: userResponse.banned,
-      login: userResponse.login,
-      updatedAt: userResponse.updatedAt,
-      createdAt: userResponse.createdAt,
+      banned: target.banned,
+      login: target.login,
+      updatedAt: target.updatedAt,
+      createdAt: target.createdAt,
     },
+    connections,
     canEditRoles,
   });
 };
