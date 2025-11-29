@@ -92,7 +92,7 @@ const UserPage = async ({ params }: PageProps<"/users/[userId]">) => {
                     color: rolesMetadata[r].foregroundColor,
                   }}
                 >
-                  {r}
+                  {rolesMetadata[r].displayName}
                 </p>
               ))}
             </div>
