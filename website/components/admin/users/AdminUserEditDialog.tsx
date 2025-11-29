@@ -160,7 +160,7 @@ const AdminUserEditDialog = ({
                           }
                           disabled={!user?.canEditRoles.includes(r)}
                         >
-                          {r}
+                          {rolesMetadata[r].displayName}
                         </Button>
                       ))}
                       <Popover modal={true} open={rolesOpen} onOpenChange={setRolesOpen}>
@@ -181,7 +181,7 @@ const AdminUserEditDialog = ({
                                     <CommandItem
                                       className="cursor-pointer"
                                       key={r}
-                                      value={r}
+                                      value={rolesMetadata[r].displayName}
                                       onSelect={() => {
                                         field.handleChange((old) => {
                                           return [...old, r];
@@ -189,7 +189,7 @@ const AdminUserEditDialog = ({
                                         setRolesOpen(false);
                                       }}
                                     >
-                                      {r}
+                                      {rolesMetadata[r].displayName}
                                     </CommandItem>
                                   ))}
                               </CommandGroup>

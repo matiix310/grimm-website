@@ -57,15 +57,37 @@ export const userRole = {
   user: ["get"],
 } satisfies Permissions;
 
-export const managerRole = {
-  ...userRole,
-  points: ["add", "delete"],
-  presets: ["view"],
-} satisfies Permissions;
-
 export const adminRole = Object.fromEntries(
   Object.entries(statement).map(([k, v]) => [k, [...v]])
 ) as Mutable<FullPermissions>;
+
+export const bureauRole = {
+  ...userRole,
+} satisfies Permissions;
+
+export const respoTechRole = {
+  ...userRole,
+} satisfies Permissions;
+
+export const respoDesignRole = {
+  ...userRole,
+} satisfies Permissions;
+
+export const respoComRole = {
+  ...userRole,
+} satisfies Permissions;
+
+export const respoAssistantsRole = {
+  ...userRole,
+} satisfies Permissions;
+
+export const respoWeiRole = {
+  ...userRole,
+} satisfies Permissions;
+
+export const respoInterRole = {
+  ...userRole,
+} satisfies Permissions;
 
 export type AdminRole = typeof adminRole;
 
@@ -75,18 +97,62 @@ export const rolesMetadata = {
     priority: 99,
     backgroundColor: "var(--yellow)",
     foregroundColor: "var(--on-yellow)",
+    displayName: "Admin",
   },
-  manager: {
-    priority: 10,
-    backgroundColor: "var(--red)",
-    foregroundColor: "var(--on-red)",
+  bureau: {
+    priority: 90,
+    backgroundColor: "#e36335",
+    foregroundColor: "#ffffff",
+    displayName: "Bureau",
+  },
+  respoTech: {
+    priority: 80,
+    backgroundColor: "#f5a90d",
+    foregroundColor: "#ffffff",
+    displayName: "Respo Tech",
+  },
+  respoDesign: {
+    priority: 80,
+    backgroundColor: "#f5a90d",
+    foregroundColor: "#ffffff",
+    displayName: "Respo Design",
+  },
+  respoCom: {
+    priority: 80,
+    backgroundColor: "#f5a90d",
+    foregroundColor: "#ffffff",
+    displayName: "Respo Com",
+  },
+  respoAssistant: {
+    priority: 80,
+    backgroundColor: "#f5a90d",
+    foregroundColor: "#ffffff",
+    displayName: "Respo Assistants",
+  },
+  respoWei: {
+    priority: 80,
+    backgroundColor: "#f5a90d",
+    foregroundColor: "#ffffff",
+    displayName: "Respo Wei",
+  },
+  respoInter: {
+    priority: 80,
+    backgroundColor: "#f5a90d",
+    foregroundColor: "#ffffff",
+    displayName: "Respo Inter",
   },
   user: {
     priority: 0,
     backgroundColor: "var(--secondary)",
     foregroundColor: "var(--on-secondary)",
+    displayName: "Utilisateur",
   },
 } as const satisfies Record<
   string,
-  { priority: number; backgroundColor: string; foregroundColor: string }
+  {
+    priority: number;
+    backgroundColor: string;
+    foregroundColor: string;
+    displayName: string;
+  }
 >;

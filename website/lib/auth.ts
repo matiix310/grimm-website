@@ -9,15 +9,42 @@ import {
   username,
 } from "better-auth/plugins";
 import { createAccessControl } from "better-auth/plugins/access";
-import { adminRole, managerRole, statement, userRole } from "./permissions";
+import {
+  adminRole,
+  bureauRole,
+  respoAssistantsRole,
+  respoComRole,
+  respoDesignRole,
+  respoInterRole,
+  respoTechRole,
+  respoWeiRole,
+  statement,
+  userRole,
+} from "./permissions";
 
 const ac = createAccessControl(statement);
 
 export const user = ac.newRole(userRole);
-export const manager = ac.newRole(managerRole);
 export const admin = ac.newRole(adminRole);
+export const bureau = ac.newRole(bureauRole);
+export const respoTech = ac.newRole(respoTechRole);
+export const respoDesign = ac.newRole(respoDesignRole);
+export const respoCom = ac.newRole(respoComRole);
+export const respoAssistants = ac.newRole(respoAssistantsRole);
+export const respoWei = ac.newRole(respoWeiRole);
+export const respoInter = ac.newRole(respoInterRole);
 
-const roles = { user, manager, admin };
+const roles = {
+  user,
+  admin,
+  bureau,
+  respoTech,
+  respoDesign,
+  respoCom,
+  respoAssistants,
+  respoWei,
+  respoInter,
+};
 
 export type Roles = keyof typeof roles;
 
