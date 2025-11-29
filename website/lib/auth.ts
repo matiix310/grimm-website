@@ -12,13 +12,18 @@ import { createAccessControl } from "better-auth/plugins/access";
 import {
   adminRole,
   bureauRole,
+  memberRole,
   respoAssistantsRole,
   respoComRole,
   respoDesignRole,
   respoInterRole,
   respoTechRole,
   respoWeiRole,
+  staffRole,
   statement,
+  teamComRole,
+  teamDesignRole,
+  teamTechRole,
   userRole,
 } from "./permissions";
 
@@ -27,12 +32,20 @@ const ac = createAccessControl(statement);
 export const user = ac.newRole(userRole);
 export const admin = ac.newRole(adminRole);
 export const bureau = ac.newRole(bureauRole);
+// respos
 export const respoTech = ac.newRole(respoTechRole);
 export const respoDesign = ac.newRole(respoDesignRole);
 export const respoCom = ac.newRole(respoComRole);
 export const respoAssistants = ac.newRole(respoAssistantsRole);
 export const respoWei = ac.newRole(respoWeiRole);
 export const respoInter = ac.newRole(respoInterRole);
+// teams
+export const teamTech = ac.newRole(teamTechRole);
+export const teamDesign = ac.newRole(teamDesignRole);
+export const teamCom = ac.newRole(teamComRole);
+// members
+export const member = ac.newRole(memberRole);
+export const staff = ac.newRole(staffRole);
 
 const roles = {
   user,
@@ -44,6 +57,11 @@ const roles = {
   respoAssistants,
   respoWei,
   respoInter,
+  teamTech,
+  teamDesign,
+  teamCom,
+  member,
+  staff,
 };
 
 export type Roles = keyof typeof roles;

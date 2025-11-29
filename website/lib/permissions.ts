@@ -1,4 +1,5 @@
 import { Mutable } from "@/types/misc";
+import { Roles } from "./auth";
 
 // statements
 
@@ -65,6 +66,7 @@ export const bureauRole = {
   ...userRole,
 } satisfies Permissions;
 
+// respos
 export const respoTechRole = {
   ...userRole,
 } satisfies Permissions;
@@ -86,6 +88,28 @@ export const respoWeiRole = {
 } satisfies Permissions;
 
 export const respoInterRole = {
+  ...userRole,
+} satisfies Permissions;
+
+// teams
+export const teamTechRole = {
+  ...userRole,
+} satisfies Permissions;
+
+export const teamDesignRole = {
+  ...userRole,
+} satisfies Permissions;
+
+export const teamComRole = {
+  ...userRole,
+} satisfies Permissions;
+
+// members
+export const memberRole = {
+  ...userRole,
+} satisfies Permissions;
+
+export const staffRole = {
   ...userRole,
 } satisfies Permissions;
 
@@ -141,6 +165,36 @@ export const rolesMetadata = {
     foregroundColor: "#ffffff",
     displayName: "Respo Inter",
   },
+  teamTech: {
+    priority: 50,
+    backgroundColor: "#3498DB",
+    foregroundColor: "#ffffff",
+    displayName: "Team Tech",
+  },
+  teamDesign: {
+    priority: 50,
+    backgroundColor: "#3498DB",
+    foregroundColor: "#ffffff",
+    displayName: "Team Design",
+  },
+  teamCom: {
+    priority: 50,
+    backgroundColor: "#3498DB",
+    foregroundColor: "#ffffff",
+    displayName: "Team Com",
+  },
+  member: {
+    priority: 30,
+    backgroundColor: "#4CA66E",
+    foregroundColor: "#ffffff",
+    displayName: "Membre",
+  },
+  staff: {
+    priority: 30,
+    backgroundColor: "#333028",
+    foregroundColor: "#FFF4DA",
+    displayName: "Staff",
+  },
   user: {
     priority: 0,
     backgroundColor: "var(--secondary)",
@@ -148,7 +202,7 @@ export const rolesMetadata = {
     displayName: "Utilisateur",
   },
 } as const satisfies Record<
-  string,
+  Roles,
   {
     priority: number;
     backgroundColor: string;
