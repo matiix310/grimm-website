@@ -190,7 +190,7 @@ export const rolesMetadata = {
     displayName: "Membre",
   },
   staff: {
-    priority: 30,
+    priority: 10,
     backgroundColor: "#333028",
     foregroundColor: "#FFF4DA",
     displayName: "Staff",
