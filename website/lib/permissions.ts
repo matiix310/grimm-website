@@ -123,7 +123,7 @@ export const rolesMetadata = {
     foregroundColor: "#ffffff",
     displayName: "Respo Com",
   },
-  respoAssistant: {
+  respoAssistants: {
     priority: 80,
     backgroundColor: "#f5a90d",
     foregroundColor: "#ffffff",
