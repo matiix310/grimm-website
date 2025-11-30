@@ -30,6 +30,16 @@ You can then connect to http://localhost.
 
 In development mode, you have access to the `drizzle-gateway` instance running on port `4983`. With it you can explore the currently running database: http://localhost:4983.
 
+## Initializing the database
+
+For this step, your database needs to be running and the variable `DEV_DB_URL` needs to be defined (eg `DEV_DB_URL=postgresql://postgres:password@localhost:5432/grimm`).
+
+```bash
+  cd website
+  bunx drizzle-kit generate
+  bunx drizzle-kit migrate
+```
+
 ## Setup Garage instance (S3)
 
 For the following step to work, the docker yould be running and named docker-garage-1 (see in `docker ps`).
