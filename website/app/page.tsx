@@ -37,7 +37,7 @@ const Home = async () => {
           </h1>
           <p className="text-xl lg:text-2xl xl:text-3xl">
             Tous les jours, venez découvrir une surprise de l&apos;avent sur le compte
-            instagram
+            instagram{" "}
             <Link
               href="/to/instagram"
               className="hover:underline text-black lg:text-white"
