@@ -40,7 +40,7 @@ const AdventCalendar = ({
               tous les jours !
             </DialogDescription>
           </DialogHeader>
-          <p className="text-4xl">{content?.content ?? ""}</p>
+          <p className="text-2xl">{content?.content ?? ""}</p>
         </DialogContent>
       </Dialog>
       <div
