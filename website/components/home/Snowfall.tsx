@@ -8,7 +8,7 @@ type SnowfallProps = React.ComponentProps<"div">;
 const Snowfall = ({ className, ...props }: SnowfallProps) => {
   return (
     <div className={cn("relative", className)} {...props}>
-      <ReactSnowfall />;
+      <ReactSnowfall />
     </div>
   );
 };
