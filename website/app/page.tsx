@@ -9,6 +9,7 @@ import { connection } from "next/server";
 import { BureauCarousel } from "@/components/home/BureauCarousel";
 import { bureau as bureauSchema } from "@/db/schema/bureau";
 import Link from "next/link";
+import GrimmXMas from "@/components/stickers/GrimmXMas";
 
 const Home = async () => {
   // prevent nextjs from prerendering this page
@@ -26,27 +27,24 @@ const Home = async () => {
   return (
     <div>
       <Navbar className="fixed top-0 left-0 w-full z-10" />
-      <section className="relative w-full lg:h-90 xl:h-110 mt-20 xl:mt-25 lg:bg-pink flex flex-col items-center lg:block">
-        <div className="relative lg:absolute top-0 lg:right-10 xl:right-20 h-auto lg:h-100 xl:h-130 w-[80%] lg:w-100 xl:w-130 bg-blue p-10 pb-12 rounded-b-full outline-8 xl:outline-10 outline-black/10">
-          <div className="h-full aspect-square">
-            <Image
-              className="size-full p-4 lg:p-6 xl:p-8 ml-2.5 lg:ml-3 xl:ml-4"
-              alt="on vous veut!"
-              src="/on-vous-veut.svg"
-              fill={true}
-              objectPosition="center"
-              objectFit="contain"
-            />
-          </div>
+      <section className="relative w-full lg:h-90 xl:h-110 mt-20 xl:mt-25 lg:bg-green flex flex-col items-center lg:block">
+        <div className="relative flex items-center justify-center lg:absolute top-0 lg:right-10 xl:right-20 h-auto lg:h-100 xl:h-130 w-[80%] lg:w-100 xl:w-130 bg-[#794210] p-5 lg:p-10 rounded-b-full outline-8 xl:outline-10 outline-black/10">
+          <GrimmXMas className="size-full" />
         </div>
-        <div className="flex flex-col gap-5 lg:gap-8 xl:gap-10 text-foreground lg:text-pink-foreground lg:w-[60%] mt-8 lg:mt-0 px-5 lg:px-10 xl:px-15 h-full justify-center text-center lg:text-start">
+        <div className="flex flex-col gap-5 lg:gap-8 xl:gap-10 text-foreground lg:text-green-foreground lg:w-[60%] mt-8 lg:mt-0 px-5 lg:px-10 xl:px-15 h-full justify-center text-center lg:text-start">
           <h1 className="font-paytone text-3xl lg:text-5xl xl:text-7xl">
-            Votez votre nouveau BDE! Votez GRIMM !!
+            C’est l’heure du Noël de GRIMM !
           </h1>
           <p className="text-xl lg:text-2xl xl:text-3xl">
-            La campagne BDE est officiellement ouverte ! Du 10 novembre au 15 novembre,
-            rendez-vous sur les sites de Villejuif et Kremlin-Bicêtre pour participer aux
-            évévenements organisés par les listes pour le BDE de l’année 2025-2026 !
+            Tous les jours, venez découvrir une surprise de l&apos;avent sur le compte
+            instagram{" "}
+            <Link
+              href="/to/instagram"
+              className="hover:underline text-black lg:text-white"
+            >
+              @bde.grimm
+            </Link>
+            .
           </p>
         </div>
       </section>
