@@ -1,8 +1,6 @@
 import { Navbar } from "@/components/home/Navbar";
 import { Button } from "@/components/ui/Button";
-import { Skeleton } from "@/components/ui/Skeleton";
 import { db } from "@/db";
-import { events as eventsSchema } from "@/db/schema/events";
 import { asc } from "drizzle-orm";
 import Image from "next/image";
 import { connection } from "next/server";
@@ -10,16 +8,17 @@ import { BureauCarousel } from "@/components/home/BureauCarousel";
 import { bureau as bureauSchema } from "@/db/schema/bureau";
 import Link from "next/link";
 import GrimmXMas from "@/components/stickers/GrimmXMas";
+import { adventCalendar as adventCalendarSchema } from "@/db/schema/adventCalendar";
+import { AdventCalendar } from "@/components/home/AdventCalendar";
 
 const Home = async () => {
   // prevent nextjs from prerendering this page
   // as it involves database content
   await connection();
 
-  const [events, bureau] = await Promise.all([
-    db.query.events.findMany({
-      orderBy: asc(eventsSchema.date),
-      limit: 3,
+  const [adventCalendar, bureau] = await Promise.all([
+    db.query.adventCalendar.findMany({
+      orderBy: asc(adventCalendarSchema.day),
     }),
     db.query.bureau.findMany({ orderBy: asc(bureauSchema.index) }),
   ]);
@@ -88,54 +87,25 @@ const Home = async () => {
         </div>
       </section>
       <section
-        id="events"
+        id="adventCalendar"
         className="w-full pt-28 -mt-15 lg:mt-0 flex flex-col px-5 lg:px-10 xl:px-20"
       >
         <div className="flex gap-2 items-center">
           <div className="relative w-10 h-15 lg:w-13 lg:h-18 xl:w-20 xl:h-25">
             <Image alt="étoile" src="/star.svg" fill={true} objectPosition="center" />
           </div>
-          <h1 className="font-paytone text-3xl lg:text-5xl xl:text-7xl">Les Events</h1>
+          <h1 className="font-paytone text-3xl lg:text-5xl xl:text-7xl">
+            Le Calendrier De L&apos;Avent
+          </h1>
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 lg:gap-10 mt-5 lg:mt-10">
-          {events.map((event) => (
-            <div
-              key={event.id}
-              className="relative w-full aspect-video bg-accent rounded-4xl overflow-hidden after:size-full after:absolute after:top-0 after:left-0 after:transition-all after:ease-in-out hover:after:bg-primary/70 hover:*:data-[slot=overlay]:opacity-100"
-              style={{
-                background: `url(${event.image})`,
-                backgroundRepeat: "no-repeat",
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-              }}
-            >
-              <Skeleton className="absolute left-0 top-0 size-full -z-1" />
-              <div
-                data-slot="overlay"
-                className="opacity-0 absolute z-2 top-[50%] left-[50%] -translate-[50%] font-paytone text-primary-foreground flex flex-col items-center"
-              >
-                <span className="text-3xl xl:text-5xl">
-                  {event.date.toLocaleDateString("fr-FR")}
-                </span>
-                <span className="text-lg xl:text-2xl">
-                  {event.date.toLocaleTimeString("fr-FR")}
-                </span>
-              </div>
-              <div className="flex flex-col gap-2 items-end absolute bottom-5 right-5 font-paytone z-2">
-                {/* <p className="bg-red text-red-foreground px-5 py-2 rounded-full text-sm lg:text-lg">
-                  A venir
-                </p> */}
-                <p className="bg-secondary text-secondary-foreground px-5 py-2 rounded-full text-sm xl:text-lg">
-                  {event.name}
-                </p>
-                <p className="static lg:hidden bg-secondary text-secondary-foreground px-5 py-2 rounded-full text-sm">
-                  {event.date.toLocaleDateString("fr-FR")}{" "}
-                  {event.date.toLocaleTimeString("fr-FR")}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
+        <AdventCalendar
+          className="mt-5 lg:mt-10"
+          adventCalendar={adventCalendar.map((e) => {
+            if (e.date === null || e.date > new Date())
+              return { ...e, content: null, date: null };
+            return { ...e, date: null };
+          })}
+        />
       </section>
       <section
         id="bureau"
