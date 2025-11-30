@@ -20,6 +20,7 @@ import * as answers from "./schema/answers";
 import * as answerUsers from "./schema/answerUsers";
 import * as presets from "./schema/presets";
 import * as links from "./schema/links";
+import * as adventCalendar from "./schema/adventCalendar";
 
 if (process.env.DB_URL === undefined)
   throw new Error("Environement variable DB_URL is not defined!");
@@ -40,6 +41,7 @@ const schema = {
   ...answerUsers,
   ...presets,
   ...links,
+  ...adventCalendar,
 } as const;
 
 export const db = drizzle(process.env.DB_URL, {
