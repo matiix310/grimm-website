@@ -91,6 +91,10 @@ export const respoInterRole = {
   ...userRole,
 } satisfies Permissions;
 
+export const respoVJRole = {
+  ...userRole,
+} satisfies Permissions;
+
 // teams
 export const teamTechRole = {
   ...userRole,
@@ -164,6 +168,12 @@ export const rolesMetadata = {
     backgroundColor: "#f5a90d",
     foregroundColor: "#ffffff",
     displayName: "Respo Inter",
+  },
+  respoVJ: {
+    priority: 80,
+    backgroundColor: "#f5a90d",
+    foregroundColor: "#ffffff",
+    displayName: "Respo VJ",
   },
   teamTech: {
     priority: 50,

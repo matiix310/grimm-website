@@ -19,6 +19,7 @@ const roleMapping: Record<string, Roles> = {
   "respo assistants": "respoAssistants",
   "respo wei": "respoWei",
   "respo inter": "respoInter",
+  "respo vj": "respoVJ",
 
   // Teams
   "team tech": "teamTech",
