@@ -4,7 +4,7 @@ import { db } from "@/db";
 import { user } from "@/db/schema/auth";
 import { getSheetData } from "@/lib/google-sheets";
 import { Roles } from "@/lib/auth";
-import { eq } from "drizzle-orm";
+import { eq, inArray, isNotNull, notInArray, and } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 // Role mapping from Google Sheet names to internal role names
@@ -54,11 +54,15 @@ export async function syncRoles() {
       return { success: false, message: "No data found in Google Sheet" };
     }
 
-    // Skip header row
+    // Skip header row and parse all rows
     const rows = data.slice(1);
-    let updatedCount = 0;
-    const errors: string[] = [];
-    const skipped: string[] = [];
+
+    // First pass: collect all logins and parse roles from sheet
+    const loginToRolesMap = new Map<
+      string,
+      { newRoles: Roles[]; unknownRoles: string[] }
+    >();
+    const skipped: string[] = []; // Initialize skipped here for the first pass
 
     for (const row of rows) {
       const login = row[0]?.trim();
@@ -91,45 +95,71 @@ export async function syncRoles() {
         continue;
       }
 
+      if (newRoles.length > 0) {
+        loginToRolesMap.set(login, { newRoles, unknownRoles });
+      }
+    }
+
+    const logins = Array.from(loginToRolesMap.keys());
+
+    if (logins.length === 0) {
+      return { success: false, message: "No valid users found in Google Sheet" };
+    }
+
+    // Fetch all users in one query
+    const users = await db.query.user.findMany({
+      where: inArray(user.login, logins),
+      columns: {
+        id: true,
+        login: true,
+        role: true,
+      },
+    });
+
+    // Build a map of users by login for quick lookup
+    const userMap = new Map(users.map((u) => [u.login, u]));
+
+    let updatedCount = 0;
+    const errors: string[] = [];
+
+    // Process updates
+    for (const [login, { newRoles, unknownRoles }] of loginToRolesMap.entries()) {
       // Log unknown roles but continue with valid ones
       if (unknownRoles.length > 0) {
         console.warn(`User ${login}: Unknown roles skipped: ${unknownRoles.join(", ")}`);
       }
 
+      const existingUser = userMap.get(login);
+
+      if (!existingUser) {
+        // User not found in database, skip this user
+        continue;
+      }
+
       try {
-        // Find user by login
-        const existingUser = await db.query.user.findFirst({
-          where: eq(user.login, login),
-        });
+        // Parse existing roles (comma-separated)
+        const existingRoles = existingUser.role
+          ? existingUser.role
+              .split(",")
+              .map((r: string) => r.trim())
+              .filter(Boolean)
+          : [];
 
-        if (existingUser) {
-          // Parse existing roles (comma-separated)
-          const existingRoles = existingUser.role
-            ? existingUser.role
-                .split(",")
-                .map((r: string) => r.trim())
-                .filter(Boolean)
-            : [];
+        // Preserve user and admin roles
+        const preservedRoles = existingRoles.filter(
+          (r: string) => r === "user" || r === "admin"
+        );
 
-          // Preserve user and admin roles
-          const preservedRoles = existingRoles.filter(
-            (r: string) => r === "user" || r === "admin"
-          );
+        // Build new role set: preserved roles + new roles from sheet
+        const finalRoles = [...new Set([...preservedRoles, ...newRoles])];
 
-          // Build new role set: preserved roles + new roles from sheet
-          const finalRoles = [...new Set([...preservedRoles, ...newRoles])];
+        // Only update if different
+        const newRoleString = finalRoles.join(",");
+        const currentRoleString = existingUser.role || "";
 
-          // Only update if different
-          const newRoleString = finalRoles.join(",");
-          const currentRoleString = existingUser.role || "";
-
-          if (currentRoleString !== newRoleString) {
-            await db
-              .update(user)
-              .set({ role: newRoleString })
-              .where(eq(user.login, login));
-            updatedCount++;
-          }
+        if (currentRoleString !== newRoleString) {
+          await db.update(user).set({ role: newRoleString }).where(eq(user.login, login));
+          updatedCount++;
         }
       } catch (err) {
         console.error(`Failed to update user ${login}:`, err);
@@ -137,9 +167,63 @@ export async function syncRoles() {
       }
     }
 
+    // Clean up users not in the Google Sheet
+    // Fetch only users NOT in the sheet who have roles
+    const usersNotInSheet = await db.query.user.findMany({
+      where: and(
+        isNotNull(user.role),
+        notInArray(user.login, logins.length > 0 ? logins : [""])
+      ),
+      columns: {
+        id: true,
+        login: true,
+        role: true,
+      },
+    });
+
+    let clearedCount = 0;
+
+    for (const dbUser of usersNotInSheet) {
+      // Skip users with null or empty roles
+      if (!dbUser.role) {
+        continue;
+      }
+
+      try {
+        // Parse existing roles
+        const existingRoles = dbUser.role
+          .split(",")
+          .map((r: string) => r.trim())
+          .filter(Boolean);
+
+        // Keep only user and admin roles
+        const preservedRoles = existingRoles.filter(
+          (r: string) => r === "user" || r === "admin"
+        );
+
+        // Only update if there were organizational roles to remove
+        if (preservedRoles.length < existingRoles.length) {
+          const newRoleString =
+            preservedRoles.length > 0 ? preservedRoles.join(",") : "user";
+
+          await db
+            .update(user)
+            .set({ role: newRoleString })
+            .where(eq(user.login, dbUser.login));
+          clearedCount++;
+        }
+      } catch (err) {
+        console.error(`Failed to clear roles for user ${dbUser.login}:`, err);
+        errors.push(`Failed to clear ${dbUser.login}`);
+      }
+    }
+
     revalidatePath("/admin/users");
 
     let message = `Synced ${updatedCount} users.`;
+    if (clearedCount > 0) {
+      message += ` Cleared ${clearedCount} users not in sheet.`;
+    }
     if (skipped.length > 0) {
       message += ` Skipped ${skipped.length} (unknown roles).`;
     }
@@ -150,7 +234,7 @@ export async function syncRoles() {
     return {
       success: true,
       message,
-      details: { updated: updatedCount, skipped, errors },
+      details: { updated: updatedCount, cleared: clearedCount, skipped, errors },
     };
   } catch (error) {
     console.error("Sync failed:", error);
