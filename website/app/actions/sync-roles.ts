@@ -122,6 +122,7 @@ export async function syncRoles() {
 
     let updatedCount = 0;
     const errors: string[] = [];
+    const changes: Array<{ login: string; from: string; to: string }> = [];
 
     // Process updates
     for (const [login, { newRoles, unknownRoles }] of loginToRolesMap.entries()) {
@@ -161,6 +162,11 @@ export async function syncRoles() {
         if (currentRoleString !== newRoleString) {
           await db.update(user).set({ role: newRoleString }).where(eq(user.login, login));
           updatedCount++;
+          changes.push({
+            login,
+            from: currentRoleString || "(empty)",
+            to: newRoleString,
+          });
         }
       } catch (err) {
         console.error(`Failed to update user ${login}:`, err);
@@ -212,6 +218,11 @@ export async function syncRoles() {
             .set({ role: newRoleString })
             .where(eq(user.login, dbUser.login));
           clearedCount++;
+          changes.push({
+            login: dbUser.login,
+            from: dbUser.role,
+            to: newRoleString,
+          });
         }
       } catch (err) {
         console.error(`Failed to clear roles for user ${dbUser.login}:`, err);
@@ -230,6 +241,75 @@ export async function syncRoles() {
     }
     if (errors.length > 0) {
       message += ` Errors: ${errors.length}.`;
+    }
+
+    // Send Discord webhook notification
+    const discordWebhook = process.env.DISCORD_ROLE_SYNC_WEBHOOK_URL;
+    console.log(discordWebhook);
+    if (discordWebhook && (updatedCount > 0 || clearedCount > 0)) {
+      try {
+        const serverUrl = process.env.BASE_URL || "Unknown Server";
+
+        // Build changes list (limit to avoid Discord message size limits)
+        const maxChanges = 10;
+        const changesList = changes
+          .slice(0, maxChanges)
+          .map((change) => `**${change.login}**: \`${change.from}\` → \`${change.to}\``)
+          .join("\n");
+
+        const moreChanges =
+          changes.length > maxChanges
+            ? `\n...and ${changes.length - maxChanges} more`
+            : "";
+
+        const fields = [
+          {
+            name: "Summary",
+            value: `**Updated:** ${updatedCount}\n**Cleared:** ${clearedCount}\n**Total Affected:** ${
+              updatedCount + clearedCount
+            }`,
+            inline: true,
+          },
+          {
+            name: "Server",
+            value: serverUrl,
+            inline: true,
+          },
+        ];
+
+        // Add changes field if there are any
+        if (changes.length > 0) {
+          fields.push({
+            name: "Changes",
+            value: changesList + moreChanges,
+            inline: false,
+          });
+        }
+
+        const embed = {
+          title: "Roles Synced",
+          description: message,
+          color: 0x4ca66e, // Green color
+          fields,
+          timestamp: new Date().toISOString(),
+          footer: {
+            text: "Role Sync System",
+          },
+        };
+
+        await fetch(discordWebhook, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            embeds: [embed],
+          }),
+        });
+      } catch (err) {
+        console.error("Failed to send Discord notification:", err);
+        // Don't fail the sync if Discord notification fails
+      }
     }
 
     return {
