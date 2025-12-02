@@ -5,6 +5,7 @@ import { hasPermission } from "@/utils/auth";
 import { and, eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { NextRequest } from "next/server";
+import { getUser } from "../../users/[userId]/route";
 
 export const GET = async (
   request: NextRequest,
@@ -33,13 +34,12 @@ export const GET = async (
 
   const user = await db.query.user.findFirst({
     where: eq(userSchema.id, discordAccount.userId),
+    columns: {
+      login: true,
+    },
   });
 
   if (user === undefined) return ApiResponse.notFound("User not found");
 
-  return ApiResponse.json({
-    login: user.login,
-    updatedAt: discordAccount.updatedAt,
-    createdAt: discordAccount.createdAt,
-  });
+  return getUser(user.login);
 };

@@ -10,14 +10,9 @@ import { headers as nextHeaders } from "next/headers";
 import { NextRequest } from "next/server";
 import z from "zod";
 
-export const GET = async (
-  request: NextRequest,
-  ctx: RouteContext<"/api/users/[userId]">
-) => {
-  const params = await ctx.params;
-
+export const getUser = async (login: string) => {
   const target = await db.query.user.findFirst({
-    where: eq(userSchema.login, params.userId),
+    where: eq(userSchema.login, login),
   });
 
   if (!target) return ApiResponse.notFoundUser();
@@ -94,6 +89,16 @@ export const GET = async (
     connections,
     canEditRoles,
   });
+};
+
+export const GET = async (
+  request: NextRequest,
+  ctx: RouteContext<"/api/users/[userId]">
+) => {
+  const params = await ctx.params;
+  const originUserLogin = params.userId;
+
+  return getUser(originUserLogin);
 };
 
 export const POST = async (
