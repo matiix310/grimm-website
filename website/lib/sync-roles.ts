@@ -1,5 +1,3 @@
-"use server";
-
 import { db } from "@/db";
 import { user } from "@/db/schema/auth";
 import { getSheetData } from "@/lib/google-sheets";
@@ -38,7 +36,19 @@ function mapRole(roleStr: string): Roles | null {
   return roleMapping[normalized] || null;
 }
 
-export async function syncRoles() {
+export interface SyncRolesResult {
+  success: boolean;
+  message: string;
+  details?: {
+    updated: number;
+    cleared: number;
+    skipped: string[];
+    errors: string[];
+    changes: Array<{ login: string; from: string[]; to: string[] }>;
+  };
+}
+
+export async function performRoleSync(): Promise<SyncRolesResult> {
   const sheetId = process.env.GOOGLE_SHEET_ID;
   const serviceAccountEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
   const privateKey = process.env.GOOGLE_PRIVATE_KEY;
@@ -63,7 +73,7 @@ export async function syncRoles() {
       string,
       { newRoles: Roles[]; unknownRoles: string[] }
     >();
-    const skipped: string[] = []; // Initialize skipped here for the first pass
+    const skipped: string[] = [];
 
     for (const row of rows) {
       const login = row[0]?.trim();
@@ -122,7 +132,7 @@ export async function syncRoles() {
 
     let updatedCount = 0;
     const errors: string[] = [];
-    const changes: Array<{ login: string; from: string; to: string }> = [];
+    const changes: Array<{ login: string; from: string[]; to: string[] }> = [];
 
     // Process updates
     for (const [login, { newRoles, unknownRoles }] of loginToRolesMap.entries()) {
@@ -164,8 +174,8 @@ export async function syncRoles() {
           updatedCount++;
           changes.push({
             login,
-            from: currentRoleString || "(empty)",
-            to: newRoleString,
+            from: existingRoles,
+            to: finalRoles,
           });
         }
       } catch (err) {
@@ -220,8 +230,8 @@ export async function syncRoles() {
           clearedCount++;
           changes.push({
             login: dbUser.login,
-            from: dbUser.role,
-            to: newRoleString,
+            from: existingRoles,
+            to: preservedRoles.length > 0 ? preservedRoles : ["user"],
           });
         }
       } catch (err) {
@@ -254,7 +264,12 @@ export async function syncRoles() {
         const maxChanges = 10;
         const changesList = changes
           .slice(0, maxChanges)
-          .map((change) => `**${change.login}**: \`${change.from}\` → \`${change.to}\``)
+          .map(
+            (change) =>
+              `**${change.login}**: \`${change.from.join(", ")}\` => \`${change.to.join(
+                ", "
+              )}\``
+          )
           .join("\n");
 
         const moreChanges =
@@ -315,7 +330,7 @@ export async function syncRoles() {
     return {
       success: true,
       message,
-      details: { updated: updatedCount, cleared: clearedCount, skipped, errors },
+      details: { updated: updatedCount, cleared: clearedCount, skipped, errors, changes },
     };
   } catch (error) {
     console.error("Sync failed:", error);

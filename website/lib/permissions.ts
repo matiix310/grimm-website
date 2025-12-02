@@ -15,6 +15,7 @@ export const statement = {
     "set-password",
     "get",
     "update",
+    "sync-roles",
   ],
   session: ["list", "revoke", "delete"],
   // ===================================

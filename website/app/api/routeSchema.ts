@@ -9,6 +9,7 @@ import answersSchema from "./answers/[answerId]/routeSchema";
 import minecraftSchema from "./minecraft/[minecraftUsername]/routeSchema";
 import discordSchema from "./discord/[discordId]/routeSchema";
 import presetsSchema from "./points/presets/routeSchema";
+import syncRolesSchema from "./admin/sync-roles/routeSchema";
 
 const schema = {
   ...usersSchema,
@@ -22,6 +23,7 @@ const schema = {
   ...minecraftSchema,
   ...discordSchema,
   ...presetsSchema,
+  ...syncRolesSchema,
 };
 
 export default schema;

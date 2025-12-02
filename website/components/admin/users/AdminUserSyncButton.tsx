@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/Button";
-import { syncRoles } from "@/app/actions/sync-roles";
+import { $fetch } from "@/lib/betterFetch";
 import { toast } from "sonner";
 import { useState } from "react";
 import { RefreshCw } from "lucide-react";
@@ -12,11 +12,17 @@ export function AdminUserSyncButton() {
   const handleSync = async () => {
     setIsLoading(true);
     try {
-      const result = await syncRoles();
-      if (result.success) {
-        toast.success(result.message);
+      const { data, error } = await $fetch("@post/api/admin/sync-roles", {});
+
+      if (error) {
+        toast.error(error.message || "Failed to sync roles");
+        return;
+      }
+
+      if (data.success) {
+        toast.success(data.message);
       } else {
-        toast.error(result.message);
+        toast.error(data.message);
       }
     } catch (error) {
       toast.error("An unexpected error occurred");

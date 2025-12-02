@@ -1,5 +1,5 @@
 import cron from "node-cron";
-import { syncRoles } from "./app/actions/sync-roles";
+import { performRoleSync } from "./lib/sync-roles";
 
 export function initScheduler() {
   console.log("Initializing role sync scheduler...");
@@ -10,16 +10,10 @@ export function initScheduler() {
     async () => {
       console.log(`[${new Date().toISOString()}] Running scheduled role sync...`);
       try {
-        const result = await syncRoles();
-        console.log(
-          `[${new Date().toISOString()}] Sync completed:`,
-          result.message
-        );
+        const result = await performRoleSync();
+        console.log(`[${new Date().toISOString()}] Sync completed:`, result.message);
       } catch (error) {
-        console.error(
-          `[${new Date().toISOString()}] Sync failed:`,
-          error
-        );
+        console.error(`[${new Date().toISOString()}] Sync failed:`, error);
       }
     },
     {
