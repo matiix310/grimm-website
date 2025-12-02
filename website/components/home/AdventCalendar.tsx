@@ -35,12 +35,31 @@ const AdventCalendar = ({
             <DialogDescription>
               Les surprises du calendrier de l&apos;avent sont publiés sur notre{" "}
               <Link href="/to/instagram" className="underline cursor-pointer">
-                page instagram
+                page Instagram
               </Link>{" "}
               tous les jours !
             </DialogDescription>
           </DialogHeader>
-          <p className="text-2xl">{content?.content ?? ""}</p>
+          <p className="text-xl">
+            {content?.content
+              ? content.content.split(/(\[[^\]]+\]\([^)]+\))/g).map((part, i) => {
+                  const match = part.match(/\[([^\]]+)\]\(([^)]+)\)/);
+                  if (match && match[0] === part) {
+                    return (
+                      <Link
+                        key={i}
+                        href={match[2]}
+                        target="_blank"
+                        className="underline hover:text-primary transition-colors"
+                      >
+                        {match[1]}
+                      </Link>
+                    );
+                  }
+                  return part;
+                })
+              : ""}
+          </p>
         </DialogContent>
       </Dialog>
       <div
