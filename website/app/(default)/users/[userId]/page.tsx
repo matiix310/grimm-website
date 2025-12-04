@@ -59,7 +59,7 @@ const UserPage = async ({ params }: PageProps<"/users/[userId]">) => {
       discordAccount =
         (
           await auth.api.accountInfo({
-            body: {
+            query: {
               accountId: discordAccountId,
             },
             headers,
