@@ -96,7 +96,7 @@ const AdminUsersTable = ({}: AdminUsersTableProps) => {
           });
 
           if (error) throw new Error(error.message);
-          updateUser(data.user);
+          updateUser({ ...data.user, banned: true, login: user.login });
         };
 
         const handleUnban = async () => {
@@ -105,7 +105,7 @@ const AdminUsersTable = ({}: AdminUsersTableProps) => {
           });
 
           if (error) throw new Error(error.message);
-          updateUser(data.user);
+          updateUser({ ...data.user, banned: false, login: user.login });
         };
 
         const handleShowProfile = () => {
