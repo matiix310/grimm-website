@@ -18,6 +18,7 @@ import {
   respoDesignRole,
   respoInterRole,
   respoTechRole,
+  respoVJRole,
   respoWeiRole,
   staffRole,
   statement,
@@ -39,6 +40,7 @@ export const respoCom = ac.newRole(respoComRole);
 export const respoAssistants = ac.newRole(respoAssistantsRole);
 export const respoWei = ac.newRole(respoWeiRole);
 export const respoInter = ac.newRole(respoInterRole);
+export const respoVJ = ac.newRole(respoVJRole);
 // teams
 export const teamTech = ac.newRole(teamTechRole);
 export const teamDesign = ac.newRole(teamDesignRole);
@@ -57,6 +59,7 @@ const roles = {
   respoAssistants,
   respoWei,
   respoInter,
+  respoVJ,
   teamTech,
   teamDesign,
   teamCom,
