@@ -48,6 +48,17 @@ services:
       db:
         condition: service_healthy
 
+  discord-bot:
+    build:
+      context: ../discord-bot/
+      dockerfile: ../discord-bot/Dockerfile
+    restart: unless-stopped
+    networks:
+      - grimm-db
+    depends_on:
+      db:
+        condition: service_healthy
+
   reverse-proxy:
     image: nginx
     restart: unless-stopped

@@ -296,3 +296,102 @@ export async function performRoleSync(): Promise<SyncRolesResult> {
     return { success: false, message: "Failed to sync roles" };
   }
 }
+
+export async function performUserRoleSync(login: string): Promise<SyncRolesResult> {
+  const serviceAccountEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
+  const privateKey = process.env.GOOGLE_PRIVATE_KEY;
+
+  if (!serviceAccountEmail || !privateKey) {
+    return { success: false, message: "Missing Google Workspace credentials" };
+  }
+
+  try {
+    const result = await db
+      .select()
+      .from(user)
+      .where(eq(user.login, login))
+      .leftJoin(
+        account,
+        and(eq(account.userId, user.id), eq(account.providerId, "google"))
+      )
+      .limit(1);
+
+    if (result.length === 0) {
+      return { success: false, message: `User ${login} not found` };
+    }
+
+    const { user: existingUser, account: googleAccount } = result[0];
+
+    if (!googleAccount) {
+      return {
+        success: false,
+        message: `User ${login} does not have a Google account linked`,
+      };
+    }
+
+    const roles = await getUserGroups(
+      googleAccount.accountId,
+      serviceAccountEmail,
+      privateKey
+    );
+
+    const newRoles: Roles[] = [];
+    for (const roleString of roles) {
+      if (roleString in roleMapping) newRoles.push(roleMapping[roleString]);
+    }
+
+    // Parse existing roles
+    const existingRoles = existingUser.role
+      ? existingUser.role
+          .split(",")
+          .map((r: string) => r.trim())
+          .filter(Boolean)
+      : [];
+
+    // Preserve user and admin roles
+    const preservedRoles = existingRoles.filter(
+      (r: string) => r === "user" || r === "admin"
+    );
+
+    // Build new role set
+    const finalRoles = [...new Set([...preservedRoles, ...newRoles])];
+
+    const newRoleString = finalRoles.join(",");
+    const currentRoleString = existingUser.role || "";
+
+    if (currentRoleString !== newRoleString) {
+      await db.update(user).set({ role: newRoleString }).where(eq(user.login, login));
+
+      return {
+        success: true,
+        message: `Synced roles for user ${login}`,
+        details: {
+          updated: 1,
+          cleared: 0,
+          errors: [],
+          changes: [
+            {
+              login,
+              from: existingRoles,
+              to: finalRoles,
+            },
+          ],
+        },
+      };
+    }
+
+    return {
+      success: true,
+      message: `No changes for user ${login}`,
+      details: {
+        updated: 0,
+        cleared: 0,
+        errors: [],
+        changes: [],
+      },
+    };
+  } catch (error) {
+    console.error(`Sync failed for user ${login}:`, error);
+    return { success: false, message: `Failed to sync roles for user ${login}` };
+  }
+}

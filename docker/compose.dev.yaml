@@ -16,6 +16,22 @@ services:
         - action: rebuild
           path: ../website/.env
 
+  discord-bot:
+    build:
+      target: dev
+    develop:
+      watch:
+        - action: sync
+          path: ../discord-bot/
+          target: /usr/src/app/
+          ignore:
+            - ../discord-bot/node_modules/
+            - ../discord-bot/package.json
+        - action: rebuild
+          path: ../discord-bot/package.json
+        - action: rebuild
+          path: ../discord-bot/.env
+
   reverse-proxy:
     ports:
       - 127.0.0.1:4983:4983

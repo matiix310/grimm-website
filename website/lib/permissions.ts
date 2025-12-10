@@ -41,7 +41,7 @@ export type Permissions = {
 
 // Only these permissions are allowed in an api key
 export const apiSafeStatement: Permissions = {
-  user: ["update"],
+  user: ["update", "sync-roles"],
   points: ["add", "delete"],
   news: ["create", "delete", "update"],
   events: ["create", "delete", "update"],
