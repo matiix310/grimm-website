@@ -1,0 +1,45 @@
+import { Client, GatewayIntentBits } from 'discord.js';
+import fs from 'fs';
+import path from 'path';
+
+import dotenv from 'dotenv';
+dotenv.config();
+
+const TOKEN = process.env.TOKEN;
+
+if (!TOKEN) {
+  throw new Error('Missing TOKEN in environment variables');
+}
+
+const client = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessageReactions,
+    GatewayIntentBits.GuildIntegrations,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.DirectMessages,
+    GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.GuildVoiceStates,
+    GatewayIntentBits.AutoModerationExecution,
+  ],
+});
+
+// Dynamically read event files
+const eventFiles = fs
+  .readdirSync(path.join(__dirname, 'events'))
+  .filter((file) => file.endsWith('.ts') || file.endsWith('.js'));
+
+(async () => {
+  for (const file of eventFiles) {
+    const filePath = path.join(__dirname, 'events', file);
+    const module = await import(filePath);
+    const event = module.default;
+    if (event.once) {
+      client.once(event.name, (...args) => event.execute(...args, client));
+    } else {
+      client.on(event.name, (...args) => event.execute(...args, client));
+    }
+  }
+
+  await client.login(TOKEN);
+})();
