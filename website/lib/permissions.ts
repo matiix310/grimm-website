@@ -32,6 +32,7 @@ export const statement = {
   presets: ["view"],
   userConnections: ["view-discord", "view-minecraft"],
   adminPanel: ["access"],
+  discord: ["admin"],
 } as const;
 
 export type FullPermissions = typeof statement;

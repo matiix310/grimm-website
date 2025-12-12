@@ -75,6 +75,11 @@ export const getUser = async (login: string) => {
     }
   }
 
+  const canSyncRoles = await hasPermission({
+    headers,
+    permissions: { user: ["sync-roles"] },
+  });
+
   return ApiResponse.json({
     user: {
       id: target.id,
@@ -88,6 +93,7 @@ export const getUser = async (login: string) => {
     },
     connections,
     canEditRoles,
+    canSyncRoles,
   });
 };
 

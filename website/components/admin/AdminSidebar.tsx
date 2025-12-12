@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import DiscordIcon from "../icons/DiscordIcon";
 
 const items = [
   {
@@ -54,6 +55,11 @@ const items = [
     url: "/admin/answers",
     icon: MessageSquare,
   },
+  {
+    title: "Discord",
+    url: "/admin/discord",
+    icon: DiscordIcon,
+  },
 ];
 
 export function AdminSidebar({
@@ -63,6 +69,7 @@ export function AdminSidebar({
   canAccessUsers,
   canAccessCodes,
   canAccessAnswers,
+  canAccessDiscord,
 }: {
   canAccessApiKeys: boolean;
   canAccessEvents: boolean;
@@ -70,6 +77,7 @@ export function AdminSidebar({
   canAccessUsers: boolean;
   canAccessCodes: boolean;
   canAccessAnswers: boolean;
+  canAccessDiscord: boolean;
 }) {
   const pathname = usePathname();
 
@@ -80,6 +88,7 @@ export function AdminSidebar({
     if (item.title === "Utilisateurs") return canAccessUsers;
     if (item.title === "Codes") return canAccessCodes;
     if (item.title === "Réponses") return canAccessAnswers;
+    if (item.title === "Discord") return canAccessDiscord;
     return false;
   });
 
