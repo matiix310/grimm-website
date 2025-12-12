@@ -31,6 +31,7 @@ export const statement = {
   answers: ["list", "create", "delete", "update"],
   presets: ["view"],
   userConnections: ["view-discord", "view-minecraft"],
+  adminPanel: ["access"],
 } as const;
 
 export type FullPermissions = typeof statement;

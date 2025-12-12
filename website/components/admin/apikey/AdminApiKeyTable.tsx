@@ -1,22 +1,9 @@
-import { ApiKey } from "@/app/(default)/admin/api-keys/page";
+import { ApiKey } from "@/app/(admin)/admin/api-keys/page";
 import { Button } from "@/components/ui/Button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/Table";
 import { authClient } from "@/lib/authClient";
-import {
-  ColumnDef,
-  createColumnHelper,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
+import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import { Trash2 } from "lucide-react";
+import { DataTable, SortableHeader } from "@/components/ui/DataTable";
 
 type AdminApiKeyTableProps = {
   apiKeys: ApiKey[];
@@ -27,15 +14,15 @@ const AdminApiKeyTable = ({ apiKeys, onRemoveApiKey }: AdminApiKeyTableProps) =>
   const columnHelper = createColumnHelper<ApiKey>();
   const columns: ColumnDef<ApiKey>[] = [
     columnHelper.accessor("name", {
-      header: "Nom",
+      header: ({ column }) => <SortableHeader column={column} title="Nom" />,
       cell: (row) => row.getValue(),
     }),
     columnHelper.accessor("expiresAt", {
-      header: "Expiration",
+      header: ({ column }) => <SortableHeader column={column} title="Expiration" />,
       cell: (row) => row.getValue()?.toLocaleString("fr-FR") ?? "infinite",
     }),
     columnHelper.accessor("createdAt", {
-      header: "Création",
+      header: ({ column }) => <SortableHeader column={column} title="Création" />,
       cell: (row) => row.getValue().toLocaleString("fr-FR"),
     }),
     {
@@ -63,51 +50,13 @@ const AdminApiKeyTable = ({ apiKeys, onRemoveApiKey }: AdminApiKeyTableProps) =>
     },
   ] as Array<ColumnDef<ApiKey, unknown>>;
 
-  const table = useReactTable({
-    data: apiKeys,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-  });
-
   return (
-    <div className="overflow-hidden rounded-md border">
-      <Table>
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
-                  </TableHead>
-                );
-              })}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
-                Aucune clé api
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-    </div>
+    <DataTable
+      columns={columns}
+      data={apiKeys}
+      filterColumn="name"
+      searchPlaceholder="Nom de la clé..."
+    />
   );
 };
 

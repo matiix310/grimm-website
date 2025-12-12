@@ -2,28 +2,10 @@
 
 import React from "react";
 import { Button } from "@/components/ui/Button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/Table";
 import { authClient } from "@/lib/authClient";
-import {
-  ColumnDef,
-  ColumnFiltersState,
-  createColumnHelper,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
+import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import { Ban, MoreHorizontal } from "lucide-react";
 import { UserWithRole } from "better-auth/plugins";
-import { FullPagination } from "@/components/ui/FullPagination";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,8 +15,8 @@ import {
 } from "@/components/ui/DropdownMenu";
 import { AdminMinecraftEditDialog } from "./AdminMinecraftEditDialog";
 import { AdminUserEditDialog } from "./AdminUserEditDialog";
-import { Input } from "@/components/ui/Input";
 import { redirect } from "next/navigation";
+import { DataTable, SortableHeader } from "@/components/ui/DataTable";
 
 type AdminUsersTableProps = {
   _?: string;
@@ -44,7 +26,6 @@ type User = Omit<UserWithRole & { login: string }, "email" | "emailVerified">;
 
 const AdminUsersTable = ({}: AdminUsersTableProps) => {
   const [users, setUsers] = React.useState<User[]>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [editMinecraftUsername, setEditMinecraftUsername] = React.useState<string>();
   const [editUser, setEditUser] = React.useState<string>();
 
@@ -58,23 +39,23 @@ const AdminUsersTable = ({}: AdminUsersTableProps) => {
   const columnHelper = createColumnHelper<User>();
   const columns: ColumnDef<User>[] = [
     columnHelper.accessor("name", {
-      header: "Nom",
+      header: ({ column }) => <SortableHeader column={column} title="Nom" />,
       cell: (row) => row.getValue(),
     }),
     columnHelper.accessor("login", {
-      header: "Login",
+      header: ({ column }) => <SortableHeader column={column} title="Login" />,
       cell: (row) => row.getValue(),
     }),
     columnHelper.accessor("role", {
-      header: "Role",
+      header: ({ column }) => <SortableHeader column={column} title="Role" />,
       cell: (row) => row.getValue(),
     }),
     columnHelper.accessor("banned", {
-      header: "Banni",
-      cell: (row) => (row.getValue() ? <Ban /> : ""),
+      header: ({ column }) => <SortableHeader column={column} title="Banni" />,
+      cell: (row) => (row.getValue() ? <Ban className="text-destructive" /> : ""),
     }),
     columnHelper.accessor("createdAt", {
-      header: "Création",
+      header: ({ column }) => <SortableHeader column={column} title="Création" />,
       cell: (row) => row.getValue()?.toLocaleString("fr-FR") ?? "infinite",
     }),
     {
@@ -149,18 +130,6 @@ const AdminUsersTable = ({}: AdminUsersTableProps) => {
     },
   ] as Array<ColumnDef<User, unknown>>;
 
-  const table = useReactTable({
-    data: users,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    onColumnFiltersChange: setColumnFilters,
-    getFilteredRowModel: getFilteredRowModel(),
-    state: {
-      columnFilters,
-    },
-  });
-
   React.useEffect(() => {
     authClient.admin
       .listUsers({
@@ -191,54 +160,11 @@ const AdminUsersTable = ({}: AdminUsersTableProps) => {
           if (!open) setEditMinecraftUsername(undefined);
         }}
       />
-      <Input
-        placeholder="Nom du joueur..."
-        value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-        onChange={(event) => table.getColumn("name")?.setFilterValue(event.target.value)}
-        className="max-w-sm"
-      />
-      <div className="overflow-hidden rounded-md border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
-                  Aucun utilisateur
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-      <FullPagination
-        selectedPage={table.getState().pagination.pageIndex}
-        totalPages={Math.ceil(users.length / table.getState().pagination.pageSize)}
-        onPageChange={(i) => table.setPageIndex(i)}
+      <DataTable
+        columns={columns}
+        data={users}
+        filterColumn="name"
+        searchPlaceholder="Nom du joueur..."
       />
     </>
   );

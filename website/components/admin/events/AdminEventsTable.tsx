@@ -6,26 +6,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/DropdownMenu";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/Table";
 import { Events } from "@/db/schema/events";
-import {
-  ColumnDef,
-  createColumnHelper,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
+import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import React from "react";
 import { AdminEventEditDialog } from "./AdminEventEditDialog";
 import { $fetch } from "@/lib/betterFetch";
+import { DataTable, SortableHeader } from "@/components/ui/DataTable";
 
 type AdminEventsTableProps = {
   events: Events[];
@@ -43,19 +30,21 @@ const AdminEventsTable = ({
   const columnHelper = createColumnHelper<Events>();
   const columns: ColumnDef<Events>[] = [
     columnHelper.accessor("name", {
-      header: "Nom",
+      header: ({ column }) => <SortableHeader column={column} title="Nom" />,
       cell: (row) => row.getValue(),
     }),
     columnHelper.accessor("date", {
-      header: "Date",
+      header: ({ column }) => <SortableHeader column={column} title="Date" />,
       cell: (row) => row.getValue().toLocaleString("fr-FR"),
     }),
     columnHelper.accessor("createdAt", {
-      header: "Date de création",
+      header: ({ column }) => <SortableHeader column={column} title="Date de création" />,
       cell: (row) => row.getValue().toLocaleString("fr-FR"),
     }),
     columnHelper.accessor("updatedAt", {
-      header: "Dernière modification",
+      header: ({ column }) => (
+        <SortableHeader column={column} title="Dernière modification" />
+      ),
       cell: (row) => row.getValue().toLocaleString("fr-FR"),
     }),
     {
@@ -100,12 +89,6 @@ const AdminEventsTable = ({
     },
   ] as Array<ColumnDef<Events, unknown>>;
 
-  const table = useReactTable({
-    data: events,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-  });
-
   return (
     <>
       <AdminEventEditDialog
@@ -116,44 +99,12 @@ const AdminEventsTable = ({
         event={editValues}
         onEditEvent={onUpdateEvent}
       />
-      <div className="overflow-hidden rounded-md border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
-                  Aucun évenement
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+      <DataTable
+        columns={columns}
+        data={events}
+        filterColumn="name"
+        searchPlaceholder="Nom de l'évenement..."
+      />
     </>
   );
 };

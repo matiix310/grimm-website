@@ -6,21 +6,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/DropdownMenu";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/Table";
-import {
-  ColumnDef,
-  createColumnHelper,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
+import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import React from "react";
 import { $fetch } from "@/lib/betterFetch";
@@ -28,6 +14,7 @@ import { AdminAnswerEditDialog } from "./AdminAnswerEditDialog";
 import { InferQueryModel } from "@/db";
 import { Answers as AnswersSchema } from "@/db/schema/answers";
 import { AdminQrCodeDialog } from "./AdminQrCodeDialog";
+import { DataTable, SortableHeader } from "@/components/ui/DataTable";
 
 type Answers = InferQueryModel<
   "answers",
@@ -51,23 +38,27 @@ const AdminAnswersTable = ({
   const columnHelper = createColumnHelper<Answers>();
   const columns: ColumnDef<Answers>[] = [
     columnHelper.accessor("name", {
-      header: "Nom",
+      header: ({ column }) => <SortableHeader column={column} title="Nom" />,
       cell: (row) => row.getValue(),
     }),
     columnHelper.accessor("points", {
-      header: "Points",
+      header: ({ column }) => <SortableHeader column={column} title="Points" />,
       cell: (row) => row.getValue(),
     }),
     columnHelper.accessor("users", {
-      header: "Nombre de réponse",
+      header: ({ column }) => (
+        <SortableHeader column={column} title="Nombre de réponse" />
+      ),
       cell: (row) => row.getValue().length,
     }),
     columnHelper.accessor("createdAt", {
-      header: "Date de création",
+      header: ({ column }) => <SortableHeader column={column} title="Date de création" />,
       cell: (row) => row.getValue()?.toLocaleString("fr-FR") ?? "infinite",
     }),
     columnHelper.accessor("updatedAt", {
-      header: "Dernière modification",
+      header: ({ column }) => (
+        <SortableHeader column={column} title="Dernière modification" />
+      ),
       cell: (row) => row.getValue()?.toLocaleString("fr-FR") ?? "infinite",
     }),
     {
@@ -124,12 +115,6 @@ const AdminAnswersTable = ({
     },
   ] as Array<ColumnDef<Answers, unknown>>;
 
-  const table = useReactTable({
-    data: answers,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-  });
-
   return (
     <>
       <AdminQrCodeDialog
@@ -147,44 +132,12 @@ const AdminAnswersTable = ({
         answer={editValues}
         onEditAnswer={onUpdateAnswer}
       />
-      <div className="overflow-hidden rounded-md border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
-                  Aucun answer
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+      <DataTable
+        columns={columns}
+        data={answers}
+        filterColumn="name"
+        searchPlaceholder="Nom de la réponse..."
+      />
     </>
   );
 };
