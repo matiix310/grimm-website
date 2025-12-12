@@ -29,6 +29,23 @@ export default {
       return;
     }
 
+    const originUser = await fetch(`${WEBSITE_URL}/api/discord/${interaction.user.id}`, {
+      headers: {
+        "x-api-key": API_KEY,
+      },
+    });
+
+    if (!originUser.ok) {
+      await interaction.editReply("Failed to fetch origin user");
+      return;
+    }
+
+    const originUserData = await originUser.json();
+    if (!originUserData.canSyncRoles) {
+      await interaction.editReply("You do not have permission to sync roles");
+      return;
+    }
+
     // Fetch role mappings from database once
     const mappings = await db.query.discordRoleMappings.findMany({
       where: (table, { eq }) => eq(table.guildId, interaction.guildId!),
