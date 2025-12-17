@@ -20,6 +20,7 @@ import {
   respoTechRole,
   respoVJRole,
   respoWeiRole,
+  respoEventsRole,
   staffRole,
   statement,
   teamComRole,
@@ -41,6 +42,7 @@ export const respoAssistants = ac.newRole(respoAssistantsRole);
 export const respoWei = ac.newRole(respoWeiRole);
 export const respoInter = ac.newRole(respoInterRole);
 export const respoVJ = ac.newRole(respoVJRole);
+export const respoEvents = ac.newRole(respoEventsRole);
 // teams
 export const teamTech = ac.newRole(teamTechRole);
 export const teamDesign = ac.newRole(teamDesignRole);
@@ -65,6 +67,7 @@ const roles = {
   teamCom,
   member,
   staff,
+  respoEvents,
 };
 
 export type Roles = keyof typeof roles;

@@ -8,7 +8,7 @@ import { getUserGroups } from "./google-workspace";
 // Role mapping from Google Workspace group names to internal role names
 const roleMapping: Record<string, Roles> = {
   // Bureau
-  bureau: "bureau",
+  "039kk8xu21d4a3b": "bureau",
 
   // Respos
   "01baon6m0qidpje": "respoTech",
@@ -18,6 +18,7 @@ const roleMapping: Record<string, Roles> = {
   "00haapch40qlumk": "respoWei",
   "respo inter": "respoInter",
   "respo vj": "respoVJ",
+  "035nkun22g1c332": "respoEvents",
 
   // Teams
   "team tech": "teamTech",
