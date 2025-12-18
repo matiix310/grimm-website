@@ -24,6 +24,7 @@ const roleMapping: Record<string, Roles> = {
   "team tech": "teamTech",
   "03oy7u290m4e7u8": "teamDesign",
   "team com": "teamCom",
+  "01t3h5sf3uofnr4": "teamEvent",
 
   // Members
   "00meukdy1c1yrhk": "member",

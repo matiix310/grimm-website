@@ -115,6 +115,10 @@ export const teamComRole = {
   ...userRole,
 } satisfies Permissions;
 
+export const teamEventRole = {
+  ...userRole,
+} satisfies Permissions;
+
 // members
 export const memberRole = {
   ...userRole,
@@ -205,6 +209,12 @@ export const rolesMetadata = {
     backgroundColor: "#3498DB",
     foregroundColor: "#ffffff",
     displayName: "Team Com",
+  },
+  teamEvent: {
+    priority: 50,
+    backgroundColor: "#3498DB",
+    foregroundColor: "#ffffff",
+    displayName: "Team Event",
   },
   member: {
     priority: 30,

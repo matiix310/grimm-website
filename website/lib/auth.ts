@@ -27,6 +27,7 @@ import {
   teamDesignRole,
   teamTechRole,
   userRole,
+  teamEventRole,
 } from "./permissions";
 
 const ac = createAccessControl(statement);
@@ -47,6 +48,7 @@ export const respoEvents = ac.newRole(respoEventsRole);
 export const teamTech = ac.newRole(teamTechRole);
 export const teamDesign = ac.newRole(teamDesignRole);
 export const teamCom = ac.newRole(teamComRole);
+export const teamEvent = ac.newRole(teamEventRole);
 // members
 export const member = ac.newRole(memberRole);
 export const staff = ac.newRole(staffRole);
@@ -65,6 +67,7 @@ const roles = {
   teamTech,
   teamDesign,
   teamCom,
+  teamEvent,
   member,
   staff,
   respoEvents,
