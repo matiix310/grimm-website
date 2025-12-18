@@ -12,7 +12,7 @@ const roleMapping: Record<string, Roles> = {
 
   // Respos
   "01baon6m0qidpje": "respoTech",
-  "respo design": "respoDesign",
+  "04h042r0370z0tg": "respoDesign",
   "respo com": "respoCom",
   "respo assistants": "respoAssistants",
   "00haapch40qlumk": "respoWei",
@@ -22,11 +22,11 @@ const roleMapping: Record<string, Roles> = {
 
   // Teams
   "team tech": "teamTech",
-  "team design": "teamDesign",
+  "03oy7u290m4e7u8": "teamDesign",
   "team com": "teamCom",
 
   // Members
-  membre: "member",
+  "00meukdy1c1yrhk": "member",
 
   // Staff
   staff: "staff",
