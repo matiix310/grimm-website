@@ -2,6 +2,7 @@ import {
   ChatInputCommandInteraction,
   SlashCommandBuilder,
   EmbedBuilder,
+  Role,
 } from "discord.js";
 import { db } from "../db";
 
@@ -51,7 +52,7 @@ export default {
       where: (table, { eq }) => eq(table.guildId, interaction.guildId!),
     });
 
-    const allManagedRoleIds = mappings.map((m) => m.discordRoleId);
+    const allManagedRoleIds = new Set<string>(mappings.map((m) => m.discordRoleId));
 
     let updatedCount = 0;
     let errorCount = 0;
@@ -86,8 +87,8 @@ export default {
             .map((r) => r.discordRoleId)
         );
 
-        const rolesToAdd = [];
-        const rolesToRemove = [];
+        const rolesToAdd: Role[] = [];
+        const rolesToRemove: Role[] = [];
 
         for (const roleId of targetRoleIds) {
           const role = guild.roles.cache.get(roleId);
