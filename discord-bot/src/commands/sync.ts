@@ -80,9 +80,11 @@ export default {
           roles = userData.user.roles as string[];
         }
 
-        const targetRoleIds = mappings
-          .filter((r) => roles.includes(r.websiteRoleId))
-          .map((r) => r.discordRoleId);
+        const targetRoleIds = new Set<string>(
+          mappings
+            .filter((r) => roles.includes(r.websiteRoleId))
+            .map((r) => r.discordRoleId)
+        );
 
         const rolesToAdd = [];
         const rolesToRemove = [];
@@ -95,7 +97,7 @@ export default {
         }
 
         for (const managedRoleId of allManagedRoleIds) {
-          if (!targetRoleIds.includes(managedRoleId)) {
+          if (!targetRoleIds.has(managedRoleId)) {
             const role = guild.roles.cache.get(managedRoleId);
             if (role && member.roles.cache.has(role.id)) {
               rolesToRemove.push(role);
