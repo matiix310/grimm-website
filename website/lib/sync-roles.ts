@@ -19,6 +19,7 @@ const roleMapping: Record<string, Roles> = {
   "00sqyw6430eht6k": "respoInter",
   "023ckvvd4dvekl0": "respoVJ",
   "00ihv6360tmquq0": "respoEvent",
+  "00kgcv8k1056q0k": "respoMerch",
 
   // Teams
   "02grqrue40zqwes": "teamTech",

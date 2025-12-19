@@ -102,6 +102,10 @@ export const respoEventRole = {
   ...userRole,
 } satisfies Permissions;
 
+export const respoMerchRole = {
+  ...userRole,
+} satisfies Permissions;
+
 // teams
 export const teamTechRole = {
   ...userRole,
@@ -191,6 +195,12 @@ export const rolesMetadata = {
     backgroundColor: "#f5a90d",
     foregroundColor: "#ffffff",
     displayName: "Respo Events",
+  },
+  respoMerch: {
+    priority: 80,
+    backgroundColor: "#f5a90d",
+    foregroundColor: "#ffffff",
+    displayName: "Respo Merch",
   },
   teamTech: {
     priority: 50,
