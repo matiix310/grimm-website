@@ -13,18 +13,18 @@ const roleMapping: Record<string, Roles> = {
   // Respos
   "01baon6m0qidpje": "respoTech",
   "04h042r0370z0tg": "respoDesign",
-  "respo com": "respoCom",
-  "respo assistants": "respoAssistants",
+  "03ygebqi3q37nt0": "respoCom",
+  "0319y80a310l5zi": "respoAssistants",
   "00haapch40qlumk": "respoWei",
-  "respo inter": "respoInter",
-  "respo vj": "respoVJ",
-  "035nkun22g1c332": "respoEvents",
+  "00sqyw6430eht6k": "respoInter",
+  "023ckvvd4dvekl0": "respoVJ",
+  "00ihv6360tmquq0": "respoEvent",
 
   // Teams
-  "team tech": "teamTech",
+  "02grqrue40zqwes": "teamTech",
   "03oy7u290m4e7u8": "teamDesign",
-  "team com": "teamCom",
-  "01t3h5sf3uofnr4": "teamEvent",
+  "02ce457m0s4ds2f": "teamCom",
+  "03ygebqi2n0ytbi": "teamEvent",
 
   // Members
   "00meukdy1c1yrhk": "member",

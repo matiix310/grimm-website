@@ -98,7 +98,7 @@ export const respoVJRole = {
   ...userRole,
 } satisfies Permissions;
 
-export const respoEventsRole = {
+export const respoEventRole = {
   ...userRole,
 } satisfies Permissions;
 
@@ -186,7 +186,7 @@ export const rolesMetadata = {
     foregroundColor: "#ffffff",
     displayName: "Respo VJ",
   },
-  respoEvents: {
+  respoEvent: {
     priority: 80,
     backgroundColor: "#f5a90d",
     foregroundColor: "#ffffff",
