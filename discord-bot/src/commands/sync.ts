@@ -51,14 +51,7 @@ export default {
       where: (table, { eq }) => eq(table.guildId, interaction.guildId!),
     });
 
-    const roleMapping: Record<string, string> = {};
-    for (const mapping of mappings) {
-      roleMapping[mapping.websiteRoleId] = mapping.discordRoleId;
-    }
-
-    const allManagedRoleIds = Object.values(roleMapping).filter(
-      (id): id is string => !!id
-    );
+    const allManagedRoleIds = mappings.map((m) => m.discordRoleId);
 
     let updatedCount = 0;
     let errorCount = 0;
@@ -87,9 +80,9 @@ export default {
           roles = userData.user.roles as string[];
         }
 
-        const targetRoleIds = roles
-          .map((r) => roleMapping[r])
-          .filter((id): id is string => !!id);
+        const targetRoleIds = mappings
+          .filter((r) => roles.includes(r.websiteRoleId))
+          .map((r) => r.discordRoleId);
 
         const rolesToAdd = [];
         const rolesToRemove = [];
