@@ -25,6 +25,7 @@ const AdminLayout = async ({
     canAccessUsers,
     canAccessCodes,
     canAccessAnswers,
+    canAccessDiscord,
   ] = await Promise.all([
     hasPermission({
       headers,
@@ -61,6 +62,10 @@ const AdminLayout = async ({
       headers,
       permissions: { answers: ["list", "create", "delete", "update"] },
     }),
+    hasPermission({
+      headers,
+      permissions: { discord: ["admin"] },
+    }),
   ]);
 
   return (
@@ -72,6 +77,7 @@ const AdminLayout = async ({
         canAccessUsers={canAccessUsers}
         canAccessCodes={canAccessCodes}
         canAccessAnswers={canAccessAnswers}
+        canAccessDiscord={canAccessDiscord}
       />
       <main className="w-full">
         <div className="flex items-center gap-2 p-4">

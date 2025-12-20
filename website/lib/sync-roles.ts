@@ -8,24 +8,27 @@ import { getUserGroups } from "./google-workspace";
 // Role mapping from Google Workspace group names to internal role names
 const roleMapping: Record<string, Roles> = {
   // Bureau
-  bureau: "bureau",
+  "039kk8xu21d4a3b": "bureau",
 
   // Respos
   "01baon6m0qidpje": "respoTech",
-  "respo design": "respoDesign",
-  "respo com": "respoCom",
-  "respo assistants": "respoAssistants",
+  "04h042r0370z0tg": "respoDesign",
+  "03ygebqi3q37nt0": "respoCom",
+  "0319y80a310l5zi": "respoAssistants",
   "00haapch40qlumk": "respoWei",
-  "respo inter": "respoInter",
-  "respo vj": "respoVJ",
+  "00sqyw6430eht6k": "respoInter",
+  "023ckvvd4dvekl0": "respoVJ",
+  "00ihv6360tmquq0": "respoEvent",
+  "00kgcv8k1056q0k": "respoMerch",
 
   // Teams
-  "team tech": "teamTech",
-  "team design": "teamDesign",
-  "team com": "teamCom",
+  "02grqrue40zqwes": "teamTech",
+  "03oy7u290m4e7u8": "teamDesign",
+  "02ce457m0s4ds2f": "teamCom",
+  "03ygebqi2n0ytbi": "teamEvent",
 
   // Members
-  membre: "member",
+  "00meukdy1c1yrhk": "member",
 
   // Staff
   staff: "staff",

@@ -32,6 +32,7 @@ export const statement = {
   presets: ["view"],
   userConnections: ["view-discord", "view-minecraft"],
   adminPanel: ["access"],
+  discord: ["admin"],
 } as const;
 
 export type FullPermissions = typeof statement;
@@ -97,6 +98,14 @@ export const respoVJRole = {
   ...userRole,
 } satisfies Permissions;
 
+export const respoEventRole = {
+  ...userRole,
+} satisfies Permissions;
+
+export const respoMerchRole = {
+  ...userRole,
+} satisfies Permissions;
+
 // teams
 export const teamTechRole = {
   ...userRole,
@@ -107,6 +116,10 @@ export const teamDesignRole = {
 } satisfies Permissions;
 
 export const teamComRole = {
+  ...userRole,
+} satisfies Permissions;
+
+export const teamEventRole = {
   ...userRole,
 } satisfies Permissions;
 
@@ -177,6 +190,18 @@ export const rolesMetadata = {
     foregroundColor: "#ffffff",
     displayName: "Respo VJ",
   },
+  respoEvent: {
+    priority: 80,
+    backgroundColor: "#f5a90d",
+    foregroundColor: "#ffffff",
+    displayName: "Respo Events",
+  },
+  respoMerch: {
+    priority: 80,
+    backgroundColor: "#f5a90d",
+    foregroundColor: "#ffffff",
+    displayName: "Respo Merch",
+  },
   teamTech: {
     priority: 50,
     backgroundColor: "#3498DB",
@@ -194,6 +219,12 @@ export const rolesMetadata = {
     backgroundColor: "#3498DB",
     foregroundColor: "#ffffff",
     displayName: "Team Com",
+  },
+  teamEvent: {
+    priority: 50,
+    backgroundColor: "#3498DB",
+    foregroundColor: "#ffffff",
+    displayName: "Team Event",
   },
   member: {
     priority: 30,

@@ -20,12 +20,15 @@ import {
   respoTechRole,
   respoVJRole,
   respoWeiRole,
+  respoEventRole,
   staffRole,
   statement,
   teamComRole,
   teamDesignRole,
   teamTechRole,
   userRole,
+  teamEventRole,
+  respoMerchRole,
 } from "./permissions";
 
 const ac = createAccessControl(statement);
@@ -41,10 +44,13 @@ export const respoAssistants = ac.newRole(respoAssistantsRole);
 export const respoWei = ac.newRole(respoWeiRole);
 export const respoInter = ac.newRole(respoInterRole);
 export const respoVJ = ac.newRole(respoVJRole);
+export const respoEvent = ac.newRole(respoEventRole);
+export const respoMerch = ac.newRole(respoMerchRole);
 // teams
 export const teamTech = ac.newRole(teamTechRole);
 export const teamDesign = ac.newRole(teamDesignRole);
 export const teamCom = ac.newRole(teamComRole);
+export const teamEvent = ac.newRole(teamEventRole);
 // members
 export const member = ac.newRole(memberRole);
 export const staff = ac.newRole(staffRole);
@@ -63,8 +69,11 @@ const roles = {
   teamTech,
   teamDesign,
   teamCom,
+  teamEvent,
   member,
   staff,
+  respoEvent,
+  respoMerch,
 };
 
 export type Roles = keyof typeof roles;

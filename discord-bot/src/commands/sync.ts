@@ -2,6 +2,7 @@ import {
   ChatInputCommandInteraction,
   SlashCommandBuilder,
   EmbedBuilder,
+  Role,
 } from "discord.js";
 import { db } from "../db";
 
@@ -29,19 +30,31 @@ export default {
       return;
     }
 
+    const originUser = await fetch(`${WEBSITE_URL}/api/discord/${interaction.user.id}`, {
+      headers: {
+        "x-api-key": API_KEY,
+      },
+    });
+
+    if (!originUser.ok) {
+      await interaction.editReply(
+        "Failed to fetch origin user, check that you are correctly linked"
+      );
+      return;
+    }
+
+    const originUserData = await originUser.json();
+    if (!originUserData.canSyncRoles) {
+      await interaction.editReply("You do not have permission to sync roles");
+      return;
+    }
+
     // Fetch role mappings from database once
     const mappings = await db.query.discordRoleMappings.findMany({
       where: (table, { eq }) => eq(table.guildId, interaction.guildId!),
     });
 
-    const roleMapping: Record<string, string> = {};
-    for (const mapping of mappings) {
-      roleMapping[mapping.websiteRoleId] = mapping.discordRoleId;
-    }
-
-    const allManagedRoleIds = Object.values(roleMapping).filter(
-      (id): id is string => !!id
-    );
+    const allManagedRoleIds = new Set<string>(mappings.map((m) => m.discordRoleId));
 
     let updatedCount = 0;
     let errorCount = 0;
@@ -70,12 +83,14 @@ export default {
           roles = userData.user.roles as string[];
         }
 
-        const targetRoleIds = roles
-          .map((r) => roleMapping[r])
-          .filter((id): id is string => !!id);
+        const targetRoleIds = new Set<string>(
+          mappings
+            .filter((r) => roles.includes(r.websiteRoleId))
+            .map((r) => r.discordRoleId)
+        );
 
-        const rolesToAdd = [];
-        const rolesToRemove = [];
+        const rolesToAdd: Role[] = [];
+        const rolesToRemove: Role[] = [];
 
         for (const roleId of targetRoleIds) {
           const role = guild.roles.cache.get(roleId);
@@ -85,7 +100,7 @@ export default {
         }
 
         for (const managedRoleId of allManagedRoleIds) {
-          if (!targetRoleIds.includes(managedRoleId)) {
+          if (!targetRoleIds.has(managedRoleId)) {
             const role = guild.roles.cache.get(managedRoleId);
             if (role && member.roles.cache.has(role.id)) {
               rolesToRemove.push(role);
