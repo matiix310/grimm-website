@@ -37,7 +37,9 @@ export default {
     });
 
     if (!originUser.ok) {
-      await interaction.editReply("Failed to fetch origin user");
+      await interaction.editReply(
+        "Failed to fetch origin user, check that you are correctly linked"
+      );
       return;
     }
 
