@@ -1,5 +1,5 @@
 import z from "zod";
-import * as loginSchema from "./[login]/routeSchema";
+import loginSchema from "./[login]/routeSchema";
 
 const schema = {
   "@post/api/admin/sync-roles": {

@@ -1,7 +1,7 @@
 import z from "zod";
 
 const schema = {
-  "@post/api/admin/sync-roles/[login]": {
+  "@post/api/admin/sync-roles/:login": {
     output: z.object({
       success: z.boolean(),
       message: z.string(),
