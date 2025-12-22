@@ -38,8 +38,6 @@ export default {
     const targetMember = interaction.options.getUser("user");
 
     try {
-      let result;
-
       if (targetMember) {
         await interaction.editReply(`Syncing roles for ${targetMember.tag}...`);
 
@@ -50,15 +48,12 @@ export default {
           return;
         }
 
-        result = await fetch(
-          `${WEBSITE_URL}/api/admin/sync-roles/${targetUser.user.login}`,
-          {
-            method: "POST",
-            headers: {
-              "x-api-key": API_KEY,
-            },
-          }
-        );
+        await fetch(`${WEBSITE_URL}/api/admin/sync-roles/${targetUser.user.login}`, {
+          method: "POST",
+          headers: {
+            "x-api-key": API_KEY,
+          },
+        });
       } else {
         if (!interaction.guildId) {
           await interaction.editReply(
@@ -67,7 +62,7 @@ export default {
           return;
         }
         await interaction.editReply("Website sync triggered. Updating Discord roles...");
-        result = await fetch(`${WEBSITE_URL}/api/admin/sync-roles`, {
+        await fetch(`${WEBSITE_URL}/api/admin/sync-roles`, {
           method: "POST",
           headers: {
             "x-api-key": API_KEY,
