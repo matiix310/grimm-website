@@ -5,6 +5,7 @@ import { nextCookies } from "better-auth/next-js";
 import {
   admin as adminPlugin,
   apiKey,
+  createAuthMiddleware,
   genericOAuth,
   username,
 } from "better-auth/plugins";
@@ -30,6 +31,7 @@ import {
   teamEventRole,
   respoMerchRole,
 } from "./permissions";
+import { performUserRoleSync } from "./sync-roles";
 
 const ac = createAccessControl(statement);
 
@@ -126,6 +128,22 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     disableSignUp: true,
+  },
+  hooks: {
+    after: createAuthMiddleware(async (ctx) => {
+      if (ctx.path === "/callback/:id") {
+        const provider = ctx.params.id;
+        if (provider === "google" || provider === "discord") {
+          const session = await auth.api.getSession({
+            headers: ctx.headers ?? new Headers(),
+          });
+
+          if (session?.user.login) {
+            await performUserRoleSync(session.user.login);
+          }
+        }
+      }
+    }),
   },
   plugins: [
     adminPlugin({

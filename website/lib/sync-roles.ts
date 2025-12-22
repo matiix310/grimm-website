@@ -289,6 +289,12 @@ export async function performRoleSync(): Promise<SyncRolesResult> {
       }
     }
 
+    const discordUrl = process.env.DISCORD_URL;
+
+    if (discordUrl) {
+      await fetch(`${discordUrl}/sync`);
+    }
+
     return {
       success: true,
       message,
@@ -381,6 +387,22 @@ export async function performUserRoleSync(login: string): Promise<SyncRolesResul
           ],
         },
       };
+    }
+
+    // update the discord user if any
+    const discordUrl = process.env.DISCORD_URL;
+
+    if (discordUrl) {
+      const discordAccount = await db.query.account.findFirst({
+        where: and(
+          eq(account.userId, existingUser.id),
+          eq(account.providerId, "discord")
+        ),
+      });
+
+      if (discordAccount) {
+        await fetch(`${discordUrl}/sync/${discordAccount.accountId}`);
+      }
     }
 
     return {

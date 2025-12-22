@@ -4,6 +4,7 @@ import { Client } from "discord.js";
 import { db } from "../db";
 import { discordRoleMappings } from "../db/schema/discord-roles";
 import { eq } from "drizzle-orm";
+import { syncAll, syncSingleUser } from "../services/sync";
 
 export const createApi = (client: Client) => {
   const app = new Elysia()
@@ -68,7 +69,23 @@ export const createApi = (client: Client) => {
           ),
         }),
       }
-    );
+    )
+    .get("/sync", async () => {
+      try {
+        const result = await syncAll(client);
+        return result;
+      } catch (error) {
+        return { error: error instanceof Error ? error.message : "Undefined error" };
+      }
+    })
+    .get("/sync/:discordId", async ({ params: { discordId } }) => {
+      try {
+        const result = await syncSingleUser(client, discordId);
+        return result;
+      } catch (error) {
+        return { error: error instanceof Error ? error.message : "Undefined error" };
+      }
+    });
 
   return app;
 };

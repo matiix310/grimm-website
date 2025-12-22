@@ -1,8 +1,7 @@
 import z from "zod";
-import * as loginSchema from "./[login]/routeSchema";
 
 const schema = {
-  "@post/api/admin/sync-roles": {
+  "@post/api/admin/sync-roles/[login]": {
     output: z.object({
       success: z.boolean(),
       message: z.string(),
@@ -22,7 +21,6 @@ const schema = {
         .optional(),
     }),
   },
-  ...loginSchema,
 };
 
 export default schema;

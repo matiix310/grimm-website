@@ -5,12 +5,14 @@ import type {
   ExtractTablesWithRelations,
 } from "drizzle-orm";
 import * as discordRolesSchema from "./schema/discord-roles";
+import * as discordLogChannelSchema from "./schema/discord-log-channel";
 
 if (process.env.DB_URL === undefined)
   throw new Error("Environement variable DB_URL is not defined!");
 
 const schema = {
   ...discordRolesSchema,
+  ...discordLogChannelSchema,
 };
 
 export const db = drizzle(process.env.DB_URL, {
