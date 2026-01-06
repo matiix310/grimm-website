@@ -6,20 +6,21 @@ import Image from "next/image";
 import { connection } from "next/server";
 import { BureauCarousel } from "@/components/home/BureauCarousel";
 import { bureau as bureauSchema } from "@/db/schema/bureau";
+import { events as eventsSchema } from "@/db/schema/events";
 import Link from "next/link";
-import GrimmXMas from "@/components/stickers/GrimmXMas";
-import { adventCalendar as adventCalendarSchema } from "@/db/schema/adventCalendar";
-import { AdventCalendar } from "@/components/home/AdventCalendar";
+import GrimmSticker from "@/components/stickers/Grimm";
 import { SocialButton } from "@/components/home/SocialButton";
+import { Skeleton } from "@/components/ui/Skeleton";
 
 const Home = async () => {
   // prevent nextjs from prerendering this page
   // as it involves database content
   await connection();
 
-  const [adventCalendar, bureau] = await Promise.all([
-    db.query.adventCalendar.findMany({
-      orderBy: asc(adventCalendarSchema.day),
+  const [events, bureau] = await Promise.all([
+    db.query.events.findMany({
+      orderBy: asc(eventsSchema.date),
+      limit: 3,
     }),
     db.query.bureau.findMany({ orderBy: asc(bureauSchema.index) }),
   ]);
@@ -27,24 +28,14 @@ const Home = async () => {
   return (
     <div>
       <Navbar className="fixed top-0 left-0 w-full z-10" />
-      <section className="relative w-full lg:h-90 xl:h-110 mt-20 xl:mt-25 lg:bg-green flex flex-col items-center lg:block">
-        <div className="relative flex items-center justify-center lg:absolute top-0 lg:right-10 xl:right-20 h-auto lg:h-100 xl:h-130 w-[80%] lg:w-100 xl:w-130 bg-[#794210] p-5 lg:p-10 rounded-b-full outline-8 xl:outline-10 outline-black/10">
-          <GrimmXMas className="size-full" />
+      <section className="relative w-full lg:h-90 xl:h-110 mt-20 xl:mt-25 lg:bg-pink flex flex-col items-center lg:block">
+        <div className="relative flex items-center justify-center lg:absolute top-0 lg:right-10 xl:right-20 h-auto lg:h-100 xl:h-130 w-[80%] lg:w-100 xl:w-130 bg-blue p-5 lg:p-10 rounded-b-full outline-8 xl:outline-10 outline-black/10">
+          <GrimmSticker className="size-full" />
         </div>
-        <div className="flex flex-col gap-5 lg:gap-8 xl:gap-10 text-foreground lg:text-green-foreground lg:w-[60%] mt-8 lg:mt-0 px-5 lg:px-10 xl:px-15 h-full justify-center text-center lg:text-start">
-          <h1 className="font-paytone text-3xl lg:text-5xl xl:text-7xl">
-            C’est l’heure du Noël de GRIMM !
-          </h1>
+        <div className="flex flex-col gap-5 lg:gap-8 xl:gap-10 text-foreground lg:text-pink-foreground lg:w-[60%] mt-8 lg:mt-0 px-5 lg:px-10 xl:px-15 h-full justify-center text-center lg:text-start">
+          <h1 className="font-paytone text-3xl lg:text-5xl xl:text-7xl">BDE Grimm</h1>
           <p className="text-xl lg:text-2xl xl:text-3xl">
-            Tous les jours, venez découvrir une surprise de l&apos;avent sur le compte
-            instagram{" "}
-            <Link
-              href="/to/instagram"
-              className="hover:underline text-black lg:text-white"
-            >
-              @bde.grimm
-            </Link>
-            .
+            BDE de l&apos;école EPITA pour l&apos;année 2026
           </p>
         </div>
       </section>
@@ -88,25 +79,54 @@ const Home = async () => {
         </div>
       </section>
       <section
-        id="adventCalendar"
+        id="events"
         className="w-full pt-28 -mt-15 lg:mt-0 flex flex-col px-5 lg:px-10 xl:px-20"
       >
         <div className="flex gap-2 items-center">
           <div className="relative w-10 h-15 lg:w-13 lg:h-18 xl:w-20 xl:h-25">
             <Image alt="étoile" src="/star.svg" fill={true} objectPosition="center" />
           </div>
-          <h1 className="font-paytone text-3xl lg:text-5xl xl:text-7xl">
-            Le Calendrier De L&apos;Avent
-          </h1>
+          <h1 className="font-paytone text-3xl lg:text-5xl xl:text-7xl">Les Events</h1>
         </div>
-        <AdventCalendar
-          className="mt-5 lg:mt-10"
-          adventCalendar={adventCalendar.map((e) => {
-            if (e.date === null || e.date > new Date())
-              return { ...e, content: null, date: null };
-            return { ...e, date: null };
-          })}
-        />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 lg:gap-10 mt-5 lg:mt-10">
+          {events.map((event) => (
+            <div
+              key={event.id}
+              className="relative w-full aspect-video bg-accent rounded-4xl overflow-hidden after:size-full after:absolute after:top-0 after:left-0 after:transition-all after:ease-in-out hover:after:bg-primary/70 hover:*:data-[slot=overlay]:opacity-100"
+              style={{
+                background: `url(${event.image})`,
+                backgroundRepeat: "no-repeat",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }}
+            >
+              <Skeleton className="absolute left-0 top-0 size-full -z-1" />
+              <div
+                data-slot="overlay"
+                className="opacity-0 absolute z-2 top-[50%] left-[50%] -translate-[50%] font-paytone text-primary-foreground flex flex-col items-center"
+              >
+                <span className="text-3xl xl:text-5xl">
+                  {event.date.toLocaleDateString("fr-FR")}
+                </span>
+                <span className="text-lg xl:text-2xl">
+                  {event.date.toLocaleTimeString("fr-FR")}
+                </span>
+              </div>
+              <div className="flex flex-col gap-2 items-end absolute bottom-5 right-5 font-paytone z-2">
+                {/* <p className="bg-red text-red-foreground px-5 py-2 rounded-full text-sm lg:text-lg">
+                  A venir
+                </p> */}
+                <p className="bg-secondary text-secondary-foreground px-5 py-2 rounded-full text-sm xl:text-lg">
+                  {event.name}
+                </p>
+                <p className="static lg:hidden bg-secondary text-secondary-foreground px-5 py-2 rounded-full text-sm">
+                  {event.date.toLocaleDateString("fr-FR")}{" "}
+                  {event.date.toLocaleTimeString("fr-FR")}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
       </section>
       <section
         id="bureau"

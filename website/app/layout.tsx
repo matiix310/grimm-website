@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { Overpass, Archivo_Narrow, Paytone_One } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/Sonner";
-import { Snowfall } from "@/components/home/Snowfall";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const overpass = Overpass({
@@ -44,7 +43,6 @@ export default function RootLayout({
     <html lang="fr">
       <body className="antialiased">
         <Toaster />
-        <Snowfall className="fixed top-0 left-0 size-full z-20 pointer-events-none" />
         {children}
       </body>
     </html>
