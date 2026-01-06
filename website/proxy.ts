@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse, ProxyConfig } from "next/server";
-import { headers } from "next/headers";
+import { headers as nextHeaders } from "next/headers";
 import { auth } from "@/lib/auth";
 import { loadAssetFromStorage } from "./lib/storage";
 import ApiResponse from "./lib/apiResponse";
@@ -16,8 +16,10 @@ export async function proxy(request: NextRequest) {
     return NextResponse.rewrite(newUrl);
   }
 
+  const headers = await nextHeaders();
+
   const session = await auth.api.getSession({
-    headers: await headers(),
+    headers,
   });
 
   const host = request.headers.get("host"); /* === "localhost"
@@ -45,8 +47,18 @@ export async function proxy(request: NextRequest) {
       );
     else return NextResponse.rewrite("http://drizzle-gate:4983" + path);
 
-  // To access "/admin" you must have "admin" role
-  if (path.startsWith("/admin") && !roles.includes("admin")) {
+  // To access "/admin" you must have the "adminPanel" permission
+  if (
+    path.startsWith("/admin") &&
+    !(await auth.api.userHasPermission({
+      headers,
+      body: {
+        permissions: {
+          adminPanel: ["access"],
+        },
+      },
+    }))
+  ) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 

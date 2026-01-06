@@ -3,7 +3,7 @@ import { Button } from "../ui/Button";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
+import { headers as nextHeaders } from "next/headers";
 import { MobileMenu } from "./MobileMenu";
 
 export type MenuButton = {
@@ -15,14 +15,23 @@ export type MenuButton = {
 type NavbarProps = {} & React.ComponentProps<"div">;
 
 const Navbar = async ({ className, ...rest }: NavbarProps) => {
+  const headers = await nextHeaders();
+
   const session = await auth.api.getSession({
-    headers: await headers(),
+    headers,
   });
 
-  const isAdmin = session?.user.role?.split(",").includes("admin") ?? false;
+  const hasAccessToAdminPanel = await auth.api.userHasPermission({
+    headers,
+    body: {
+      permissions: {
+        adminPanel: ["access"],
+      },
+    },
+  });
 
   const buttons: MenuButton[] = [
-    ...(isAdmin
+    ...(hasAccessToAdminPanel
       ? [
           {
             name: "Admin",

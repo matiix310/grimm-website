@@ -100,6 +100,8 @@ export const respoVJRole = {
 
 export const respoEventRole = {
   ...userRole,
+  adminPanel: ["access"],
+  events: ["create", "delete", "update"],
 } satisfies Permissions;
 
 export const respoMerchRole = {
