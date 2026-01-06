@@ -21,14 +21,16 @@ const Navbar = async ({ className, ...rest }: NavbarProps) => {
     headers,
   });
 
-  const hasAccessToAdminPanel = await auth.api.userHasPermission({
-    headers,
-    body: {
-      permissions: {
-        adminPanel: ["access"],
+  const hasAccessToAdminPanel =
+    !!session &&
+    (await auth.api.userHasPermission({
+      headers,
+      body: {
+        permissions: {
+          adminPanel: ["access"],
+        },
       },
-    },
-  });
+    }));
 
   const buttons: MenuButton[] = [
     ...(hasAccessToAdminPanel
