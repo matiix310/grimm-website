@@ -12,6 +12,8 @@ ticket_closing_date: 2026-01-17 5:00:00
 ticket_link: https://www.helloasso.com/associations/bde-epita/evenements/once-upon-a-night
 ---
 
+# LA SOIRÉE EN BREF
+
 Votre BDE vous invite à la première soirée du mandat du BDE GRIMM, une nuit magique qui s’annonce… enchantée 🧚‍♀️
 
 📍 Rendez-vous le 16 janvier 2026 de 23h à 5h à l’Under !
