@@ -9,7 +9,6 @@ import { bureau as bureauSchema } from "@/db/schema/bureau";
 import Link from "next/link";
 import GrimmSticker from "@/components/stickers/Grimm";
 import { SocialButton } from "@/components/home/SocialButton";
-import { Skeleton } from "@/components/ui/Skeleton";
 import { events as veliteEvents } from "@/.velite";
 
 const Home = async () => {
