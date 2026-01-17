@@ -1,0 +1,32 @@
+.content h1 {
+  font-size: 3rem;
+  font-family:
+    Paytone One,
+    Paytone One Fallback;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.content h2 {
+  font-size: 2.25rem;
+}
+
+.content h3 {
+  font-size: 1.875rem;
+}
+
+.content h4 {
+  font-size: 1.5rem;
+}
+
+.content h5 {
+  font-size: 1.3125rem;
+}
+
+.content h6 {
+  font-size: 1.125rem;
+}
+
+.content p {
+  font-size: 1.5rem;
+}

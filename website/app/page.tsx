@@ -6,24 +6,27 @@ import Image from "next/image";
 import { connection } from "next/server";
 import { BureauCarousel } from "@/components/home/BureauCarousel";
 import { bureau as bureauSchema } from "@/db/schema/bureau";
-import { events as eventsSchema } from "@/db/schema/events";
 import Link from "next/link";
 import GrimmSticker from "@/components/stickers/Grimm";
 import { SocialButton } from "@/components/home/SocialButton";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { events as veliteEvents } from "@/.velite";
 
 const Home = async () => {
   // prevent nextjs from prerendering this page
   // as it involves database content
   await connection();
 
-  const [events, bureau] = await Promise.all([
-    db.query.events.findMany({
-      orderBy: asc(eventsSchema.date),
-      limit: 3,
-    }),
+  const [bureau] = await Promise.all([
     db.query.bureau.findMany({ orderBy: asc(bureauSchema.index) }),
   ]);
+
+  const events = veliteEvents
+    .filter((e) => new Date(e.starting_date) > new Date())
+    .sort(
+      (a, b) => new Date(b.starting_date).getTime() - new Date(a.starting_date).getTime(),
+    )
+    .slice(0, 3);
 
   return (
     <div>
@@ -90,26 +93,28 @@ const Home = async () => {
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 lg:gap-10 mt-5 lg:mt-10">
           {events.map((event) => (
-            <div
-              key={event.id}
+            <a
+              href={`/events/${event.slug}`}
+              key={event.slug}
               className="relative w-full aspect-video bg-accent rounded-4xl overflow-hidden after:size-full after:absolute after:top-0 after:left-0 after:transition-all after:ease-in-out hover:after:bg-primary/70 hover:*:data-[slot=overlay]:opacity-100"
-              style={{
-                background: `url(${event.image})`,
-                backgroundRepeat: "no-repeat",
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-              }}
             >
-              <Skeleton className="absolute left-0 top-0 size-full -z-1" />
+              <Image
+                src={event.cover}
+                alt={event.title}
+                fill={true}
+                objectPosition="center"
+                objectFit="cover"
+                placeholder="blur"
+              />
               <div
                 data-slot="overlay"
                 className="opacity-0 absolute z-2 top-[50%] left-[50%] -translate-[50%] font-paytone text-primary-foreground flex flex-col items-center"
               >
                 <span className="text-3xl xl:text-5xl">
-                  {event.date.toLocaleDateString("fr-FR")}
+                  {new Date(event.starting_date).toLocaleDateString("fr-FR")}
                 </span>
                 <span className="text-lg xl:text-2xl">
-                  {event.date.toLocaleTimeString("fr-FR")}
+                  {new Date(event.starting_date).toLocaleTimeString("fr-FR")}
                 </span>
               </div>
               <div className="flex flex-col gap-2 items-end absolute bottom-5 right-5 font-paytone z-2">
@@ -117,14 +122,14 @@ const Home = async () => {
                   A venir
                 </p> */}
                 <p className="bg-secondary text-secondary-foreground px-5 py-2 rounded-full text-sm xl:text-lg">
-                  {event.name}
+                  {event.title}
                 </p>
                 <p className="static lg:hidden bg-secondary text-secondary-foreground px-5 py-2 rounded-full text-sm">
-                  {event.date.toLocaleDateString("fr-FR")}{" "}
-                  {event.date.toLocaleTimeString("fr-FR")}
+                  {new Date(event.starting_date).toLocaleDateString("fr-FR")}{" "}
+                  {new Date(event.starting_date).toLocaleTimeString("fr-FR")}
                 </p>
               </div>
-            </div>
+            </a>
           ))}
         </div>
       </section>
