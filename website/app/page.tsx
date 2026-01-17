@@ -21,7 +21,7 @@ const Home = async () => {
   ]);
 
   const events = veliteEvents
-    .filter((e) => new Date(e.starting_date) > new Date())
+    .filter((e) => new Date(e.ending_date ?? e.starting_date) > new Date())
     .sort(
       (a, b) => new Date(b.starting_date).getTime() - new Date(a.starting_date).getTime(),
     )
