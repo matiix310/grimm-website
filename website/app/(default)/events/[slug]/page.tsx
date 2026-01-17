@@ -16,8 +16,8 @@ export default async function Events({ params }: PageProps<"/events/[slug]">) {
   if (event === undefined) return notFound();
 
   return (
-    <div className="p-5 lg:p-10 flex flex-col gap-10 text-xs lg:text-base">
-      <div className="flex flex-col lg:flex-row gap-5 lg:gap-10">
+    <div className="p-5 lg:p-8 flex flex-col gap-8 text-xs lg:text-xs xl:text-base">
+      <div className="flex flex-col lg:flex-row gap-5 lg:gap-8">
         <div className="relative w-full aspect-video flex-1">
           <Image
             src={event.cover}
@@ -26,12 +26,12 @@ export default async function Events({ params }: PageProps<"/events/[slug]">) {
             fill={true}
             objectFit="cover"
             objectPosition="center"
-            className="rounded-4xl"
+            className="rounded-2xl xl:rounded-4xl"
           />
         </div>
-        <div className="flex-1 flex flex-col gap-5 lg:gap-10 justify-center">
-          <h1 className="font-paytone text-3xl lg:text-6xl">{event.title}</h1>
-          <div className="text-2xl lg:text-4xl flex gap-2 items-center">
+        <div className="flex-1 flex flex-col gap-5 xl:gap-8 justify-center">
+          <h1 className="font-paytone text-3xl lg:text-4xl xl:text-6xl">{event.title}</h1>
+          <div className="text-2xl lg:text-2xl xl:text-4xl flex gap-2 items-center">
             <p>📅</p>
             <div className="flex flex-col lg:flex-row">
               <p>
@@ -49,7 +49,7 @@ export default async function Events({ params }: PageProps<"/events/[slug]">) {
               )}
             </div>
           </div>
-          <div className="text-2xl lg:text-4xl flex gap-2 items-center">
+          <div className="text-2xl lg:text-2xl xl:text-4xl flex gap-2 items-center">
             <p>📍</p>
             <a href={event.location_link} target="_blank">
               {event.location}
@@ -59,7 +59,7 @@ export default async function Events({ params }: PageProps<"/events/[slug]">) {
             {event.tags.map((tag, i) => (
               <span
                 key={i}
-                className="text-base lg:text-2xl bg-secondary text-secondary-foreground px-4 py-1 rounded-full"
+                className="text-base lg:text-lg xl:text-2xl bg-secondary text-secondary-foreground px-3 xl:px-4 xl:py-1 rounded-full"
               >
                 {tag}
               </span>
