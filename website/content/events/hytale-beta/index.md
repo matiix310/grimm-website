@@ -2,10 +2,10 @@
 title: Serveur Hytale Beta
 slug: hytale-beta
 starting_date: 2026-01-13 17:00:00
-ending_date: 2026-01-31 00:00:00
+ending_date: 2026-01-18 17:00:00
 cover: cover.webp
 tags: ["hytale", "virtuel"]
-location: en ligne
+location: En ligne
 location_address: play.bde-grimm.com
 ---
 

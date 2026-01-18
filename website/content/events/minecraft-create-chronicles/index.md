@@ -1,5 +1,5 @@
 ---
-title: Serveur Minecraft Moddé
+title: Serveur Minecraft Create Chronicles
 slug: minecraft-create-chronicles
 starting_date: 2025-12-07 14:00:00
 ending_date: 2026-01-13 17:00:00
