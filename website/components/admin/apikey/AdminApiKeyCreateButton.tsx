@@ -164,7 +164,9 @@ const AdminApiKeyCreateButton = ({ onNewApiKey }: AdminApiKeyCreateButtonProps) 
                               id="date-picker"
                               className="cursor-pointer hover:bg-secondary/10 flex items-center h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
                             >
-                              {field.state.value.toLocaleDateString("fr-FR")}
+                              {field.state.value.toLocaleDateString("fr-FR", {
+                                timeZone: "UTC",
+                              })}
                             </div>
                           </PopoverTrigger>
                           <PopoverContent
@@ -181,8 +183,8 @@ const AdminApiKeyCreateButton = ({ onNewApiKey }: AdminApiKeyCreateButtonProps) 
                                     new Date(
                                       date!.toString().split(" ").splice(0, 4).join(" ") +
                                         " " +
-                                        old!.toTimeString().split(" ")[0]
-                                    )
+                                        old!.toTimeString().split(" ")[0],
+                                    ),
                                 );
                                 setOpen(false);
                               }}
@@ -202,8 +204,8 @@ const AdminApiKeyCreateButton = ({ onNewApiKey }: AdminApiKeyCreateButtonProps) 
                                 new Date(
                                   old.toString().split(" ").splice(0, 4).join(" ") +
                                     " " +
-                                    e.target.value
-                                )
+                                    e.target.value,
+                                ),
                             )
                           }
                           type="time"
@@ -241,7 +243,7 @@ const AdminApiKeyCreateButton = ({ onNewApiKey }: AdminApiKeyCreateButtonProps) 
                               onClick={() =>
                                 field.handleChange((old) => {
                                   const copy = Object.fromEntries(
-                                    Object.entries(old).map(([k, v]) => [k, [...v]])
+                                    Object.entries(old).map(([k, v]) => [k, [...v]]),
                                   );
 
                                   if (copy[k].length === 1) {
@@ -257,7 +259,7 @@ const AdminApiKeyCreateButton = ({ onNewApiKey }: AdminApiKeyCreateButtonProps) 
                               {permissionName}
                             </Button>
                           );
-                        })
+                        }),
                       )}
                       <Popover
                         modal={true}
@@ -280,7 +282,7 @@ const AdminApiKeyCreateButton = ({ onNewApiKey }: AdminApiKeyCreateButtonProps) 
                                     .filter(
                                       (v) =>
                                         !field.state.value[k] ||
-                                        !field.state.value[k].includes(v)
+                                        !field.state.value[k].includes(v),
                                     )
                                     .map((v) => {
                                       const permissionName = `${k}/${v}`;
@@ -295,7 +297,7 @@ const AdminApiKeyCreateButton = ({ onNewApiKey }: AdminApiKeyCreateButtonProps) 
                                                 Object.entries(old).map(([k, v]) => [
                                                   k,
                                                   [...v],
-                                                ])
+                                                ]),
                                               );
                                               if (!copy[k]) copy[k] = [v];
                                               else copy[k] = [...copy[k], v];
@@ -307,7 +309,7 @@ const AdminApiKeyCreateButton = ({ onNewApiKey }: AdminApiKeyCreateButtonProps) 
                                           {permissionName}
                                         </CommandItem>
                                       );
-                                    })
+                                    }),
                                 )}
                               </CommandGroup>
                             </CommandList>

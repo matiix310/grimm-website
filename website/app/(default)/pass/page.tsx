@@ -27,7 +27,10 @@ const PassPage = async () => {
           </div>
           <h1 className="font-paytone text-2xl xl:text-5xl">{session.user.name}</h1>
           <p className="font-archivo text-2xl xl:text-5xl">
-            Soutient Grimm depuis le {session.user.createdAt.toLocaleDateString("fr-FR")}
+            Soutient Grimm depuis le{" "}
+            {session.user.createdAt.toLocaleDateString("fr-FR", {
+              timeZone: "UTC",
+            })}
           </p>
         </CardItem>
         <div className="absolute size-full top-0 left-0 rounded-4xl border-orange border-4 overflow-hidden">

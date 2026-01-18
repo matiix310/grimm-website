@@ -165,10 +165,14 @@ const Home = async () => {
                 className="opacity-0 absolute z-2 top-[50%] left-[50%] -translate-[50%] font-paytone text-primary-foreground flex flex-col items-center"
               >
                 <span className="text-3xl xl:text-5xl">
-                  {new Date(event.starting_date).toLocaleDateString("fr-FR")}
+                  {new Date(event.starting_date).toLocaleDateString("fr-FR", {
+                    timeZone: "UTC",
+                  })}
                 </span>
                 <span className="text-lg xl:text-2xl">
-                  {new Date(event.starting_date).toLocaleTimeString("fr-FR")}
+                  {new Date(event.starting_date).toLocaleTimeString("fr-FR", {
+                    timeZone: "UTC",
+                  })}
                 </span>
               </div>
               <div className="flex flex-col gap-2 items-end absolute bottom-5 right-5 font-paytone z-2">
@@ -182,8 +186,12 @@ const Home = async () => {
                   {event.title}
                 </p>
                 <p className="static lg:hidden bg-secondary text-secondary-foreground px-5 py-2 rounded-full text-sm">
-                  {new Date(event.starting_date).toLocaleDateString("fr-FR")}{" "}
-                  {new Date(event.starting_date).toLocaleTimeString("fr-FR")}
+                  {new Date(event.starting_date).toLocaleDateString("fr-FR", {
+                    timeZone: "UTC",
+                  })}{" "}
+                  {new Date(event.starting_date).toLocaleTimeString("fr-FR", {
+                    timeZone: "UTC",
+                  })}
                 </p>
               </div>
             </a>

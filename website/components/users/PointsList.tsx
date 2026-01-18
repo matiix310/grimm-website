@@ -79,12 +79,12 @@ const PointsList = ({
           <Tooltip>
             <TooltipTrigger asChild>
               <p className="absolute bottom-1 right-2 lg:right-5 text-sm lg:text-xl cursor-default">
-                {p.createdAt.toLocaleDateString("fr-FR")}
+                {p.createdAt.toLocaleDateString("fr-FR", { timeZone: "UTC" })}
               </p>
             </TooltipTrigger>
             <TooltipContent>
               <p className="text-sm lg:text-lg">
-                {p.createdAt.toLocaleTimeString("fr-FR")}
+                {p.createdAt.toLocaleTimeString("fr-FR", { timeZone: "UTC" })}
               </p>
             </TooltipContent>
           </Tooltip>

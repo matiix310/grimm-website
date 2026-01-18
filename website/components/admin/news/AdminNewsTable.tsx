@@ -31,13 +31,19 @@ const AdminNewsTable = ({ news, onRemoveNews, onUpdateNews }: AdminNewsTableProp
     }),
     columnHelper.accessor("createdAt", {
       header: ({ column }) => <SortableHeader column={column} title="Date de création" />,
-      cell: (row) => row.getValue()?.toLocaleString("fr-FR") ?? "infinite",
+      cell: (row) =>
+        row.getValue()?.toLocaleString("fr-FR", {
+          timeZone: "UTC",
+        }) ?? "infinite",
     }),
     columnHelper.accessor("updatedAt", {
       header: ({ column }) => (
         <SortableHeader column={column} title="Dernière modification" />
       ),
-      cell: (row) => row.getValue()?.toLocaleString("fr-FR") ?? "infinite",
+      cell: (row) =>
+        row.getValue()?.toLocaleString("fr-FR", {
+          timeZone: "UTC",
+        }) ?? "infinite",
     }),
     {
       id: "actions",

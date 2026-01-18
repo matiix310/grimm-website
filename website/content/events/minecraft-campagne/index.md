@@ -5,7 +5,8 @@ starting_date: 2025-11-10 19:00:00
 ending_date: 2025-12-07 14:00:00
 cover: ../common/minecraft.webp
 tags: ["minecraft", "virtuel"]
-location: play.bde-grimm.com (1.21.8)
+location: en ligne
+location_address: play.bde-grimm.com
 ---
 
 # IP : play.bde-grimm.com

@@ -19,11 +19,17 @@ const AdminApiKeyTable = ({ apiKeys, onRemoveApiKey }: AdminApiKeyTableProps) =>
     }),
     columnHelper.accessor("expiresAt", {
       header: ({ column }) => <SortableHeader column={column} title="Expiration" />,
-      cell: (row) => row.getValue()?.toLocaleString("fr-FR") ?? "infinite",
+      cell: (row) =>
+        row.getValue()?.toLocaleString("fr-FR", {
+          timeZone: "UTC",
+        }) ?? "infinite",
     }),
     columnHelper.accessor("createdAt", {
       header: ({ column }) => <SortableHeader column={column} title="Création" />,
-      cell: (row) => row.getValue().toLocaleString("fr-FR"),
+      cell: (row) =>
+        row.getValue().toLocaleString("fr-FR", {
+          timeZone: "UTC",
+        }),
     }),
     {
       id: "actions",

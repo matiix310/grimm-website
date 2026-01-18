@@ -14,6 +14,7 @@ export default defineConfig({
           cover: s.image(),
           tags: s.array(s.string()),
           location: s.string(),
+          location_address: s.string().optional(),
           location_link: s
             .string()
             .regex(/https?:\/\/.*/)

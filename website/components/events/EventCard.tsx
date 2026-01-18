@@ -46,7 +46,7 @@ export function EventCard({ event }: EventCardProps) {
             placeholder="blur"
           />
           {status === "ongoing" && (
-            <div className="absolute top-2 left-2 bg-green-500 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-md flex items-center gap-2 animate-pulse">
+            <div className="absolute top-2 left-2 bg-green text-green-foreground px-4 py-1.5 rounded-full text-sm font-bold shadow-md flex items-center gap-2 animate-pulse">
               <ClockIcon className="size-4" />
               En cours
             </div>
@@ -57,7 +57,7 @@ export function EventCard({ event }: EventCardProps) {
             </div>
           )}
           {status === "upcoming" && (
-            <div className="absolute top-2 left-2 bg-blue-500 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-md flex items-center gap-2">
+            <div className="absolute top-2 left-2 bg-blue text-blue-foreground px-4 py-1.5 rounded-full text-sm font-bold shadow-md flex items-center gap-2">
               À venir
             </div>
           )}
@@ -83,12 +83,14 @@ export function EventCard({ event }: EventCardProps) {
                     day: "numeric",
                     month: "short",
                     year: "numeric",
+                    timeZone: "UTC",
                   })}
                   {event.ending_date &&
                     ` - ${new Date(event.ending_date).toLocaleDateString("fr-FR", {
                       day: "numeric",
                       month: "short",
                       year: "numeric",
+                      timeZone: "UTC",
                     })}`}
                 </span>
               </div>
@@ -106,7 +108,7 @@ export function EventCard({ event }: EventCardProps) {
                 key={tag}
                 className="text-xs bg-background/50 px-2 py-1 rounded-md font-medium"
               >
-                #{tag}
+                {tag}
               </span>
             ))}
           </div>

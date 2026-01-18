@@ -5,7 +5,8 @@ starting_date: 2026-01-16 23:00:00
 ending_date: 2026-01-17 5:00:00
 cover: cover.jpg
 tags: ["under", "soirée"]
-location: Under EPITA - 24 Rue Pasteur, 94270 Le Kremlin-Bicêtre
+location: Under EPITA
+location_address: 24 Rue Pasteur, 94270 Le Kremlin-Bicêtre
 location_link: https://maps.app.goo.gl/99KdvECKbcJpQBMT7
 ticket_opening_date: 2026-01-10 00:00:00
 ticket_closing_date: 2026-01-17 5:00:00

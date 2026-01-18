@@ -39,10 +39,12 @@ export default async function Events({ params }: PageProps<"/events/[slug]">) {
                   day: "numeric",
                   month: "short",
                   year: "numeric",
+                  timeZone: "UTC",
                 })}{" "}
                 {new Date(event.starting_date).toLocaleTimeString("fr-FR", {
                   hour: "numeric",
                   minute: "numeric",
+                  timeZone: "UTC",
                 })}
               </p>
               {event.ending_date && (
@@ -53,10 +55,12 @@ export default async function Events({ params }: PageProps<"/events/[slug]">) {
                       day: "numeric",
                       month: "short",
                       year: "numeric",
+                      timeZone: "UTC",
                     })}{" "}
                     {new Date(event.ending_date).toLocaleTimeString("fr-FR", {
                       hour: "numeric",
                       minute: "numeric",
+                      timeZone: "UTC",
                     })}
                   </p>
                 </>
@@ -66,7 +70,14 @@ export default async function Events({ params }: PageProps<"/events/[slug]">) {
           <div className="text-2xl lg:text-2xl xl:text-4xl flex gap-2 items-center">
             <p>📍</p>
             <a href={event.location_link} target="_blank">
-              {event.location}
+              <div className="flex flex-col">
+                <p>{event.location}</p>
+                {event.location_address && (
+                  <p className="text-base lg:text-lg xl:text-2xl">
+                    {event.location_address}
+                  </p>
+                )}
+              </div>
             </a>
           </div>
           <div className="flex gap-2">
