@@ -108,7 +108,10 @@ const UserPage = async ({ params }: PageProps<"/users/[userId]">) => {
             <p className="text-3xl lg:text-3xl xl:text-4xl opacity-80">{user.login}</p>
           </div>
           <p className="text-3xl lg:text-3xl xl:text-4xl opacity-80">
-            Inscrit depuis le {user.createdAt.toLocaleDateString("fr-FR")}
+            Inscrit depuis le{" "}
+            {user.createdAt.toLocaleDateString("fr-FR", {
+              timeZone: "UTC",
+            })}
           </p>
         </div>
       </div>

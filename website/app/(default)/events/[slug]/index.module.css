@@ -1,0 +1,55 @@
+.content h1 {
+  font-size: 3em;
+  font-family:
+    Paytone One,
+    Paytone One Fallback;
+  margin-top: 0.5em;
+  margin-bottom: 0.25em;
+}
+
+.content h2 {
+  font-size: 2.25em;
+}
+
+.content h3 {
+  font-size: 1.875em;
+}
+
+.content h4 {
+  font-size: 1.5em;
+}
+
+.content h5 {
+  font-size: 1.3125em;
+}
+
+.content h6 {
+  font-size: 1.125em;
+}
+
+.content p,
+.content li {
+  font-size: 1.5em;
+}
+
+.content ul,
+.content ol {
+  margin-left: 3em;
+}
+
+.content ul {
+  list-style-type: disc;
+}
+
+.content ol {
+  list-style-type: decimal;
+}
+
+.content a {
+  color: var(--blue);
+  text-decoration: none;
+}
+
+.content a:hover {
+  text-decoration: underline;
+}

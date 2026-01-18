@@ -6,24 +6,28 @@ import Image from "next/image";
 import { connection } from "next/server";
 import { BureauCarousel } from "@/components/home/BureauCarousel";
 import { bureau as bureauSchema } from "@/db/schema/bureau";
-import { events as eventsSchema } from "@/db/schema/events";
 import Link from "next/link";
 import GrimmSticker from "@/components/stickers/Grimm";
 import { SocialButton } from "@/components/home/SocialButton";
-import { Skeleton } from "@/components/ui/Skeleton";
+import { events as veliteEvents } from "@/.velite";
+import { ArrowRight, ClockIcon, TicketIcon } from "lucide-react";
+import { parseUTCDate } from "@/lib/dates";
 
 const Home = async () => {
   // prevent nextjs from prerendering this page
   // as it involves database content
   await connection();
 
-  const [events, bureau] = await Promise.all([
-    db.query.events.findMany({
-      orderBy: asc(eventsSchema.date),
-      limit: 3,
-    }),
+  const [bureau] = await Promise.all([
     db.query.bureau.findMany({ orderBy: asc(bureauSchema.index) }),
   ]);
+
+  const events = veliteEvents
+    .filter((e) => parseUTCDate(e.ending_date ?? e.starting_date) > new Date())
+    .sort(
+      (a, b) => new Date(b.starting_date).getTime() - new Date(a.starting_date).getTime(),
+    )
+    .slice(0, 3);
 
   return (
     <div>
@@ -82,49 +86,116 @@ const Home = async () => {
         id="events"
         className="w-full pt-28 -mt-15 lg:mt-0 flex flex-col px-5 lg:px-10 xl:px-20"
       >
-        <div className="flex gap-2 items-center">
-          <div className="relative w-10 h-15 lg:w-13 lg:h-18 xl:w-20 xl:h-25">
-            <Image alt="étoile" src="/star.svg" fill={true} objectPosition="center" />
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-4 lg:gap-0">
+          <div className="flex gap-2 items-center">
+            <div className="relative w-10 h-15 lg:w-13 lg:h-18 xl:w-20 xl:h-25">
+              <Image alt="étoile" src="/star.svg" fill={true} objectPosition="center" />
+            </div>
+            <h1 className="font-paytone text-3xl lg:text-5xl xl:text-7xl">Les Events</h1>
           </div>
-          <h1 className="font-paytone text-3xl lg:text-5xl xl:text-7xl">Les Events</h1>
+          <Link href="/events">
+            <Button className="rounded-full" size="lg">
+              Voir tout <ArrowRight className="size-5" />
+            </Button>
+          </Link>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 lg:gap-10 mt-5 lg:mt-10">
           {events.map((event) => (
-            <div
-              key={event.id}
+            <a
+              href={`/events/${event.slug}`}
+              key={event.slug}
               className="relative w-full aspect-video bg-accent rounded-4xl overflow-hidden after:size-full after:absolute after:top-0 after:left-0 after:transition-all after:ease-in-out hover:after:bg-primary/70 hover:*:data-[slot=overlay]:opacity-100"
-              style={{
-                background: `url(${event.image})`,
-                backgroundRepeat: "no-repeat",
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-              }}
             >
-              <Skeleton className="absolute left-0 top-0 size-full -z-1" />
+              <Image
+                src={event.cover}
+                alt={event.title}
+                fill={true}
+                objectPosition="center"
+                objectFit="cover"
+                placeholder="blur"
+              />
+              {(() => {
+                const now = new Date();
+                const startDate = parseUTCDate(event.starting_date);
+                const endDate = event.ending_date
+                  ? parseUTCDate(event.ending_date)
+                  : startDate;
+                const isTicketAvailable =
+                  event.ticket_link &&
+                  event.ticket_opening_date &&
+                  event.ticket_closing_date &&
+                  now >= parseUTCDate(event.ticket_opening_date) &&
+                  now <= parseUTCDate(event.ticket_closing_date);
+
+                let status: "upcoming" | "ongoing" | "finished" = "upcoming";
+                if (now > endDate) {
+                  status = "finished";
+                } else if (now >= startDate && now <= endDate) {
+                  status = "ongoing";
+                }
+
+                return (
+                  <>
+                    {status === "ongoing" && (
+                      <div className="absolute top-5 left-5 z-10 bg-green-500 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-md flex items-center gap-2 animate-pulse">
+                        <ClockIcon className="size-4" />
+                        En cours
+                      </div>
+                    )}
+                    {status === "finished" && (
+                      <div className="absolute top-5 left-5 z-10 bg-gray-500 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-md flex items-center gap-2">
+                        Terminé
+                      </div>
+                    )}
+                    {status === "upcoming" && (
+                      <div className="absolute top-5 left-5 z-10 bg-blue-500 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-md flex items-center gap-2">
+                        À venir
+                      </div>
+                    )}
+                    {isTicketAvailable && (
+                      <div className="absolute top-5 right-5 z-10 bg-primary text-primary-foreground px-4 py-1.5 rounded-full text-sm font-bold shadow-md flex items-center gap-2 animate-pulse">
+                        <TicketIcon className="size-4" />
+                        Billets disponibles
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
               <div
                 data-slot="overlay"
                 className="opacity-0 absolute z-2 top-[50%] left-[50%] -translate-[50%] font-paytone text-primary-foreground flex flex-col items-center"
               >
                 <span className="text-3xl xl:text-5xl">
-                  {event.date.toLocaleDateString("fr-FR")}
+                  {new Date(event.starting_date).toLocaleDateString("fr-FR", {
+                    timeZone: "UTC",
+                  })}
                 </span>
                 <span className="text-lg xl:text-2xl">
-                  {event.date.toLocaleTimeString("fr-FR")}
+                  {new Date(event.starting_date).toLocaleTimeString("fr-FR", {
+                    timeZone: "UTC",
+                  })}
                 </span>
               </div>
               <div className="flex flex-col gap-2 items-end absolute bottom-5 right-5 font-paytone z-2">
                 {/* <p className="bg-red text-red-foreground px-5 py-2 rounded-full text-sm lg:text-lg">
                   A venir
                 </p> */}
+                <div className="flex flex-wrap gap-2 justify-end">
+                  {/* Status badges moved to top */}
+                </div>
                 <p className="bg-secondary text-secondary-foreground px-5 py-2 rounded-full text-sm xl:text-lg">
-                  {event.name}
+                  {event.title}
                 </p>
                 <p className="static lg:hidden bg-secondary text-secondary-foreground px-5 py-2 rounded-full text-sm">
-                  {event.date.toLocaleDateString("fr-FR")}{" "}
-                  {event.date.toLocaleTimeString("fr-FR")}
+                  {new Date(event.starting_date).toLocaleDateString("fr-FR", {
+                    timeZone: "UTC",
+                  })}{" "}
+                  {new Date(event.starting_date).toLocaleTimeString("fr-FR", {
+                    timeZone: "UTC",
+                  })}
                 </p>
               </div>
-            </div>
+            </a>
           ))}
         </div>
       </section>

@@ -56,7 +56,10 @@ const AdminUsersTable = ({}: AdminUsersTableProps) => {
     }),
     columnHelper.accessor("createdAt", {
       header: ({ column }) => <SortableHeader column={column} title="Création" />,
-      cell: (row) => row.getValue()?.toLocaleString("fr-FR") ?? "infinite",
+      cell: (row) =>
+        row.getValue()?.toLocaleString("fr-FR", {
+          timeZone: "UTC",
+        }) ?? "infinite",
     }),
     {
       id: "actions",

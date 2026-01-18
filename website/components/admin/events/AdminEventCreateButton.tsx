@@ -191,7 +191,9 @@ const AdminEventCreateButton = ({ onNewEvent }: AdminEventCreateButtonProps) => 
                               id="date-picker"
                               className="cursor-pointer hover:bg-secondary/10 flex items-center h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
                             >
-                              {field.state.value.toLocaleDateString("fr-FR")}
+                              {field.state.value.toLocaleDateString("fr-FR", {
+                                timeZone: "UTC",
+                              })}
                             </div>
                           </PopoverTrigger>
                           <PopoverContent
@@ -208,8 +210,8 @@ const AdminEventCreateButton = ({ onNewEvent }: AdminEventCreateButtonProps) => 
                                     new Date(
                                       date!.toString().split(" ").splice(0, 4).join(" ") +
                                         " " +
-                                        old!.toTimeString().split(" ")[0]
-                                    )
+                                        old!.toTimeString().split(" ")[0],
+                                    ),
                                 );
                                 setCalendarOpen(false);
                               }}
@@ -229,8 +231,8 @@ const AdminEventCreateButton = ({ onNewEvent }: AdminEventCreateButtonProps) => 
                                 new Date(
                                   old.toString().split(" ").splice(0, 4).join(" ") +
                                     " " +
-                                    e.target.value
-                                )
+                                    e.target.value,
+                                ),
                             )
                           }
                           type="time"

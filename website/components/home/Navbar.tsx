@@ -33,6 +33,7 @@ const Navbar = async ({ className, ...rest }: NavbarProps) => {
     }));
 
   const buttons: MenuButton[] = [
+    { name: "Events", variant: "secondary", link: "/events" },
     ...(hasAccessToAdminPanel
       ? [
           {
@@ -73,7 +74,7 @@ const Navbar = async ({ className, ...rest }: NavbarProps) => {
     <div
       className={cn(
         "flex items-center justify-between h-20 xl:h-25 min-h-20 xl:min-h-25 px-5 lg:px-8 bg-pink",
-        className
+        className,
       )}
       {...rest}
     >
