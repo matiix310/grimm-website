@@ -4,7 +4,7 @@ slug: minecraft-cobblemon
 starting_date: 2026-01-18 18:00:00
 ending_date: 2026-02-30 00:00:00
 cover: ../common/minecraft.webp
-tags: ["minecraft", "virtuel"]
+tags: ["minecraft"]
 location: En ligne
 location_address: play.bde-grimm.com
 ---
