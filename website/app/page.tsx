@@ -11,6 +11,7 @@ import GrimmSticker from "@/components/stickers/Grimm";
 import { SocialButton } from "@/components/home/SocialButton";
 import { events as veliteEvents } from "@/.velite";
 import { ArrowRight, ClockIcon, TicketIcon } from "lucide-react";
+import { parseUTCDate } from "@/lib/dates";
 
 const Home = async () => {
   // prevent nextjs from prerendering this page
@@ -22,7 +23,7 @@ const Home = async () => {
   ]);
 
   const events = veliteEvents
-    .filter((e) => new Date(e.ending_date ?? e.starting_date) > new Date())
+    .filter((e) => parseUTCDate(e.ending_date ?? e.starting_date) > new Date())
     .sort(
       (a, b) => new Date(b.starting_date).getTime() - new Date(a.starting_date).getTime(),
     )
@@ -115,16 +116,16 @@ const Home = async () => {
               />
               {(() => {
                 const now = new Date();
-                const startDate = new Date(event.starting_date);
+                const startDate = parseUTCDate(event.starting_date);
                 const endDate = event.ending_date
-                  ? new Date(event.ending_date)
+                  ? parseUTCDate(event.ending_date)
                   : startDate;
                 const isTicketAvailable =
                   event.ticket_link &&
                   event.ticket_opening_date &&
                   event.ticket_closing_date &&
-                  now >= new Date(event.ticket_opening_date) &&
-                  now <= new Date(event.ticket_closing_date);
+                  now >= parseUTCDate(event.ticket_opening_date) &&
+                  now <= parseUTCDate(event.ticket_closing_date);
 
                 let status: "upcoming" | "ongoing" | "finished" = "upcoming";
                 if (now > endDate) {

@@ -4,6 +4,7 @@ import styles from "./index.module.css";
 import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { TicketIcon } from "lucide-react";
+import { parseUTCDate } from "@/lib/dates";
 
 const getEventBySlug = (slug: string) => {
   return events.find((e) => e.slug === slug);
@@ -95,8 +96,8 @@ export default async function Events({ params }: PageProps<"/events/[slug]">) {
       {event.ticket_link &&
         event.ticket_opening_date &&
         event.ticket_closing_date &&
-        new Date() >= new Date(event.ticket_opening_date) &&
-        new Date() <= new Date(event.ticket_closing_date) && (
+        new Date() >= parseUTCDate(event.ticket_opening_date) &&
+        new Date() <= parseUTCDate(event.ticket_closing_date) && (
           <a href={event.ticket_link} target="_blank" className="w-full">
             <Button className="font-archivo text-3xl! w-full" variant="primary" size="lg">
               <TicketIcon />

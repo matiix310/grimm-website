@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { TicketIcon, MapPinIcon, CalendarIcon, ClockIcon } from "lucide-react";
 import { events } from "#velite";
+import { parseUTCDate } from "@/lib/dates";
 
 type Event = (typeof events)[number];
 
@@ -15,12 +16,12 @@ export function EventCard({ event }: EventCardProps) {
     event.ticket_link &&
     event.ticket_opening_date &&
     event.ticket_closing_date &&
-    new Date() >= new Date(event.ticket_opening_date) &&
-    new Date() <= new Date(event.ticket_closing_date);
+    new Date() >= parseUTCDate(event.ticket_opening_date) &&
+    new Date() <= parseUTCDate(event.ticket_closing_date);
 
   const now = new Date();
-  const startDate = new Date(event.starting_date);
-  const endDate = event.ending_date ? new Date(event.ending_date) : startDate;
+  const startDate = parseUTCDate(event.starting_date);
+  const endDate = event.ending_date ? parseUTCDate(event.ending_date) : startDate;
 
   let status: "upcoming" | "ongoing" | "finished" = "upcoming";
   if (now > endDate) {
