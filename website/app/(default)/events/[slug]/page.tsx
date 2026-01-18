@@ -35,15 +35,29 @@ export default async function Events({ params }: PageProps<"/events/[slug]">) {
             <p>📅</p>
             <div className="flex flex-col lg:flex-row">
               <p>
-                {new Date(event.starting_date).toLocaleDateString("fr-FR")}{" "}
-                {new Date(event.starting_date).toLocaleTimeString("fr-FR")}
+                {new Date(event.starting_date).toLocaleDateString("fr-FR", {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                })}{" "}
+                {new Date(event.starting_date).toLocaleTimeString("fr-FR", {
+                  hour: "numeric",
+                  minute: "numeric",
+                })}
               </p>
               {event.ending_date && (
                 <>
                   <p className="hidden lg:block lg:mx-2"> - </p>
                   <p>
-                    {new Date(event.ending_date).toLocaleDateString("fr-FR")}{" "}
-                    {new Date(event.ending_date).toLocaleTimeString("fr-FR")}
+                    {new Date(event.ending_date).toLocaleDateString("fr-FR", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    })}{" "}
+                    {new Date(event.ending_date).toLocaleTimeString("fr-FR", {
+                      hour: "numeric",
+                      minute: "numeric",
+                    })}
                   </p>
                 </>
               )}

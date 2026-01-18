@@ -10,6 +10,7 @@ import Link from "next/link";
 import GrimmSticker from "@/components/stickers/Grimm";
 import { SocialButton } from "@/components/home/SocialButton";
 import { events as veliteEvents } from "@/.velite";
+import { ArrowRight, ClockIcon, TicketIcon } from "lucide-react";
 
 const Home = async () => {
   // prevent nextjs from prerendering this page
@@ -84,11 +85,18 @@ const Home = async () => {
         id="events"
         className="w-full pt-28 -mt-15 lg:mt-0 flex flex-col px-5 lg:px-10 xl:px-20"
       >
-        <div className="flex gap-2 items-center">
-          <div className="relative w-10 h-15 lg:w-13 lg:h-18 xl:w-20 xl:h-25">
-            <Image alt="étoile" src="/star.svg" fill={true} objectPosition="center" />
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-4 lg:gap-0">
+          <div className="flex gap-2 items-center">
+            <div className="relative w-10 h-15 lg:w-13 lg:h-18 xl:w-20 xl:h-25">
+              <Image alt="étoile" src="/star.svg" fill={true} objectPosition="center" />
+            </div>
+            <h1 className="font-paytone text-3xl lg:text-5xl xl:text-7xl">Les Events</h1>
           </div>
-          <h1 className="font-paytone text-3xl lg:text-5xl xl:text-7xl">Les Events</h1>
+          <Link href="/events">
+            <Button className="rounded-full" size="lg">
+              Voir tout <ArrowRight className="size-5" />
+            </Button>
+          </Link>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 lg:gap-10 mt-5 lg:mt-10">
           {events.map((event) => (
@@ -105,6 +113,53 @@ const Home = async () => {
                 objectFit="cover"
                 placeholder="blur"
               />
+              {(() => {
+                const now = new Date();
+                const startDate = new Date(event.starting_date);
+                const endDate = event.ending_date
+                  ? new Date(event.ending_date)
+                  : startDate;
+                const isTicketAvailable =
+                  event.ticket_link &&
+                  event.ticket_opening_date &&
+                  event.ticket_closing_date &&
+                  now >= new Date(event.ticket_opening_date) &&
+                  now <= new Date(event.ticket_closing_date);
+
+                let status: "upcoming" | "ongoing" | "finished" = "upcoming";
+                if (now > endDate) {
+                  status = "finished";
+                } else if (now >= startDate && now <= endDate) {
+                  status = "ongoing";
+                }
+
+                return (
+                  <>
+                    {status === "ongoing" && (
+                      <div className="absolute top-5 left-5 z-10 bg-green-500 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-md flex items-center gap-2 animate-pulse">
+                        <ClockIcon className="size-4" />
+                        En cours
+                      </div>
+                    )}
+                    {status === "finished" && (
+                      <div className="absolute top-5 left-5 z-10 bg-gray-500 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-md flex items-center gap-2">
+                        Terminé
+                      </div>
+                    )}
+                    {status === "upcoming" && (
+                      <div className="absolute top-5 left-5 z-10 bg-blue-500 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-md flex items-center gap-2">
+                        À venir
+                      </div>
+                    )}
+                    {isTicketAvailable && (
+                      <div className="absolute top-5 right-5 z-10 bg-primary text-primary-foreground px-4 py-1.5 rounded-full text-sm font-bold shadow-md flex items-center gap-2 animate-pulse">
+                        <TicketIcon className="size-4" />
+                        Billets disponibles
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
               <div
                 data-slot="overlay"
                 className="opacity-0 absolute z-2 top-[50%] left-[50%] -translate-[50%] font-paytone text-primary-foreground flex flex-col items-center"
@@ -120,6 +175,9 @@ const Home = async () => {
                 {/* <p className="bg-red text-red-foreground px-5 py-2 rounded-full text-sm lg:text-lg">
                   A venir
                 </p> */}
+                <div className="flex flex-wrap gap-2 justify-end">
+                  {/* Status badges moved to top */}
+                </div>
                 <p className="bg-secondary text-secondary-foreground px-5 py-2 rounded-full text-sm xl:text-lg">
                   {event.title}
                 </p>
