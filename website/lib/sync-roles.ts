@@ -68,7 +68,7 @@ export async function performRoleSync(): Promise<SyncRolesResult> {
       const roles = await getUserGroups(
         account.account.accountId,
         process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL!,
-        process.env.GOOGLE_PRIVATE_KEY!
+        process.env.GOOGLE_PRIVATE_KEY!,
       );
 
       const newRoles: Roles[] = [];
@@ -120,7 +120,7 @@ export async function performRoleSync(): Promise<SyncRolesResult> {
 
           // Preserve user and admin roles
           const preservedRoles = existingRoles.filter(
-            (r: string) => r === "user" || r === "admin"
+            (r: string) => r === "user" || r === "admin",
           );
 
           // Build new role set: preserved roles + new roles from workspace
@@ -154,7 +154,7 @@ export async function performRoleSync(): Promise<SyncRolesResult> {
     const usersNotInWorkspace = await db.query.user.findMany({
       where: and(
         isNotNull(user.role),
-        notInArray(user.login, logins.length > 0 ? logins : [""])
+        notInArray(user.login, logins.length > 0 ? logins : [""]),
       ),
       columns: {
         id: true,
@@ -180,7 +180,7 @@ export async function performRoleSync(): Promise<SyncRolesResult> {
 
         // Keep only user and admin roles
         const preservedRoles = existingRoles.filter(
-          (r: string) => r === "user" || r === "admin"
+          (r: string) => r === "user" || r === "admin",
         );
 
         // Only update if there were organizational roles to remove
@@ -229,8 +229,8 @@ export async function performRoleSync(): Promise<SyncRolesResult> {
           .map(
             (change) =>
               `**${change.login}**: \`${change.from.join(", ")}\` => \`${change.to.join(
-                ", "
-              )}\``
+                ", ",
+              )}\``,
           )
           .join("\n");
 
@@ -310,6 +310,8 @@ export async function performUserRoleSync(login: string): Promise<SyncRolesResul
   const serviceAccountEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
   const privateKey = process.env.GOOGLE_PRIVATE_KEY;
 
+  console.log("Syncing roles for user", login);
+
   if (!serviceAccountEmail || !privateKey) {
     return { success: false, message: "Missing Google Workspace credentials" };
   }
@@ -321,7 +323,7 @@ export async function performUserRoleSync(login: string): Promise<SyncRolesResul
       .where(eq(user.login, login))
       .leftJoin(
         account,
-        and(eq(account.userId, user.id), eq(account.providerId, "google"))
+        and(eq(account.userId, user.id), eq(account.providerId, "google")),
       )
       .limit(1);
 
@@ -341,7 +343,7 @@ export async function performUserRoleSync(login: string): Promise<SyncRolesResul
     const roles = await getUserGroups(
       googleAccount.accountId,
       serviceAccountEmail,
-      privateKey
+      privateKey,
     );
 
     const newRoles: Roles[] = [];
@@ -359,7 +361,7 @@ export async function performUserRoleSync(login: string): Promise<SyncRolesResul
 
     // Preserve user and admin roles
     const preservedRoles = existingRoles.filter(
-      (r: string) => r === "user" || r === "admin"
+      (r: string) => r === "user" || r === "admin",
     );
 
     // Build new role set
@@ -396,7 +398,7 @@ export async function performUserRoleSync(login: string): Promise<SyncRolesResul
       const discordAccount = await db.query.account.findFirst({
         where: and(
           eq(account.userId, existingUser.id),
-          eq(account.providerId, "discord")
+          eq(account.providerId, "discord"),
         ),
       });
 

@@ -6,7 +6,7 @@ import { NextRequest } from "next/server";
 
 export const POST = async (
   request: NextRequest,
-  ctx: { params: Promise<{ login: string }> }
+  ctx: { params: Promise<{ login: string }> },
 ) => {
   // Check permissions - requires user:sync-roles permission
   if (
@@ -27,6 +27,7 @@ export const POST = async (
     if (result.message.includes("not found")) {
       return ApiResponse.notFound(result.message);
     }
+    console.error(result.message);
     return ApiResponse.internalServerError(result.message);
   }
 
