@@ -449,23 +449,25 @@ export async function performUserRoleSync(login: string): Promise<SyncRolesResul
 
     if (currentRoleString !== newRoleString) {
       await db.update(user).set({ role: newRoleString }).where(eq(user.login, login));
+    }
 
-      // update the discord user if any
-      const discordUrl = process.env.DISCORD_URL;
+    // update the discord user if any
+    const discordUrl = process.env.DISCORD_URL;
 
-      if (discordUrl) {
-        const discordAccount = await db.query.account.findFirst({
-          where: and(
-            eq(account.userId, existingUser.id),
-            eq(account.providerId, "discord"),
-          ),
-        });
+    if (discordUrl) {
+      const discordAccount = await db.query.account.findFirst({
+        where: and(
+          eq(account.userId, existingUser.id),
+          eq(account.providerId, "discord"),
+        ),
+      });
 
-        if (discordAccount) {
-          await fetch(`${discordUrl}/sync/${discordAccount.accountId}`);
-        }
+      if (discordAccount) {
+        await fetch(`${discordUrl}/sync/${discordAccount.accountId}`);
       }
+    }
 
+    if (currentRoleString !== newRoleString) {
       await sendDiscordNotification(
         "Scheduled User Role Sync [" + login + "]",
         "Synced roles for user " +
