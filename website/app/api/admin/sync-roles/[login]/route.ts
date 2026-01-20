@@ -25,6 +25,7 @@ export const POST = async (
 
   if (!result.success) {
     if (result.message.includes("not found")) {
+      console.error(result.message);
       return ApiResponse.notFound(result.message);
     }
     console.error(result.message);

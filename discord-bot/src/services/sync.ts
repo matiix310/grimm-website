@@ -14,7 +14,7 @@ export type SyncResult = {
 };
 
 export const fetchUser = async (
-  discordId: string
+  discordId: string,
 ): Promise<
   | { error: false; user: { login: string }; canSyncRoles: boolean }
   | { error: true; message: string }
@@ -25,8 +25,16 @@ export const fetchUser = async (
     },
   });
 
-  if (!res.ok) {
+  if (res.status === 401) {
+    return { error: true, message: "The API key is invalid" };
+  }
+
+  if (res.status === 404) {
     return { error: true, message: "The user is not linked to a Grimm account" };
+  }
+
+  if (!res.ok) {
+    return { error: true, message: "An error occurred while trying to sync the user" };
   }
 
   const data = await res.json();
@@ -38,7 +46,7 @@ export const syncUser = async (
   guild: Guild,
   memberId: string,
   mappings: { discordRoleId: string; websiteRoleId: string }[],
-  allManagedRoleIds: Set<string>
+  allManagedRoleIds: Set<string>,
 ): Promise<{ success: boolean; changes: string[] }> => {
   try {
     const member = await guild.members.fetch(memberId).catch(() => null);
@@ -62,7 +70,7 @@ export const syncUser = async (
     }
 
     const targetRoleIds = new Set<string>(
-      mappings.filter((r) => roles.includes(r.websiteRoleId)).map((r) => r.discordRoleId)
+      mappings.filter((r) => roles.includes(r.websiteRoleId)).map((r) => r.discordRoleId),
     );
 
     const rolesToAdd: Role[] = [];
@@ -176,7 +184,7 @@ export const syncGuild = async (client: Client, guildId: string): Promise<SyncRe
 
 export const syncSingleUser = async (
   client: Client,
-  memberId: string
+  memberId: string,
 ): Promise<SyncResult> => {
   let updatedCount = 0;
   let errorCount = 0;
@@ -203,7 +211,7 @@ export const syncSingleUser = async (
           await sendLog(
             guild,
             [`**${member.user.tag}**:\n${result.changes.join("\n")}`],
-            "Role Synchronization - Single User"
+            "Role Synchronization - Single User",
           );
         }
       } else {

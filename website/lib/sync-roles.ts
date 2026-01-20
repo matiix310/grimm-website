@@ -45,13 +45,56 @@ export interface SyncRolesResult {
   };
 }
 
+const sendDiscordNotification = async (
+  title: string,
+  message: string,
+  status: "success" | "error" | "info" = "info",
+) => {
+  const discordWebhook = process.env.DISCORD_ROLE_SYNC_WEBHOOK_URL;
+  if (discordWebhook) {
+    let color = 0x00ff00;
+    if (status === "error") color = 0xff0000;
+    if (status === "info") color = 0x0000ff;
+    try {
+      const embed = {
+        title: title,
+        description: message,
+        color: color,
+        timestamp: new Date().toISOString(),
+        footer: {
+          text: "Role Sync System",
+        },
+      };
+
+      await fetch(discordWebhook, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          embeds: [embed],
+        }),
+      });
+    } catch (err) {
+      console.error("Failed to send Discord notification:", err);
+    }
+  }
+};
+
 export async function performRoleSync(): Promise<SyncRolesResult> {
   const serviceAccountEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
   const privateKey = process.env.GOOGLE_PRIVATE_KEY;
 
   if (!serviceAccountEmail || !privateKey) {
+    await sendDiscordNotification(
+      "Scheduled Bulk Role Sync",
+      "Missing Google Workspace credentials",
+      "error",
+    );
     return { success: false, message: "Missing Google Workspace credentials" };
   }
+
+  await sendDiscordNotification("Scheduled Bulk Role Sync", "Role sync started", "info");
 
   try {
     const loginToRolesMap = new Map<string, { newRoles: Roles[] }>();
@@ -217,7 +260,6 @@ export async function performRoleSync(): Promise<SyncRolesResult> {
 
     // Send Discord webhook notification
     const discordWebhook = process.env.DISCORD_ROLE_SYNC_WEBHOOK_URL;
-    console.log(discordWebhook);
     if (discordWebhook && (updatedCount > 0 || clearedCount > 0)) {
       try {
         const serverUrl = process.env.BASE_URL || "Unknown Server";
@@ -266,7 +308,7 @@ export async function performRoleSync(): Promise<SyncRolesResult> {
         const embed = {
           title: "Roles Synced",
           description: message,
-          color: 0x4ca66e, // Green color
+          color: 0x00ff00,
           fields,
           timestamp: new Date().toISOString(),
           footer: {
@@ -287,6 +329,22 @@ export async function performRoleSync(): Promise<SyncRolesResult> {
         console.error("Failed to send Discord notification:", err);
         // Don't fail the sync if Discord notification fails
       }
+    }
+
+    if (errors.length > 0) {
+      await sendDiscordNotification(
+        "Scheduled Bulk Role Sync",
+        "The following errors occurred:\n" + errors.join("\n"),
+        "error",
+      );
+    }
+
+    if (updatedCount === 0 && clearedCount === 0) {
+      await sendDiscordNotification(
+        "Scheduled Bulk Role Sync",
+        "No changes occurred.",
+        "success",
+      );
     }
 
     const discordUrl = process.env.DISCORD_URL;
@@ -310,11 +368,20 @@ export async function performUserRoleSync(login: string): Promise<SyncRolesResul
   const serviceAccountEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
   const privateKey = process.env.GOOGLE_PRIVATE_KEY;
 
-  console.log("Syncing roles for user", login);
-
   if (!serviceAccountEmail || !privateKey) {
+    await sendDiscordNotification(
+      "Scheduled User Role Sync [" + login + "]",
+      "Missing Google Workspace credentials",
+      "error",
+    );
     return { success: false, message: "Missing Google Workspace credentials" };
   }
+
+  await sendDiscordNotification(
+    "Scheduled User Role Sync [" + login + "]",
+    "Role sync started for user " + login,
+    "info",
+  );
 
   try {
     const result = await db
@@ -328,12 +395,22 @@ export async function performUserRoleSync(login: string): Promise<SyncRolesResul
       .limit(1);
 
     if (result.length === 0) {
+      await sendDiscordNotification(
+        "Scheduled User Role Sync [" + login + "]",
+        "User " + login + " not found",
+        "error",
+      );
       return { success: false, message: `User ${login} not found` };
     }
 
     const { user: existingUser, account: googleAccount } = result[0];
 
     if (!googleAccount) {
+      await sendDiscordNotification(
+        "Scheduled User Role Sync [" + login + "]",
+        "User " + login + " does not have a Google account linked",
+        "error",
+      );
       return {
         success: false,
         message: `User ${login} does not have a Google account linked`,
@@ -373,6 +450,34 @@ export async function performUserRoleSync(login: string): Promise<SyncRolesResul
     if (currentRoleString !== newRoleString) {
       await db.update(user).set({ role: newRoleString }).where(eq(user.login, login));
 
+      // update the discord user if any
+      const discordUrl = process.env.DISCORD_URL;
+
+      if (discordUrl) {
+        const discordAccount = await db.query.account.findFirst({
+          where: and(
+            eq(account.userId, existingUser.id),
+            eq(account.providerId, "discord"),
+          ),
+        });
+
+        if (discordAccount) {
+          await fetch(`${discordUrl}/sync/${discordAccount.accountId}`);
+        }
+      }
+
+      await sendDiscordNotification(
+        "Scheduled User Role Sync [" + login + "]",
+        "Synced roles for user " +
+          login +
+          "\nFrom: `" +
+          existingRoles.join(", ") +
+          "`\nTo: `" +
+          finalRoles.join(", ") +
+          "`",
+        "success",
+      );
+
       return {
         success: true,
         message: `Synced roles for user ${login}`,
@@ -391,21 +496,11 @@ export async function performUserRoleSync(login: string): Promise<SyncRolesResul
       };
     }
 
-    // update the discord user if any
-    const discordUrl = process.env.DISCORD_URL;
-
-    if (discordUrl) {
-      const discordAccount = await db.query.account.findFirst({
-        where: and(
-          eq(account.userId, existingUser.id),
-          eq(account.providerId, "discord"),
-        ),
-      });
-
-      if (discordAccount) {
-        await fetch(`${discordUrl}/sync/${discordAccount.accountId}`);
-      }
-    }
+    await sendDiscordNotification(
+      "Scheduled User Role Sync [" + login + "]",
+      "No changes for user " + login,
+      "success",
+    );
 
     return {
       success: true,
