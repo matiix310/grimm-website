@@ -357,6 +357,11 @@ export async function performRoleSync(): Promise<SyncRolesResult> {
     };
   } catch (error) {
     console.error("Sync failed:", error);
+    await sendDiscordNotification(
+      "Scheduled Bulk Role Sync",
+      "Sync failed, see console for more details",
+      "error",
+    );
     return { success: false, message: "Failed to sync roles" };
   }
 }
