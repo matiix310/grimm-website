@@ -2,7 +2,6 @@ import { db } from "@/db";
 import { account, user } from "@/db/schema/auth";
 import { Roles } from "@/lib/auth";
 import { eq, inArray, isNotNull, notInArray, and } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
 import { getUserGroups } from "./google-workspace";
 
 // Role mapping from Google Workspace group names to internal role names
@@ -247,8 +246,6 @@ export async function performRoleSync(): Promise<SyncRolesResult> {
         errors.push(`Failed to clear ${dbUser.login}`);
       }
     }
-
-    revalidatePath("/admin/users");
 
     let message = `Synced ${updatedCount} users.`;
     if (clearedCount > 0) {
