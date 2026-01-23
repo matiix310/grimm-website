@@ -169,8 +169,9 @@ export async function performRoleSync(): Promise<SyncRolesResult> {
           const finalRoles = [...new Set([...preservedRoles, ...newRoles])];
 
           // Only update if different
-          const newRoleString = finalRoles.join(",");
-          const currentRoleString = existingUser.role || "";
+          const newRoleString = finalRoles.toSorted().join(",");
+          const currentRoleString =
+            existingUser.role?.split(",").toSorted().join(",") || "";
 
           if (currentRoleString !== newRoleString) {
             await db
@@ -303,7 +304,7 @@ export async function performRoleSync(): Promise<SyncRolesResult> {
         }
 
         const embed = {
-          title: "Roles Synced",
+          title: "Scheduled Bulk Role Sync",
           description: message,
           color: 0x00ff00,
           fields,
@@ -446,8 +447,8 @@ export async function performUserRoleSync(login: string): Promise<SyncRolesResul
     // Build new role set
     const finalRoles = [...new Set([...preservedRoles, ...newRoles])];
 
-    const newRoleString = finalRoles.join(",");
-    const currentRoleString = existingUser.role || "";
+    const newRoleString = finalRoles.toSorted().join(",");
+    const currentRoleString = existingUser.role?.split(",").toSorted().join(",") || "";
 
     if (currentRoleString !== newRoleString) {
       await db.update(user).set({ role: newRoleString }).where(eq(user.login, login));
