@@ -15,7 +15,9 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set Up Git
         run: |
@@ -35,7 +37,13 @@ jobs:
           )
 
           # Get the list of changed files
-          changed_files=$(git diff --name-only origin/main...HEAD)
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+              echo "Push on main detected. Comparing with previous commit (HEAD~1)..."
+              changed_files=$(git diff --name-only HEAD~1 HEAD)
+          else
+              echo "Push/PR on ${{ github.ref }} detected. Comparing with origin/main..."
+              changed_files=$(git diff --name-only origin/main...HEAD)
+          fi
 
           # Initialize an array for services needing rebuilds
           services_to_rebuild=()
@@ -49,12 +57,15 @@ jobs:
               done
           done
 
+          # Deduplicate services
+          services_to_rebuild=($(echo "${services_to_rebuild[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' '))
+
           # Output the services ready for rebuild
           if [[ ${#services_to_rebuild[@]} -gt 0 ]]; then
-              echo "::set-output name=rebuild_services::${services_to_rebuild[*]}"
+              echo "rebuild_services=${services_to_rebuild[*]}" >> $GITHUB_OUTPUT
               echo "Services to rebuild: ${services_to_rebuild[@]}"
           else
-              echo "::set-output name=rebuild_services::"
+              echo "rebuild_services=" >> $GITHUB_OUTPUT
               echo "No services to rebuild."
           fi
 
