@@ -132,23 +132,23 @@ const Home = async () => {
                 return (
                   <>
                     {status === "ongoing" && (
-                      <div className="absolute top-5 left-5 z-10 bg-green-500 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-md flex items-center gap-2 animate-pulse">
+                      <div className="absolute top-5 left-5 bg-green-500 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-md flex items-center gap-2 animate-pulse">
                         <ClockIcon className="size-4" />
                         En cours
                       </div>
                     )}
                     {status === "finished" && (
-                      <div className="absolute top-5 left-5 z-10 bg-gray-500 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-md flex items-center gap-2">
+                      <div className="absolute top-5 left-5 bg-gray-500 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-md flex items-center gap-2">
                         Terminé
                       </div>
                     )}
                     {status === "upcoming" && (
-                      <div className="absolute top-5 left-5 z-10 bg-blue-500 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-md flex items-center gap-2">
+                      <div className="absolute top-5 left-5 bg-blue-500 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-md flex items-center gap-2">
                         À venir
                       </div>
                     )}
                     {isTicketAvailable && (
-                      <div className="absolute top-5 right-5 z-10 bg-primary text-primary-foreground px-4 py-1.5 rounded-full text-sm font-bold shadow-md flex items-center gap-2 animate-pulse">
+                      <div className="absolute top-5 right-5 bg-primary text-primary-foreground px-4 py-1.5 rounded-full text-sm font-bold shadow-md flex items-center gap-2 animate-pulse">
                         <TicketIcon className="size-4" />
                         Billets disponibles
                       </div>
