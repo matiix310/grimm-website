@@ -12,8 +12,6 @@ export type MenuButton = {
   link: string;
 };
 
-// remove me
-
 type NavbarProps = {} & React.ComponentProps<"div">;
 
 const Navbar = async ({ className, ...rest }: NavbarProps) => {

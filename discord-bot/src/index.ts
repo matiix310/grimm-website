@@ -7,6 +7,8 @@ import { getEnvOrThrow } from "./libs/env";
 
 const TOKEN = getEnvOrThrow("TOKEN");
 
+// remove me
+
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
