@@ -1,12 +1,14 @@
 import { defineConfig } from "drizzle-kit";
 
-if (process.env.DEV_DB_URL === undefined)
-  throw new Error("Environement variable DEV_DB_URL is not defined!");
-
 export default defineConfig({
   dialect: "postgresql",
   schema: "./src/db/schema/*",
   dbCredentials: {
-    url: process.env.DEV_DB_URL,
+    database: "discord",
+    host: "localhost",
+    port: 5432,
+    user: "postgres",
+    password: process.env.DB_PASSWORD,
+    ssl: false,
   },
 });

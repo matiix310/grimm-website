@@ -1,28 +1,20 @@
-import { and, inArray, notLike } from "drizzle-orm";
-import { db } from "./db";
-import { user } from "./db/schema/auth";
-import { initScheduler } from "./scheduler";
-
 export async function register() {
-  // register the default admins at next instance startup
-  const admins = [
-    "lucas.stephan",
-    "jules.dubois",
-    "baptiste.durringer",
-    "simon1.meloni",
-    "arthur.gallier",
-    "nicolas.naegelen",
-    "baptiste.cormorant",
-    "valentin.oison",
-    "flavien.henrotte-robert",
-  ];
-  await db
-    .update(user)
-    .set({ role: "admin" })
-    .where(and(inArray(user.login, admins), notLike(user.role, "%admin%")));
+  if (process.env.NEXT_RUNTIME === "nodejs") {
+    const baseUrl = "http://localhost:8000";
 
-  // Initialize scheduled tasks
-  if (process.env.NODE_ENV === "production") {
-    initScheduler();
+    // Call /init in the background after a short delay to ensure the server is up
+    setTimeout(async () => {
+      try {
+        console.log(`[Instrumentation] Triggering initialization via ${baseUrl}/init`);
+        const response = await fetch(`${baseUrl}/init`);
+        if (response.ok) {
+          console.log("[Instrumentation] /init triggered successfully");
+        } else {
+          console.error(`[Instrumentation] /init failed with status: ${response.status}`);
+        }
+      } catch (error) {
+        console.error("[Instrumentation] Error triggering /init:", error);
+      }
+    }, 2000);
   }
 }

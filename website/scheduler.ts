@@ -18,7 +18,7 @@ export function initScheduler() {
     },
     {
       timezone: "Europe/Paris",
-    }
+    },
   );
 
   console.log("Role sync scheduler initialized (runs daily at 4:00 AM Europe/Paris)");

@@ -1,11 +1,9 @@
-import { Client, Guild, Role, EmbedBuilder, TextChannel } from "discord.js";
+import { Client, Guild, Role, EmbedBuilder } from "discord.js";
 import { db } from "../db";
+import { getEnvOrThrow } from "../libs/env";
 
-const { API_KEY, WEBSITE_URL } = process.env;
-
-if (!API_KEY || !WEBSITE_URL) {
-  throw new Error("Missing API_KEY or WEBSITE_URL");
-}
+const API_KEY = getEnvOrThrow("API_KEY");
+const WEBSITE_URL = getEnvOrThrow("WEBSITE_URL");
 
 export type SyncResult = {
   updatedCount: number;

@@ -1,4 +1,5 @@
 import { db } from "@/db";
+import { getEnv, getEnvOrThrow } from "@/lib/env";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
@@ -81,6 +82,7 @@ const roles = {
 export type Roles = keyof typeof roles;
 
 export const auth = betterAuth({
+  secret: getEnvOrThrow("BETTER_AUTH_SECRET"),
   database: drizzleAdapter(db, {
     provider: "pg",
   }),
@@ -115,13 +117,13 @@ export const auth = betterAuth({
   },
   socialProviders: {
     discord: {
-      clientId: process.env.DISCORD_CLIENT_ID as string,
-      clientSecret: process.env.DISCORD_CLIENT_SECRET as string,
+      clientId: getEnv("DISCORD_CLIENT_ID") ?? "123",
+      clientSecret: getEnv("DISCORD_CLIENT_SECRET") ?? "123",
       disableSignUp: true,
     },
     google: {
-      clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      clientId: getEnv("GOOGLE_CLIENT_ID") ?? "123",
+      clientSecret: getEnv("GOOGLE_CLIENT_SECRET") ?? "123",
       disableSignUp: true,
     },
   },
@@ -156,8 +158,8 @@ export const auth = betterAuth({
       config: [
         {
           providerId: "forge-id",
-          clientId: process.env.FORGE_ID_CLIENT_ID!,
-          clientSecret: process.env.FORGE_ID_CLIENT_SECRET!,
+          clientId: getEnvOrThrow("FORGE_ID_CLIENT_ID"),
+          clientSecret: getEnvOrThrow("FORGE_ID_CLIENT_SECRET"),
           discoveryUrl: "https://cri.epita.fr/.well-known/openid-configuration",
           scopes: ["openid", "profile"],
           redirectURI:

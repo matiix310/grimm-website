@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/Button";
 import { db } from "@/db";
 import { asc } from "drizzle-orm";
 import Image from "next/image";
-import { connection } from "next/server";
 import { BureauCarousel } from "@/components/home/BureauCarousel";
 import { bureau as bureauSchema } from "@/db/schema/bureau";
 import Link from "next/link";
@@ -14,10 +13,6 @@ import { ArrowRight, ClockIcon, TicketIcon } from "lucide-react";
 import { parseUTCDate } from "@/lib/dates";
 
 const Home = async () => {
-  // prevent nextjs from prerendering this page
-  // as it involves database content
-  await connection();
-
   const [bureau] = await Promise.all([
     db.query.bureau.findMany({ orderBy: asc(bureauSchema.index) }),
   ]);

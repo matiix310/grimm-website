@@ -4,6 +4,7 @@ import type {
   DBQueryConfig,
   ExtractTablesWithRelations,
 } from "drizzle-orm";
+import { getEnvOrThrow } from "@/lib/env";
 
 import * as auth from "./schema/auth";
 import * as events from "./schema/events";
@@ -22,8 +23,7 @@ import * as presets from "./schema/presets";
 import * as links from "./schema/links";
 import * as adventCalendar from "./schema/adventCalendar";
 
-if (process.env.DB_URL === undefined)
-  throw new Error("Environement variable DB_URL is not defined!");
+const DB_PASSWORD = getEnvOrThrow("DB_PASSWORD");
 
 const schema = {
   ...auth,
@@ -44,7 +44,7 @@ const schema = {
   ...adventCalendar,
 } as const;
 
-export const db = drizzle(process.env.DB_URL, {
+export const db = drizzle("postgres://postgres:" + DB_PASSWORD + "@db:5432/grimm", {
   schema,
 });
 
@@ -68,7 +68,7 @@ export type IncludeColumns<TableName extends keyof TablesWithRelations> = DBQuer
 export type InferQueryModel<
   TableName extends keyof TablesWithRelations,
   With extends IncludeRelation<TableName> | undefined = undefined,
-  Columns extends IncludeColumns<TableName> | undefined = undefined
+  Columns extends IncludeColumns<TableName> | undefined = undefined,
 > = {
   [K in keyof BuildQueryResult<
     TablesWithRelations,

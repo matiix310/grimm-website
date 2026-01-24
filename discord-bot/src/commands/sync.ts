@@ -4,6 +4,7 @@ import {
   EmbedBuilder,
 } from "discord.js";
 import { fetchUser } from "../services/sync";
+import { getEnv } from "../libs/env";
 
 const sendEmbed = (
   interaction: ChatInputCommandInteraction,
@@ -29,7 +30,8 @@ export default {
   async execute(interaction: ChatInputCommandInteraction) {
     await interaction.deferReply();
 
-    const { API_KEY, WEBSITE_URL } = process.env;
+    const API_KEY = getEnv("API_KEY");
+    const WEBSITE_URL = getEnv("WEBSITE_URL");
 
     if (!API_KEY || !WEBSITE_URL) {
       await sendEmbed(interaction, "Missing API_KEY or WEBSITE_URL", "error");

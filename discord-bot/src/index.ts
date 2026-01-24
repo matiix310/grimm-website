@@ -3,14 +3,9 @@ import fs from "fs";
 import path from "path";
 import { createApi } from "./api";
 
-import dotenv from "dotenv";
-dotenv.config();
+import { getEnvOrThrow } from "./libs/env";
 
-const TOKEN = process.env.TOKEN;
-
-if (!TOKEN) {
-  throw new Error("Missing TOKEN in environment variables");
-}
+const TOKEN = getEnvOrThrow("TOKEN");
 
 const client = new Client({
   intents: [

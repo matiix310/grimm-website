@@ -38,5 +38,3 @@ services:
       - 127.0.0.1:80:80
     volumes:
       - ./nginx.dev.conf:/etc/nginx/nginx.conf:ro
-      # - ./localhost.crt:/etc/ssl/localhost.crt:ro
-      # - ./localhost.key:/etc/ssl/localhost.key:ro

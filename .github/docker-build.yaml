@@ -1,0 +1,69 @@
+name: Detect and Rebuild Docker Images
+
+on:
+  push:
+    branches:
+      - main
+      - "*"
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  check_docker_changes:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set Up Git
+        run: |
+          git fetch origin main
+
+      - name: Detect Changed Docker Services
+        id: detect_changes
+        run: |
+          #!/bin/bash
+
+          # Define the mapping of Docker directories to container names
+          declare -A container_mapping
+          container_mapping=( 
+              ["website"]="website"
+              ["db"]="db"
+              ["discord-bot"]="discord-bot"
+          )
+
+          # Get the list of changed files
+          changed_files=$(git diff --name-only origin/main...HEAD)
+
+          # Initialize an array for services needing rebuilds
+          services_to_rebuild=()
+
+          # Check changed files for Docker service directories
+          for file in $changed_files; do
+              for dir in "${!container_mapping[@]}"; do
+                  if [[ $file == $dir/* ]]; then
+                      services_to_rebuild+=("${container_mapping[$dir]}")
+                  fi
+              done
+          done
+
+          # Output the services ready for rebuild
+          if [[ ${#services_to_rebuild[@]} -gt 0 ]]; then
+              echo "::set-output name=rebuild_services::${services_to_rebuild[*]}"
+              echo "Services to rebuild: ${services_to_rebuild[@]}"
+          else
+              echo "::set-output name=rebuild_services::"
+              echo "No services to rebuild."
+          fi
+
+      - name: Build Docker Containers
+        if: steps.detect_changes.outputs.rebuild_services != ''
+        run: |
+          #!/bin/bash
+
+          IFS=' ' read -r -a services <<< "${{ steps.detect_changes.outputs.rebuild_services }}"
+
+          echo "Building Docker containers for services: ${services[@]}"
+          docker-compose -f docker/compose.yaml -f docker/compose.prod.yaml build "${services[@]}"

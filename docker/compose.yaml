@@ -1,13 +1,18 @@
 services:
   db:
     build:
-      context: .
-      dockerfile: db.Dockerfile
+      context: ../db/
+      dockerfile: ../db/db.Dockerfile
     restart: unless-stopped
     shm_size: 128mb
     ports:
       - 127.0.0.1:5432:5432
-    env_file: .env
+    environment:
+      POSTGRES_DB: grimm
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+    secrets:
+      - db_password
     command:
       [
         "postgres",
@@ -18,23 +23,20 @@ services:
         "-c",
         "shared_preload_libraries=pg_cron",
         "-c",
-        "cron.database_name=${POSTGRES_DB}",
+        "cron.database_name=grimm",
       ]
     networks:
       - grimm-db
     healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "psql -U $${POSTGRES_USER} -d $${POSTGRES_DB} -c 'SELECT 1' || exit 1",
-        ]
+      test: ["CMD-SHELL", "psql -U postgres -d grimm -c 'SELECT 1' || exit 1"]
       interval: 5s
       timeout: 3s
       retries: 5
     volumes:
-      - ./01_cron_extension.sql:/docker-entrypoint-initdb.d/01_cron_extension.sql
-      - ./02_update_total_points_function.sql:/docker-entrypoint-initdb.d/02_update_total_points_function.sql
-      - ./03_cron_job.sql:/docker-entrypoint-initdb.d/03_cron_job.sql
+      - pg-data:/var/lib/postgresql
+      - ../db/01_cron_extension.sql:/docker-entrypoint-initdb.d/01_cron_extension.sql
+      - ../db/02_update_total_points_function.sql:/docker-entrypoint-initdb.d/02_update_total_points_function.sql
+      - ../db/03_cron_job.sql:/docker-entrypoint-initdb.d/03_cron_job.sql
 
   website:
     build:
@@ -47,6 +49,59 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    environment:
+      DB_PASSWORD_FILE: /run/secrets/db_password
+
+      BETTER_AUTH_SECRET_FILE: /run/secrets/better_auth_secret
+
+      BASE_URL: http://localhost
+
+      FORGE_ID_CLIENT_ID_FILE: /run/secrets/forge_id_client_id
+      FORGE_ID_CLIENT_SECRET_FILE: /run/secrets/forge_id_client_secret
+
+      GOOGLE_SERVICE_ACCOUNT_EMAIL_FILE: /run/secrets/google_service_account_email
+      GOOGLE_PRIVATE_KEY_FILE: /run/secrets/google_private_key
+
+      DISCORD_ROLE_SYNC_WEBHOOK_URL_FILE: /run/secrets/discord_role_sync_webhook_url
+
+      DISCORD_CLIENT_ID_FILE: /run/secrets/website_discord_client_id
+      DISCORD_CLIENT_SECRET_FILE: /run/secrets/website_discord_client_secret
+
+      GOOGLE_CLIENT_ID_FILE: /run/secrets/google_client_id
+      GOOGLE_CLIENT_SECRET_FILE: /run/secrets/google_client_secret
+
+      S3_URL: http://garage:3900
+      S3_ACCESS_KEY_ID_FILE: /run/secrets/s3_access_key_id
+      S3_SECRET_ACCESS_KEY_FILE: /run/secrets/s3_secret_access_key
+      S3_BUCKET_NAME: grimm-bucket
+
+      DISCORD_URL: http://discord-bot:3001
+
+      # prevent any edition of the points (comment to re enable it)
+      DISABLE_EDIT_POINTS: 1
+
+      # prevent admin from editing points (comment to re enable it)
+      DISABLE_EDIT_POINTS_ADMIN: 1
+
+      # disable the ranking page (comment to re enable it)
+      # DISABLE_RANKING_PAGE: 1
+
+      # disable how-to points (comment to re enable it)
+      DISABLE_HOWTO_POINTS: 1
+    secrets:
+      - db_password
+      - better_auth_secret
+      - forge_id_client_id
+      - forge_id_client_secret
+      - website_discord_client_id
+      - website_discord_client_secret
+      - google_client_id
+      - google_client_secret
+      - google_service_account_email
+      - google_private_key
+      - discord_role_sync_webhook_url
+      - s3_access_key_id
+      - s3_secret_access_key
 
   discord-bot:
     build:
@@ -58,6 +113,19 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    environment:
+      TOKEN_FILE: /run/secrets/discord_token
+      CLIENT_ID_FILE: /run/secrets/discord_client_id
+
+      DB_PASSWORD_FILE: /run/secrets/db_password
+
+      API_KEY_FILE: /run/secrets/discord_api_key
+      WEBSITE_URL: http://website:8000
+    secrets:
+      - discord_token
+      - discord_client_id
+      - discord_api_key
+      - db_password
 
   reverse-proxy:
     image: nginx
@@ -81,10 +149,11 @@ services:
     environment:
       PORT: 4983
       STORE_PATH: /app
-      MASTERPASS: ${DRIZZLE_GATEWAY_MASTER_PASSWORD}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+      POSTGRES_DB: grimm
+    secrets:
+      - db_password
 
   garage:
     image: dxflrs/garage:v2.1.0
@@ -97,6 +166,11 @@ services:
       - garage-data:/var/lib/garage/data
     networks:
       - grimm-proxy
+    environment:
+      GARAGE_RPC_SECRET_FILE: /run/secrets/garage_rpc_secret
+    secrets:
+      - source: garage_rpc_secret
+        mode: 0600
 
 networks:
   grimm-db:
@@ -106,3 +180,40 @@ volumes:
   drizzle-gateway:
   garage-meta:
   garage-data:
+  pg-data:
+
+secrets:
+  db_password:
+    environment: DB_PASSWORD
+  garage_rpc_secret:
+    environment: GARAGE_RPC_SECRET
+  better_auth_secret:
+    environment: BETTER_AUTH_SECRET
+  forge_id_client_id:
+    environment: FORGE_ID_CLIENT_ID
+  forge_id_client_secret:
+    environment: FORGE_ID_CLIENT_SECRET
+  website_discord_client_id:
+    environment: WEBSITE_DISCORD_CLIENT_ID
+  website_discord_client_secret:
+    environment: WEBSITE_DISCORD_CLIENT_SECRET
+  google_client_id:
+    environment: GOOGLE_CLIENT_ID
+  google_client_secret:
+    environment: GOOGLE_CLIENT_SECRET
+  google_service_account_email:
+    environment: GOOGLE_SERVICE_ACCOUNT_EMAIL
+  google_private_key:
+    environment: GOOGLE_PRIVATE_KEY
+  discord_role_sync_webhook_url:
+    environment: DISCORD_ROLE_SYNC_WEBHOOK_URL
+  s3_access_key_id:
+    environment: S3_ACCESS_KEY_ID
+  s3_secret_access_key:
+    environment: S3_SECRET_ACCESS_KEY
+  discord_token:
+    environment: DISCORD_TOKEN
+  discord_client_id:
+    environment: DISCORD_CLIENT_ID
+  discord_api_key:
+    environment: DISCORD_API_KEY

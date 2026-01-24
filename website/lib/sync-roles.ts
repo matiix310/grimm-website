@@ -3,6 +3,7 @@ import { account, user } from "@/db/schema/auth";
 import { Roles } from "@/lib/auth";
 import { eq, inArray, isNotNull, notInArray, and } from "drizzle-orm";
 import { getUserGroups } from "./google-workspace";
+import { getEnvOrThrow } from "./env";
 
 // Role mapping from Google Workspace group names to internal role names
 const roleMapping: Record<string, Roles> = {
@@ -49,7 +50,7 @@ const sendDiscordNotification = async (
   message: string,
   status: "success" | "error" | "info" = "info",
 ) => {
-  const discordWebhook = process.env.DISCORD_ROLE_SYNC_WEBHOOK_URL;
+  const discordWebhook = getEnvOrThrow("DISCORD_ROLE_SYNC_WEBHOOK_URL");
   if (discordWebhook) {
     let color = 0x00ff00;
     if (status === "error") color = 0xff0000;
@@ -81,8 +82,8 @@ const sendDiscordNotification = async (
 };
 
 export async function performRoleSync(): Promise<SyncRolesResult> {
-  const serviceAccountEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
-  const privateKey = process.env.GOOGLE_PRIVATE_KEY;
+  const serviceAccountEmail = getEnvOrThrow("GOOGLE_SERVICE_ACCOUNT_EMAIL");
+  const privateKey = getEnvOrThrow("GOOGLE_PRIVATE_KEY");
 
   if (!serviceAccountEmail || !privateKey) {
     await sendDiscordNotification(
@@ -109,8 +110,8 @@ export async function performRoleSync(): Promise<SyncRolesResult> {
 
       const roles = await getUserGroups(
         account.account.accountId,
-        process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL!,
-        process.env.GOOGLE_PRIVATE_KEY!,
+        serviceAccountEmail,
+        privateKey,
       );
 
       const newRoles: Roles[] = [];
@@ -257,7 +258,7 @@ export async function performRoleSync(): Promise<SyncRolesResult> {
     }
 
     // Send Discord webhook notification
-    const discordWebhook = process.env.DISCORD_ROLE_SYNC_WEBHOOK_URL;
+    const discordWebhook = getEnvOrThrow("DISCORD_ROLE_SYNC_WEBHOOK_URL");
     if (discordWebhook && (updatedCount > 0 || clearedCount > 0)) {
       try {
         const serverUrl = process.env.BASE_URL || "Unknown Server";
@@ -368,8 +369,8 @@ export async function performRoleSync(): Promise<SyncRolesResult> {
 }
 
 export async function performUserRoleSync(login: string): Promise<SyncRolesResult> {
-  const serviceAccountEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
-  const privateKey = process.env.GOOGLE_PRIVATE_KEY;
+  const serviceAccountEmail = getEnvOrThrow("GOOGLE_SERVICE_ACCOUNT_EMAIL");
+  const privateKey = getEnvOrThrow("GOOGLE_PRIVATE_KEY");
 
   if (!serviceAccountEmail || !privateKey) {
     await sendDiscordNotification(

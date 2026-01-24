@@ -6,18 +6,19 @@ import type {
 } from "drizzle-orm";
 import * as discordRolesSchema from "./schema/discord-roles";
 import * as discordLogChannelSchema from "./schema/discord-log-channel";
-
-if (process.env.DB_URL === undefined)
-  throw new Error("Environement variable DB_URL is not defined!");
+import { getEnvOrThrow } from "../libs/env";
 
 const schema = {
   ...discordRolesSchema,
   ...discordLogChannelSchema,
 };
 
-export const db = drizzle(process.env.DB_URL, {
-  schema,
-});
+export const db = drizzle(
+  "postgresql://postgres:" + getEnvOrThrow("DB_PASSWORD") + "@db:5432/discord",
+  {
+    schema,
+  },
+);
 
 type Schema = typeof schema;
 type TablesWithRelations = ExtractTablesWithRelations<Schema>;
@@ -39,7 +40,7 @@ export type IncludeColumns<TableName extends keyof TablesWithRelations> = DBQuer
 export type InferQueryModel<
   TableName extends keyof TablesWithRelations,
   With extends IncludeRelation<TableName> | undefined = undefined,
-  Columns extends IncludeColumns<TableName> | undefined = undefined
+  Columns extends IncludeColumns<TableName> | undefined = undefined,
 > = {
   [K in keyof BuildQueryResult<
     TablesWithRelations,
