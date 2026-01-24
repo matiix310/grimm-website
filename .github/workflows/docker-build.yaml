@@ -77,4 +77,4 @@ jobs:
           IFS=' ' read -r -a services <<< "${{ steps.detect_changes.outputs.rebuild_services }}"
 
           echo "Building Docker containers for services: ${services[@]}"
-          docker-compose -f docker/compose.yaml -f docker/compose.prod.yaml build "${services[@]}"
+          docker compose -f docker/compose.yaml -f docker/compose.prod.yaml build "${services[@]}"
