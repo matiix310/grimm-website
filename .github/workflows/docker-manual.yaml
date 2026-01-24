@@ -1,0 +1,17 @@
+name: Manual Docker Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build_all:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Build All Docker Containers
+        run: |
+          echo "Building all Docker containers..."
+          docker compose -f docker/compose.yaml -f docker/compose.prod.yaml build
