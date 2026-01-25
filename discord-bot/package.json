@@ -33,7 +33,7 @@
     "pg": "^8.17.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
-    "zod": "^4.1.13"
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@swc-node/register": "^1.11.1",
