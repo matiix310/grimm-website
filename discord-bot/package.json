@@ -23,7 +23,7 @@
     "better-auth": "^1.4.6",
     "discord-api-types": "^0.38.37",
     "discord.js": "^14.25.1",
-    "dotenv": "^16.6.1",
+    "dotenv": "^17.2.3",
     "drizzle-cuid2": "^2.2.0",
     "drizzle-orm": "^0.45.1",
     "drizzle-zod": "^0.8.3",
