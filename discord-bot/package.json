@@ -10,7 +10,7 @@
     "deploy": "bun src/utils/deploy.ts",
     "migrate": "drizzle-kit migrate",
     "dev": "nodemon",
-    "start:debug": "nest start --debug --watch",
+    "start:debug": "bun inspect src/index.ts",
     "start:prod": "bun src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -23,7 +23,6 @@
     "better-auth": "^1.4.6",
     "discord-api-types": "^0.38.37",
     "discord.js": "^14.25.1",
-    "dotenv": "^16.6.1",
     "drizzle-cuid2": "^2.2.0",
     "drizzle-orm": "^0.45.1",
     "drizzle-zod": "^0.8.3",
