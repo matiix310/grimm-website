@@ -37,7 +37,7 @@
   },
   "devDependencies": {
     "@swc-node/register": "^1.11.1",
-    "@swc/cli": "^0.3.14",
+    "@swc/cli": "^0.7.10",
     "@types/pg": "^8.16.0",
     "drizzle-kit": "^0.31.8"
   },
