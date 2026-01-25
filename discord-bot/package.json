@@ -31,7 +31,7 @@
     "env": "^0.0.2",
     "eslint": "^9.39.1",
     "nodemon": "^3.1.11",
-    "pg": "^8.16.3",
+    "pg": "^8.17.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
     "zod": "^4.1.13"
@@ -39,7 +39,7 @@
   "devDependencies": {
     "@swc-node/register": "^1.11.1",
     "@swc/cli": "^0.3.14",
-    "@types/pg": "^8.15.6",
+    "@types/pg": "^8.16.0",
     "drizzle-kit": "^0.31.8"
   },
   "packageManager": "bun@1.2.19"
