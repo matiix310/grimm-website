@@ -3,6 +3,7 @@ import { headers as nextHeaders } from "next/headers";
 import { auth } from "@/lib/auth";
 import { loadAssetFromStorage } from "./lib/storage";
 import ApiResponse from "./lib/apiResponse";
+import { getEnvOrThrow } from "@/lib/env";
 
 export async function proxy(request: NextRequest) {
   const assetsPrefix = "/api/s3/";
@@ -29,21 +30,23 @@ export async function proxy(request: NextRequest) {
   if (!session) {
     return NextResponse.redirect(
       new URL(
-        `${process.env.BASE_URL!}/login?redirect=${
+        `${getEnvOrThrow("BASE_URL")}/login?redirect=${
           request.nextUrl.protocol
-        }//${host}${path}`
-      )
+        }//${host}${path}`,
+      ),
     );
   }
 
-  if (session.user.banned) return NextResponse.redirect(process.env.BASE_URL!);
+  if (session.user.banned) return NextResponse.redirect(getEnvOrThrow("BASE_URL"));
 
   const roles = session.user.role?.split(",") ?? [];
 
   if (request.headers.get("host") === "db.bde-grimm.com")
     if (!roles.includes("admin"))
       return NextResponse.redirect(
-        new URL(`${process.env.BASE_URL!}/login?redirect=https://db.bde-grimm.com${path}`)
+        new URL(
+          `${getEnvOrThrow("BASE_URL")}/login?redirect=https://db.bde-grimm.com${path}`,
+        ),
       );
     else return NextResponse.rewrite("http://drizzle-gate:4983" + path);
 

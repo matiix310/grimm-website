@@ -16,9 +16,11 @@ fi
 if [ "$MODE" == "prod" ]; then
     COMPOSE_FILES="-f compose.yaml -f compose.prod.yaml"
     ENV_FILE="prod.env"
+    BASE_URL="https://bde-grimm.com"
 else
     COMPOSE_FILES="-f compose.yaml -f compose.dev.yaml"
     ENV_FILE="dev.env"
+    BASE_URL="http://localhost"
 fi
 
 # Colors for output
@@ -125,6 +127,7 @@ S3_SECRET_ACCESS_KEY="$S3_SECRET_ACCESS_KEY"
 DISCORD_TOKEN="$DISCORD_TOKEN"
 DISCORD_CLIENT_ID="$DISCORD_CLIENT_ID"
 DISCORD_API_KEY="$DISCORD_API_KEY"
+BASE_URL="$BASE_URL"
 EOF
     log "$ENV_FILE created successfully."
 }
@@ -160,6 +163,13 @@ if [ ! -f "$ENV_FILE" ]; then
     create_env_file
 else
     log "$ENV_FILE already exists, skipping generation."
+fi
+
+# Ensure BASE_URL is in the env file and up to date
+if grep -q "^BASE_URL=" "$ENV_FILE"; then
+    sed -i "s|^BASE_URL=.*|BASE_URL=\"$BASE_URL\"|" "$ENV_FILE"
+else
+    echo "BASE_URL=\"$BASE_URL\"" >> "$ENV_FILE"
 fi
 
 # apply database migrations

@@ -54,7 +54,7 @@ services:
 
       BETTER_AUTH_SECRET_FILE: /run/secrets/better_auth_secret
 
-      BASE_URL: http://localhost
+      BASE_URL_FILE: /run/secrets/base_url
 
       FORGE_ID_CLIENT_ID_FILE: /run/secrets/forge_id_client_id
       FORGE_ID_CLIENT_SECRET_FILE: /run/secrets/forge_id_client_secret
@@ -102,6 +102,7 @@ services:
       - discord_role_sync_webhook_url
       - s3_access_key_id
       - s3_secret_access_key
+      - base_url
 
   discord-bot:
     build:
@@ -217,3 +218,5 @@ secrets:
     environment: DISCORD_CLIENT_ID
   discord_api_key:
     environment: DISCORD_API_KEY
+  base_url:
+    environment: BASE_URL

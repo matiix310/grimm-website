@@ -3,7 +3,7 @@ import { account, user } from "@/db/schema/auth";
 import { Roles } from "@/lib/auth";
 import { eq, inArray, isNotNull, notInArray, and } from "drizzle-orm";
 import { getUserGroups } from "./google-workspace";
-import { getEnvOrThrow } from "./env";
+import { getEnvOrThrow, getEnv } from "./env";
 
 // Role mapping from Google Workspace group names to internal role names
 const roleMapping: Record<string, Roles> = {
@@ -261,7 +261,7 @@ export async function performRoleSync(): Promise<SyncRolesResult> {
     const discordWebhook = getEnvOrThrow("DISCORD_ROLE_SYNC_WEBHOOK_URL");
     if (discordWebhook && (updatedCount > 0 || clearedCount > 0)) {
       try {
-        const serverUrl = process.env.BASE_URL || "Unknown Server";
+        const serverUrl = getEnv("BASE_URL") || "Unknown Server";
 
         // Build changes list (limit to avoid Discord message size limits)
         const maxChanges = 10;

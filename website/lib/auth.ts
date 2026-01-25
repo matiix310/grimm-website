@@ -163,7 +163,7 @@ export const auth = betterAuth({
           discoveryUrl: "https://cri.epita.fr/.well-known/openid-configuration",
           scopes: ["openid", "profile"],
           redirectURI:
-            process.env.BASE_URL! +
+            getEnvOrThrow("BASE_URL") +
             (process.env.NODE_ENV === "development"
               ? "/complete/epita/"
               : "/api/auth/oauth2/callback/forge-id"),

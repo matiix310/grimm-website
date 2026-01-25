@@ -1,5 +1,6 @@
 import { CardBody, CardContainer, CardItem } from "@/components/ui/3dCard";
 import { auth } from "@/lib/auth";
+import { getEnvOrThrow } from "@/lib/env";
 import { headers as nextHeaders } from "next/headers";
 import Image from "next/image";
 import { redirect } from "next/navigation";
@@ -47,7 +48,7 @@ const PassPage = async () => {
             className="p-3 bg-orange rounded-2xl"
             size={256}
             style={{ height: "auto", width: "50%" }}
-            value={`${process.env.BASE_URL!}/users/${session.user.login}`}
+            value={`${getEnvOrThrow("BASE_URL")}/users/${session.user.login}`}
             viewBox={`0 0 256 256`}
             bgColor="var(--orange)"
             fgColor="var(--on-orange)"
