@@ -17,7 +17,7 @@
   "dependencies": {
     "@discordjs/builders": "^1.13.1",
     "@elysiajs/cors": "^1.4.1",
-    "@paralleldrive/cuid2": "^3.0.4",
+    "@paralleldrive/cuid2": "^3.3.0",
     "@swc/core": "^1.15.10",
     "@types/node": "^20.19.26",
     "better-auth": "^1.4.6",
