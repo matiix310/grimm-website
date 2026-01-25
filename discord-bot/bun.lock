@@ -7,7 +7,7 @@
       "dependencies": {
         "@discordjs/builders": "^1.13.1",
         "@elysiajs/cors": "^1.4.1",
-        "@paralleldrive/cuid2": "^3.0.4",
+        "@paralleldrive/cuid2": "^3.3.0",
         "@swc/core": "^1.15.10",
         "@types/node": "^20.19.26",
         "better-auth": "^1.4.17",
@@ -244,7 +244,7 @@
 
     "@oxc-resolver/binding-win32-x64-msvc": ["@oxc-resolver/binding-win32-x64-msvc@11.15.0", "", { "os": "win32", "cpu": "x64" }, "sha512-HZsfne0s/tGOcJK9ZdTGxsNU2P/dH0Shf0jqrPvsC6wX0Wk+6AyhSpHFLQCnLOuFQiHHU0ePfM8iYsoJb5hHpQ=="],
 
-    "@paralleldrive/cuid2": ["@paralleldrive/cuid2@3.0.4", "", { "dependencies": { "@noble/hashes": "^2.0.1", "bignumber.js": "^9.3.1", "error-causes": "^3.0.2" }, "bin": { "cuid2": "bin/cuid2.js" } }, "sha512-sM6M2PWrByOEpN2QYAdulhEbSZmChwj0e52u4hpwB7u4PznFiNAavtE6m7O8tWUlzX+jT2eKKtc5/ZgX+IHrtg=="],
+    "@paralleldrive/cuid2": ["@paralleldrive/cuid2@3.3.0", "", { "dependencies": { "@noble/hashes": "^2.0.1", "bignumber.js": "^9.3.1", "error-causes": "^3.0.2" }, "bin": { "cuid2": "bin/cuid2.js" } }, "sha512-OqiFvSOF0dBSesELYY2CAMa4YINvlLpvKOz/rv6NeZEqiyttlHgv98Juwv4Ch+GrEV7IZ8jfI2VcEoYUjXXCjw=="],
 
     "@sapphire/async-queue": ["@sapphire/async-queue@1.5.5", "", {}, "sha512-cvGzxbba6sav2zZkH8GPf2oGk9yYoD5qrNWdu9fRehifgnFZJMV+nuy2nON2roRO4yQQ+v7MK/Pktl/HgfsUXg=="],
 
