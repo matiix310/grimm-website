@@ -24,7 +24,7 @@ jobs:
             cd /root/grimm-website/docker
             echo "Updating repository to branch ${{ github.event.inputs.target_branch }}..."
             git fetch origin
-            git checkout ${{ github.event.inputs.target_branch }}
-            git pull origin ${{ github.event.inputs.target_branch }}
+            git checkout -f ${{ github.event.inputs.target_branch }}
+            git reset --hard origin/${{ github.event.inputs.target_branch }}
             echo "Running deployment script..."
             ./run.sh prod -d
