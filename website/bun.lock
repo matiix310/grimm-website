@@ -1,5 +1,6 @@
 {
   "lockfileVersion": 1,
+  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "grimm-website",
@@ -34,7 +35,7 @@
         "node-cron": "^4.2.1",
         "pg": "^8.16.3",
         "react": "19.2.0",
-        "react-day-picker": "^9.11.3",
+        "react-day-picker": "^9.13.0",
         "react-dom": "19.2.0",
         "react-qr-code": "^2.0.18",
         "react-snowfall": "^2.4.0",
@@ -1437,7 +1438,7 @@
 
     "react": ["react@19.2.0", "", {}, "sha512-tmbWg6W31tQLeB5cdIBOicJDJRR2KzXsV7uSK9iNfLWQ5bIZfxuPEHp7M8wiHyHnn0DD1i7w3Zmin0FtkrwoCQ=="],
 
-    "react-day-picker": ["react-day-picker@9.11.3", "", { "dependencies": { "@date-fns/tz": "^1.4.1", "date-fns": "^4.1.0", "date-fns-jalali": "^4.1.0-0" }, "peerDependencies": { "react": ">=16.8.0" } }, "sha512-7lD12UvGbkyXqgzbYIGQTbl+x29B9bAf+k0pP5Dcs1evfpKk6zv4EdH/edNc8NxcmCiTNXr2HIYPrSZ3XvmVBg=="],
+    "react-day-picker": ["react-day-picker@9.13.0", "", { "dependencies": { "@date-fns/tz": "^1.4.1", "date-fns": "^4.1.0", "date-fns-jalali": "^4.1.0-0" }, "peerDependencies": { "react": ">=16.8.0" } }, "sha512-euzj5Hlq+lOHqI53NiuNhCP8HWgsPf/bBAVijR50hNaY1XwjKjShAnIe8jm8RD2W9IJUvihDIZ+KrmqfFzNhFQ=="],
 
     "react-dom": ["react-dom@19.2.0", "", { "dependencies": { "scheduler": "^0.27.0" }, "peerDependencies": { "react": "^19.2.0" } }, "sha512-UlbRu4cAiGaIewkPyiRGJk0imDN2T3JjieT6spoL2UeSf5od4n5LB/mQ4ejmxhCFT1tYe8IvaFulzynWovsEFQ=="],
 
