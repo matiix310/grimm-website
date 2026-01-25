@@ -21,7 +21,7 @@
     "@swc/core": "^1.15.3",
     "@types/node": "^20.19.26",
     "better-auth": "^1.4.6",
-    "discord-api-types": "^0.37.120",
+    "discord-api-types": "^0.38.37",
     "discord.js": "^14.25.1",
     "dotenv": "^16.6.1",
     "drizzle-cuid2": "^2.2.0",
