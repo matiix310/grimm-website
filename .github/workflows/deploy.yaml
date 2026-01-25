@@ -1,0 +1,29 @@
+name: Manual VPS Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_branch:
+        description: "Branch to deploy"
+        required: true
+        default: "main"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to VPS via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script: |
+            cd /root/grimm-website/docker
+            echo "Updating repository to branch ${{ github.event.inputs.target_branch }}..."
+            git fetch origin
+            git checkout ${{ github.event.inputs.target_branch }}
+            git pull origin ${{ github.event.inputs.target_branch }}
+            echo "Running deployment script..."
+            ./run.sh prod -d
