@@ -133,11 +133,25 @@ EOF
 }
 
 apply_migrations() {
-    DB_PASSWORD="$1"
-    cd "../$2"
-    bun install -D drizzle-kit
-    bunx drizzle-kit generate
-    DB_PASSWORD="$DB_PASSWORD" bunx drizzle-kit migrate
+    local db_pass="$1"
+    local dir="$2"
+    local drizzle_kit_cmd="bunx drizzle-kit"
+
+    if command -v "drizzle-kit" &>/dev/null; then
+        drizzle_kit_cmd="drizzle-kit"
+    fi
+
+    cd "../$dir"
+
+    # Doing so, the drizzle-kit command will never be updated
+    # Maybe update it once in a while
+    if [ ! -f "node_modules/.bin/drizzle-kit" ]; then
+        log "drizzle-kit not found in $dir, installing..."
+        bun install -D drizzle-kit
+    fi
+
+    $drizzle_kit_cmd generate
+    DB_PASSWORD="$db_pass" $drizzle_kit_cmd migrate
     cd ../docker
 }
 
