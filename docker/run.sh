@@ -129,6 +129,26 @@ EOF
     log "$ENV_FILE created successfully."
 }
 
+apply_migrations() {
+    DB_PASSWORD="$1"
+    cd "../$2"
+    bun install -D drizzle-kit
+    bunx drizzle-kit generate
+    DB_PASSWORD="$DB_PASSWORD" bunx drizzle-kit migrate
+    cd ../docker
+}
+
+apply_all_migrations() {
+    log "Applying database migrations..."
+    DB_PASSWORD=$(grep '^DB_PASSWORD=' ../docker/"$ENV_FILE" | cut -d '=' -f2- | tr -d '"')
+    docker compose --env-file "$ENV_FILE" $COMPOSE_FILES up --build -d --wait db
+    if ! docker compose --env-file "$ENV_FILE" $COMPOSE_FILES exec db psql -U postgres -tAc "SELECT 1 FROM pg_database WHERE datname='discord'" | grep -q 1; then
+        docker compose --env-file "$ENV_FILE" $COMPOSE_FILES exec db psql -U postgres -c "CREATE DATABASE discord;"
+    fi
+    apply_migrations $DB_PASSWORD website
+    apply_migrations $DB_PASSWORD discord-bot
+}
+
 # Main Execution
 
 # Check dependencies
@@ -138,23 +158,12 @@ check_cmd "docker"
 # Check if env file exists
 if [ ! -f "$ENV_FILE" ]; then
     create_env_file
-    # apply database migrations
-    log "Applying database migrations..."
-    DB_PASSWORD=$(grep '^DB_PASSWORD=' ../docker/"$ENV_FILE" | cut -d '=' -f2- | tr -d '"')
-    docker compose --env-file "$ENV_FILE" $COMPOSE_FILES up --build -d --wait db
-    if ! docker compose --env-file "$ENV_FILE" $COMPOSE_FILES exec db psql -U postgres -tAc "SELECT 1 FROM pg_database WHERE datname='discord'" | grep -q 1; then
-        docker compose --env-file "$ENV_FILE" $COMPOSE_FILES exec db psql -U postgres -c "CREATE DATABASE discord;"
-    fi
-    cd ../website
-    bunx drizzle-kit generate
-    DB_PASSWORD="$DB_PASSWORD" bunx drizzle-kit migrate
-    cd ../discord-bot
-    bunx drizzle-kit generate
-    DB_PASSWORD="$DB_PASSWORD" bunx drizzle-kit migrate
-    cd ../docker
 else
     log "$ENV_FILE already exists, skipping generation."
 fi
+
+# apply database migrations
+apply_all_migrations
 
 # Run Docker Compose
 log "Starting services with Docker Compose ($MODE mode)..."
