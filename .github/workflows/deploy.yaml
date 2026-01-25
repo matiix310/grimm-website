@@ -20,6 +20,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT || 22 }}
           script: |
+            export PATH="$HOME/.bun/bin:$PATH"
             cd /root/grimm-website/docker
             echo "Updating repository to branch ${{ github.event.inputs.target_branch }}..."
             git fetch origin

@@ -157,6 +157,8 @@ apply_all_migrations() {
 # Check dependencies
 check_cmd "openssl"
 check_cmd "docker"
+check_cmd "bun"
+check_cmd "bunx"
 
 # Check if env file exists
 if [ ! -f "$ENV_FILE" ]; then
