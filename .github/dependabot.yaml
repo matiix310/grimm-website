@@ -1,0 +1,45 @@
+version: 2
+updates:
+  # Maintain dependencies for Bun (website)
+  - package-ecosystem: "bun"
+    directory: "/website"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+
+  # Maintain dependencies for Bun (discord-bot)
+  - package-ecosystem: "bun"
+    directory: "/discord-bot"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+
+  # Maintain Docker dependencies for website
+  - package-ecosystem: "docker"
+    directory: "/website"
+    schedule:
+      interval: "weekly"
+
+  # Maintain Docker dependencies for discord-bot
+  - package-ecosystem: "docker"
+    directory: "/discord-bot"
+    schedule:
+      interval: "weekly"
+
+  # Maintain Docker dependencies for database
+  - package-ecosystem: "docker"
+    directory: "/db"
+    schedule:
+      interval: "weekly"
+
+  # Maintain Docker Compose dependencies in docker/
+  - package-ecosystem: "docker"
+    directory: "/docker"
+    schedule:
+      interval: "weekly"
+
+  # Maintain GitHub Actions dependencies
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
