@@ -31,13 +31,10 @@
     "eslint": "^9.39.2",
     "nodemon": "^3.1.11",
     "pg": "^8.17.2",
-    "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@swc-node/register": "^1.11.1",
-    "@swc/cli": "^0.3.14",
     "@types/pg": "^8.16.0",
     "drizzle-kit": "^0.31.8"
   },
