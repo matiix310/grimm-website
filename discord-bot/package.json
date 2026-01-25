@@ -19,7 +19,7 @@
     "@elysiajs/cors": "^1.4.1",
     "@paralleldrive/cuid2": "^3.3.0",
     "@swc/core": "^1.15.10",
-    "@types/node": "^20.19.26",
+    "@types/node": "^25.0.10",
     "better-auth": "^1.4.17",
     "discord-api-types": "^0.38.37",
     "discord.js": "^14.25.1",
