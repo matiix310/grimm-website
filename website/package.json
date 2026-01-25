@@ -32,7 +32,7 @@
     "better-auth": "^1.4.5",
     "cmdk": "^1.1.1",
     "drizzle-cuid2": "^2.2.0",
-    "drizzle-orm": "^0.44.7",
+    "drizzle-orm": "^0.45.1",
     "drizzle-zod": "^0.8.3",
     "embla-carousel-autoplay": "^8.6.0",
     "embla-carousel-react": "^8.6.0",
