@@ -1,5 +1,6 @@
 #!/bin/bash
 set -euo pipefail
+set -x
 
 # Environment selection
 MODE="dev"
@@ -137,16 +138,9 @@ apply_migrations() {
     local dir="$2"
     local drizzle_kit_cmd="bunx drizzle-kit"
 
-    if command -v "drizzle-kit" &>/dev/null; then
-        drizzle_kit_cmd="drizzle-kit"
-    fi
-
     cd "../$dir"
 
-    # Doing so, the drizzle-kit command will never be updated
-    # Maybe update it once in a while
-    if [ ! -f "node_modules/.bin/drizzle-kit" ]; then
-        log "drizzle-kit not found in $dir, installing..."
+    if [ "$drizzle_kit_cmd" == "bunx drizzle-kit" ]; then
         bun install -D drizzle-kit
     fi
 
