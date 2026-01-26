@@ -121,7 +121,7 @@ export function initScheduler() {
         usedCodes.set(code.code, {
           orderId: ticket.id,
           targetEmail: ticket.customFields
-            ?.find((f: { name: string }) => f.name === "Email du duo")
+            ?.find((f: { name: string }) => f.name.includes("Email du Duo"))
             ?.answer.trim(),
           sender: (ticket.user.firstName + " " + ticket.user.lastName).replace(
             /[^a-zA-Z -]/g,
