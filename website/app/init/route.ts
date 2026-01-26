@@ -35,9 +35,7 @@ export async function GET() {
       .where(and(inArray(user.login, admins), notLike(user.role, "%admin%")));
 
     // Initialize scheduled tasks
-    if (process.env.NODE_ENV === "production") {
-      initScheduler();
-    }
+    initScheduler();
 
     return NextResponse.json({ message: "Initialized successfully" });
   } catch (error) {

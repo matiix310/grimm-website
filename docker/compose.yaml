@@ -75,6 +75,9 @@ services:
       S3_SECRET_ACCESS_KEY_FILE: /run/secrets/s3_secret_access_key
       S3_BUCKET_NAME: grimm-bucket
 
+      HELLOASSO_CLIENT_ID_FILE: /run/secrets/helloasso_client_id
+      HELLOASSO_CLIENT_SECRET_FILE: /run/secrets/helloasso_client_secret
+
       DISCORD_URL: http://discord-bot:3001
 
       # prevent any edition of the points (comment to re enable it)
@@ -103,6 +106,8 @@ services:
       - s3_access_key_id
       - s3_secret_access_key
       - base_url
+      - helloasso_client_id
+      - helloasso_client_secret
 
   discord-bot:
     build:
@@ -220,3 +225,7 @@ secrets:
     environment: DISCORD_API_KEY
   base_url:
     environment: BASE_URL
+  helloasso_client_id:
+    environment: HELLOASSO_CLIENT_ID
+  helloasso_client_secret:
+    environment: HELLOASSO_CLIENT_SECRET
