@@ -42,6 +42,7 @@
     "next": "^16.0.7",
     "next-themes": "^0.4.6",
     "node-cron": "^4.2.1",
+    "nodemailer": "^7.0.12",
     "pg": "^8.17.2",
     "react": "19.2.0",
     "react-day-picker": "^9.13.0",
@@ -54,6 +55,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.18",
     "@types/node": "^20.19.25",
+    "@types/nodemailer": "^7.0.5",
     "@types/pg": "^8.16.0",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",

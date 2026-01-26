@@ -22,6 +22,7 @@ import * as answerUsers from "./schema/answerUsers";
 import * as presets from "./schema/presets";
 import * as links from "./schema/links";
 import * as adventCalendar from "./schema/adventCalendar";
+import * as promoCodes from "./schema/promoCodes";
 
 const DB_PASSWORD = getEnvOrThrow("DB_PASSWORD");
 
@@ -42,6 +43,7 @@ const schema = {
   ...presets,
   ...links,
   ...adventCalendar,
+  ...promoCodes,
 } as const;
 
 export const db = drizzle("postgres://postgres:" + DB_PASSWORD + "@db:5432/grimm", {
