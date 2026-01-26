@@ -36,7 +36,7 @@ export function initScheduler() {
   cron.schedule(
     "*/5 * * * *",
     async () => {
-      const participants = await getParticipants("aphrodisiac-under-14-02-2");
+      const participants = await getParticipants("aphrodisiac-under-14-02");
 
       if (participants === undefined) {
         console.error("Failed to get a list of participants");
@@ -50,17 +50,21 @@ export function initScheduler() {
 
       // What is offered by whom
       const tickets = {
-        "BILLET DUO TEST": "BILLET DUO TEST",
+        "EARLY DUO": "EARLY DUO",
+        "REGULAR DUO": "REGULAR DUO",
+        "LATE DUO": "LATE DUO",
       } as const;
 
       const codes = await db.query.promoCodes.findMany();
 
       // get the participants with a DUO ticket
       const newDuoTickets = participants.filter(
-        (p) => p.name in tickets && codes.find((c) => c.orderId === p.id) === undefined, // &&
-        // p.payments !== undefined &&
-        // p.payments.length > 0 &&
-        // p.discount === undefined,
+        (p) =>
+          p.name in tickets &&
+          codes.find((c) => c.orderId === p.id) === undefined &&
+          p.payments !== undefined &&
+          p.payments.length > 0 &&
+          p.discount === undefined,
       );
 
       if (newDuoTickets.length === 0) return;
@@ -84,8 +88,9 @@ export function initScheduler() {
 
       for (const ticket of newDuoTickets) {
         if (
-          ticket.customFields?.find((f) => f.name === "Email du duo")?.answer ===
-          undefined
+          ticket.customFields?.find((f: { name: string }) =>
+            f.name.includes("Email du duo"),
+          )?.answer === undefined
         ) {
           console.error("No target email found for ticket:", ticket.id);
           await sendDiscordNotification(
@@ -133,9 +138,9 @@ export function initScheduler() {
         const textContent = `
         Salut !
         
-        ${data.sender} t'offre une place DUO pour la Soirée Aphrodisiac organisée par le BDE Grimm !
+        ${data.sender} t'offre une place ${data.ticketKind} pour la Soirée Aphrodisiac organisée par le BDE Grimm !
         
-        Voici ton code promo exclusif pour obtenir ta place DUO offerte : ${code}
+        Voici ton code promo exclusif pour obtenir ta place ${data.ticketKind} offerte : ${code}
         
         Utilise ce lien pour prendre ta place : ${ticketLink}
         
@@ -178,7 +183,7 @@ export function initScheduler() {
                </div>
         
                <p style="font-size: 16px; line-height: 1.6; color: #e0e0e0; text-align: center; margin-bottom: 30px;">
-                 Utilise ce code sur la billetterie pour valider ta place offerte.
+                 Pour utiliser ce code, séléctionne un ticket <strong>${data.ticketKind}</strong>, puis, à la dernière étape, entre le code promo pour bénéficier de ta place offerte.
                </p>
         
                <!-- CTA Button -->
