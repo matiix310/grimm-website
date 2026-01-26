@@ -87,20 +87,6 @@ export function initScheduler() {
       > = new Map();
 
       for (const ticket of newDuoTickets) {
-        if (
-          ticket.customFields?.find((f: { name: string }) =>
-            f.name.includes("Email du Duo"),
-          )?.answer === undefined
-        ) {
-          console.error("No target email found for ticket:", ticket.id);
-          await sendDiscordNotification(
-            `No target email found`,
-            `Order ID : ${ticket.id}\nTicket kind : ${tickets[ticket.name as keyof typeof tickets]}`,
-            "error",
-          );
-          continue;
-        }
-
         const code = codes.find(
           (c) =>
             !c.used &&
@@ -118,11 +104,14 @@ export function initScheduler() {
           continue;
         }
 
+        const targetEmail =
+          ticket.customFields
+            ?.find((f: { name: string }) => f.name.includes("Email du Duo"))
+            ?.answer.trim() ?? ticket.payer.email.trim();
+
         usedCodes.set(code.code, {
           orderId: ticket.id,
-          targetEmail: ticket.customFields
-            ?.find((f: { name: string }) => f.name.includes("Email du Duo"))
-            ?.answer.trim(),
+          targetEmail,
           sender: (ticket.user.firstName + " " + ticket.user.lastName).replace(
             /[^a-zA-Z -]/g,
             "",
