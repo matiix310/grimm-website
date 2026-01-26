@@ -109,6 +109,21 @@ const Home = async () => {
                 objectFit="cover"
                 placeholder="blur"
               />
+              <div
+                data-slot="overlay"
+                className="opacity-0 absolute z-2 top-[50%] left-[50%] -translate-[50%] font-paytone text-primary-foreground flex flex-col items-center"
+              >
+                <span className="text-3xl xl:text-5xl">
+                  {new Date(event.starting_date).toLocaleDateString("fr-FR", {
+                    timeZone: "UTC",
+                  })}
+                </span>
+                <span className="text-lg xl:text-2xl">
+                  {new Date(event.starting_date).toLocaleTimeString("fr-FR", {
+                    timeZone: "UTC",
+                  })}
+                </span>
+              </div>
               {(() => {
                 const now = new Date();
                 const startDate = parseUTCDate(event.starting_date);
@@ -132,23 +147,23 @@ const Home = async () => {
                 return (
                   <>
                     {status === "ongoing" && (
-                      <div className="absolute top-5 left-5 bg-green-500 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-md flex items-center gap-2 animate-pulse">
+                      <div className="absolute top-5 left-5 bg-green-500 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-md flex items-center gap-2 animate-pulse z-2">
                         <ClockIcon className="size-4" />
                         En cours
                       </div>
                     )}
                     {status === "finished" && (
-                      <div className="absolute top-5 left-5 bg-gray-500 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-md flex items-center gap-2">
+                      <div className="absolute top-5 left-5 bg-gray-500 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-md flex items-center gap-2 z-2">
                         Terminé
                       </div>
                     )}
                     {status === "upcoming" && (
-                      <div className="absolute top-5 left-5 bg-blue-500 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-md flex items-center gap-2">
+                      <div className="absolute top-5 left-5 bg-blue-500 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-md flex items-center gap-2 z-2">
                         À venir
                       </div>
                     )}
                     {isTicketAvailable && (
-                      <div className="absolute top-5 right-5 bg-primary text-primary-foreground px-4 py-1.5 rounded-full text-sm font-bold shadow-md flex items-center gap-2 animate-pulse">
+                      <div className="absolute top-5 right-5 bg-primary text-primary-foreground px-4 py-1.5 rounded-full text-sm font-bold shadow-md flex items-center gap-2 animate-pulse z-2">
                         <TicketIcon className="size-4" />
                         Billets disponibles
                       </div>
@@ -156,21 +171,6 @@ const Home = async () => {
                   </>
                 );
               })()}
-              <div
-                data-slot="overlay"
-                className="opacity-0 absolute z-2 top-[50%] left-[50%] -translate-[50%] font-paytone text-primary-foreground flex flex-col items-center"
-              >
-                <span className="text-3xl xl:text-5xl">
-                  {new Date(event.starting_date).toLocaleDateString("fr-FR", {
-                    timeZone: "UTC",
-                  })}
-                </span>
-                <span className="text-lg xl:text-2xl">
-                  {new Date(event.starting_date).toLocaleTimeString("fr-FR", {
-                    timeZone: "UTC",
-                  })}
-                </span>
-              </div>
               <div className="flex flex-col gap-2 items-end absolute bottom-5 right-5 font-paytone z-2">
                 {/* <p className="bg-red text-red-foreground px-5 py-2 rounded-full text-sm lg:text-lg">
                   A venir
