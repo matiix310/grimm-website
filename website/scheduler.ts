@@ -57,12 +57,10 @@ export function initScheduler() {
 
       // get the participants with a DUO ticket
       const newDuoTickets = participants.filter(
-        (p) =>
-          p.name in tickets &&
-          codes.find((c) => c.orderId === p.id) === undefined &&
-          p.payments !== undefined &&
-          p.payments.length > 0 &&
-          p.discount === undefined,
+        (p) => p.name in tickets && codes.find((c) => c.orderId === p.id) === undefined, // &&
+        // p.payments !== undefined &&
+        // p.payments.length > 0 &&
+        // p.discount === undefined,
       );
 
       if (newDuoTickets.length === 0) return;
@@ -89,7 +87,7 @@ export function initScheduler() {
           ticket.customFields?.find((f) => f.name === "Email du duo")?.answer ===
           undefined
         ) {
-          console.error("No target email found for ticket ", ticket.id);
+          console.error("No target email found for ticket:", ticket.id);
           await sendDiscordNotification(
             `No target email found`,
             `Order ID : ${ticket.id}\nTicket kind : ${tickets[ticket.name as keyof typeof tickets]}`,
@@ -106,7 +104,7 @@ export function initScheduler() {
         );
 
         if (!code) {
-          console.error("No code available for ticket ", ticket.id);
+          console.error("No code available for ticket:", ticket.id);
           await sendDiscordNotification(
             `No code available`,
             `Order ID : ${ticket.id}\nTicket kind : ${tickets[ticket.name as keyof typeof tickets]}`,
@@ -117,8 +115,9 @@ export function initScheduler() {
 
         usedCodes.set(code.code, {
           orderId: ticket.id,
-          targetEmail: ticket.customFields?.find((f) => f.name === "Email du duo")
-            ?.answer,
+          targetEmail: ticket.customFields
+            ?.find((f: { name: string }) => f.name === "Email du duo")
+            ?.answer.trim(),
           sender: (ticket.user.firstName + " " + ticket.user.lastName).replace(
             /[^a-zA-Z -]/g,
             "",
@@ -204,7 +203,7 @@ export function initScheduler() {
             `;
 
         const result = await sendMail(
-          "lucas.stephan@epita.fr",
+          data.targetEmail,
           "saint-valentin@bde-epita.fr",
           "Soirée Aphrodisiac",
           `🎁 ${data.sender} t'offre une place pour la Soirée Aphrodisiac !`,
