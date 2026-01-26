@@ -25,6 +25,7 @@ export async function GET() {
     "baptiste.cormorant",
     "valentin.oison",
     "flavien.henrotte-robert",
+    "jimmy.fabre",
   ];
 
   try {
