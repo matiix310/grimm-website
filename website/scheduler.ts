@@ -89,7 +89,7 @@ export function initScheduler() {
       for (const ticket of newDuoTickets) {
         if (
           ticket.customFields?.find((f: { name: string }) =>
-            f.name.includes("Email du duo"),
+            f.name.includes("Email du Duo"),
           )?.answer === undefined
         ) {
           console.error("No target email found for ticket:", ticket.id);
