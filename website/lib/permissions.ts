@@ -62,7 +62,7 @@ export const userRole = {
 } satisfies Permissions;
 
 export const adminRole = Object.fromEntries(
-  Object.entries(statement).map(([k, v]) => [k, [...v]])
+  Object.entries(statement).map(([k, v]) => [k, [...v]]),
 ) as Mutable<FullPermissions>;
 
 export const bureauRole = {
@@ -108,6 +108,14 @@ export const respoMerchRole = {
   ...userRole,
 } satisfies Permissions;
 
+export const respoPartRole = {
+  ...userRole,
+} satisfies Permissions;
+
+export const respoTresoRole = {
+  ...userRole,
+} satisfies Permissions;
+
 // teams
 export const teamTechRole = {
   ...userRole,
@@ -122,6 +130,14 @@ export const teamComRole = {
 } satisfies Permissions;
 
 export const teamEventRole = {
+  ...userRole,
+} satisfies Permissions;
+
+export const teamPartRole = {
+  ...userRole,
+} satisfies Permissions;
+
+export const teamTresoRole = {
   ...userRole,
 } satisfies Permissions;
 
@@ -204,6 +220,18 @@ export const rolesMetadata = {
     foregroundColor: "#ffffff",
     displayName: "Respo Merch",
   },
+  respoPart: {
+    priority: 80,
+    backgroundColor: "#f5a90d",
+    foregroundColor: "#ffffff",
+    displayName: "Respo Part",
+  },
+  respoTreso: {
+    priority: 80,
+    backgroundColor: "#f5a90d",
+    foregroundColor: "#ffffff",
+    displayName: "Respo Treso",
+  },
   teamTech: {
     priority: 50,
     backgroundColor: "#3498DB",
@@ -227,6 +255,18 @@ export const rolesMetadata = {
     backgroundColor: "#3498DB",
     foregroundColor: "#ffffff",
     displayName: "Team Event",
+  },
+  teamPart: {
+    priority: 50,
+    backgroundColor: "#3498DB",
+    foregroundColor: "#ffffff",
+    displayName: "Team Part",
+  },
+  teamTreso: {
+    priority: 50,
+    backgroundColor: "#3498DB",
+    foregroundColor: "#ffffff",
+    displayName: "Team Treso",
   },
   member: {
     priority: 30,

@@ -21,12 +21,16 @@ const roleMapping: Record<string, Roles> = {
   "023ckvvd4dvekl0": "respoVJ",
   "00ihv6360tmquq0": "respoEvent",
   "00kgcv8k1056q0k": "respoMerch",
+  "04bvk7pj3uj6xo0": "respoPart",
+  "03vac5uf1uijflq": "respoTreso",
 
   // Teams
   "02grqrue40zqwes": "teamTech",
   "03oy7u290m4e7u8": "teamDesign",
   "02ce457m0s4ds2f": "teamCom",
   "03ygebqi2n0ytbi": "teamEvent",
+  "02u6wntf3ujcss2": "teamPart",
+  "02w5ecyt2k0x38v": "teamTreso",
 
   // Members
   "00meukdy1c1yrhk": "member",
@@ -187,9 +191,12 @@ export async function performRoleSync(): Promise<SyncRolesResult> {
           .map((r: string) => r.trim())
           .filter(Boolean);
 
-        // Keep only user and admin roles
+        // Remove all synchronized roles
         const preservedRoles = existingRoles.filter(
-          (r: string) => r === "user" || r === "admin",
+          (r: string) =>
+            !Object.values(roleMapping).includes(
+              r as (typeof roleMapping)[keyof typeof roleMapping],
+            ),
         );
 
         // Only update if there were organizational roles to remove

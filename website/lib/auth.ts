@@ -23,14 +23,18 @@ import {
   respoVJRole,
   respoWeiRole,
   respoEventRole,
+  respoMerchRole,
+  respoPartRole,
+  respoTresoRole,
   staffRole,
   statement,
   teamComRole,
   teamDesignRole,
   teamTechRole,
-  userRole,
   teamEventRole,
-  respoMerchRole,
+  teamPartRole,
+  teamTresoRole,
+  userRole,
 } from "./permissions";
 import { performUserRoleSync } from "./sync-roles";
 
@@ -49,11 +53,15 @@ export const respoInter = ac.newRole(respoInterRole);
 export const respoVJ = ac.newRole(respoVJRole);
 export const respoEvent = ac.newRole(respoEventRole);
 export const respoMerch = ac.newRole(respoMerchRole);
+export const respoPart = ac.newRole(respoPartRole);
+export const respoTreso = ac.newRole(respoTresoRole);
 // teams
 export const teamTech = ac.newRole(teamTechRole);
 export const teamDesign = ac.newRole(teamDesignRole);
 export const teamCom = ac.newRole(teamComRole);
 export const teamEvent = ac.newRole(teamEventRole);
+export const teamPart = ac.newRole(teamPartRole);
+export const teamTreso = ac.newRole(teamTresoRole);
 // members
 export const member = ac.newRole(memberRole);
 export const staff = ac.newRole(staffRole);
@@ -69,14 +77,18 @@ const roles = {
   respoWei,
   respoInter,
   respoVJ,
+  respoEvent,
+  respoMerch,
+  respoPart,
+  respoTreso,
   teamTech,
   teamDesign,
   teamCom,
   teamEvent,
+  teamPart,
+  teamTreso,
   member,
   staff,
-  respoEvent,
-  respoMerch,
 };
 
 export type Roles = keyof typeof roles;
