@@ -87,7 +87,7 @@ services:
       DISABLE_EDIT_POINTS_ADMIN: 1
 
       # disable the ranking page (comment to re enable it)
-      # DISABLE_RANKING_PAGE: 1
+      DISABLE_RANKING_PAGE: 1
 
       # disable how-to points (comment to re enable it)
       DISABLE_HOWTO_POINTS: 1

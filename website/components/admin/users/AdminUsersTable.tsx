@@ -17,6 +17,8 @@ import { AdminMinecraftEditDialog } from "./AdminMinecraftEditDialog";
 import { AdminUserEditDialog } from "./AdminUserEditDialog";
 import { redirect } from "next/navigation";
 import { DataTable, SortableHeader } from "@/components/ui/DataTable";
+import { $fetch } from "@/lib/betterFetch";
+import { toast } from "sonner";
 
 type AdminUsersTableProps = {
   _?: string;
@@ -96,6 +98,27 @@ const AdminUsersTable = ({}: AdminUsersTableProps) => {
           redirect(`/users/${user.login}`);
         };
 
+        const handleSyncRoles = async () => {
+          const loadingToast = toast.loading("Synchronising user with other services...");
+
+          const { data, error } = await $fetch("/api/users/:id", {
+            params: {
+              id: user.login,
+            },
+          });
+
+          toast.dismiss(loadingToast);
+
+          if (error) {
+            toast.error(error.message);
+            throw new Error(error.message);
+          }
+
+          toast.success("User roles synchronised");
+
+          updateUser({ ...user, role: data.user.roles.join(",") });
+        };
+
         return (
           <div className="flex justify-end">
             <DropdownMenu modal={false}>
@@ -114,6 +137,9 @@ const AdminUsersTable = ({}: AdminUsersTableProps) => {
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => handleEditMinecraft()}>
                   Définir le pseudo minecraft
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleSyncRoles()}>
+                  Synchroniser les rôles
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 {user.banned ? (

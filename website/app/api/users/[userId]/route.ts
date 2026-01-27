@@ -4,6 +4,7 @@ import { minecraftUsernames } from "@/db/schema/minecraftUsernames";
 import ApiResponse from "@/lib/apiResponse";
 import { auth } from "@/lib/auth";
 import { rolesMetadata } from "@/lib/permissions";
+import { performUserRoleSync } from "@/lib/sync-roles";
 import { hasPermission } from "@/utils/auth";
 import { eq } from "drizzle-orm";
 import { headers as nextHeaders } from "next/headers";
@@ -26,12 +27,12 @@ export const getUser = async (login: string) => {
 
   const userRoles = user?.user.role?.split(",").filter((r) => r in rolesMetadata) ?? [];
   const userPriority = Math.max(
-    ...userRoles.map((r) => rolesMetadata[r as keyof typeof rolesMetadata].priority)
+    ...userRoles.map((r) => rolesMetadata[r as keyof typeof rolesMetadata].priority),
   );
 
   const targetRoles = target.role?.split(",").filter((r) => r in rolesMetadata) ?? [];
   const targetPriority = Math.max(
-    ...targetRoles.map((r) => rolesMetadata[r as keyof typeof rolesMetadata].priority)
+    ...targetRoles.map((r) => rolesMetadata[r as keyof typeof rolesMetadata].priority),
   );
 
   const canEditRoles =
@@ -101,7 +102,7 @@ export const getUser = async (login: string) => {
 
 export const GET = async (
   request: NextRequest,
-  ctx: RouteContext<"/api/users/[userId]">
+  ctx: RouteContext<"/api/users/[userId]">,
 ) => {
   const params = await ctx.params;
   const originUserLogin = params.userId;
@@ -111,7 +112,7 @@ export const GET = async (
 
 export const POST = async (
   request: NextRequest,
-  ctx: RouteContext<"/api/users/[userId]">
+  ctx: RouteContext<"/api/users/[userId]">,
 ) => {
   const params = await ctx.params;
 
@@ -145,9 +146,9 @@ export const POST = async (
       roles: z.array(
         z.union(
           Object.keys(rolesMetadata).map((r) =>
-            z.literal(r as keyof typeof rolesMetadata)
-          )
-        )
+            z.literal(r as keyof typeof rolesMetadata),
+          ),
+        ),
       ),
     })
     .partial()
@@ -174,14 +175,14 @@ export const POST = async (
     // check that the target user has a lower priority than the origin user
     const originUserMaxPriority = Math.max(
       ...originUserRoles.map(
-        (r) => rolesMetadata[r as keyof typeof rolesMetadata].priority
-      )
+        (r) => rolesMetadata[r as keyof typeof rolesMetadata].priority,
+      ),
     );
 
     const targetUserMaxPriority = Math.max(
       ...targetUserRoles.map(
-        (r) => rolesMetadata[r as keyof typeof rolesMetadata].priority
-      )
+        (r) => rolesMetadata[r as keyof typeof rolesMetadata].priority,
+      ),
     );
 
     if (
@@ -189,7 +190,7 @@ export const POST = async (
       originUserMaxPriority < rolesMetadata.admin.priority
     )
       return ApiResponse.unauthorized(
-        "The target user has a greater priority than yours. You can't edit their roles"
+        "The target user has a greater priority than yours. You can't edit their roles",
       );
 
     // check that the origin user can give / remove the roles he has given / removed
@@ -205,13 +206,13 @@ export const POST = async (
       const priority = rolesMetadata[role].priority;
       if (priority >= originUserMaxPriority)
         return ApiResponse.unauthorized(
-          `You can't edit the role ${role}. You don't have the required permissions.`
+          `You can't edit the role ${role}. You don't have the required permissions.`,
         );
     }
 
     // order the role with their priority
     parsed.data.roles.toSorted(
-      (a, b) => rolesMetadata[b].priority - rolesMetadata[a].priority
+      (a, b) => rolesMetadata[b].priority - rolesMetadata[a].priority,
     );
   }
 
@@ -222,6 +223,10 @@ export const POST = async (
     .returning();
 
   if (updatedUser.length === 0) return ApiResponse.internalServerError();
+
+  if (parsed.data.roles !== undefined) {
+    await performUserRoleSync(targetUser.login);
+  }
 
   return ApiResponse.json({
     id: updatedUser[0].id,
