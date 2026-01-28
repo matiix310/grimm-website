@@ -94,6 +94,7 @@ const roles = {
 export type Roles = keyof typeof roles;
 
 export const auth = betterAuth({
+  baseURL: getEnvOrThrow("BASE_URL"),
   secret: getEnvOrThrow("BETTER_AUTH_SECRET"),
   database: drizzleAdapter(db, {
     provider: "pg",
