@@ -1,6 +1,6 @@
 import cron from "node-cron";
 import { performRoleSync } from "./lib/sync-roles";
-import { getParticipants } from "./lib/helloasso";
+import helloasso from "./lib/helloasso";
 import { db } from "./db";
 import { promoCodes } from "./db/schema/promoCodes";
 import { eq } from "drizzle-orm";
@@ -36,10 +36,24 @@ export function initScheduler() {
   cron.schedule(
     "*/5 * * * *",
     async () => {
-      const participants = await getParticipants("aphrodisiac-under-14-02");
+      const { data, error } = await helloasso.request(
+        "/organizations/bde-epita/forms/Event/:eventSlug/items",
+        {
+          params: {
+            eventSlug: "aphrodisiac-under-14-02",
+          },
+          query: {
+            itemStates: ["Processed"],
+            pageSize: 100,
+            pageIndex: 1,
+            sortField: "UpdateDate",
+            sortOrder: "Desc",
+          },
+        },
+      );
 
-      if (participants === undefined) {
-        console.error("Failed to get a list of participants");
+      if (error || !data.data) {
+        console.error("Failed to get a list of participants:", error);
         await sendDiscordNotification(
           "Failed to get a list of participants",
           "See console for more details",
@@ -58,7 +72,7 @@ export function initScheduler() {
       const codes = await db.query.promoCodes.findMany();
 
       // get the participants with a DUO ticket
-      const newDuoTickets = participants.filter(
+      const newDuoTickets = data.data.filter(
         (p) =>
           p.name in tickets &&
           codes.find((c) => c.orderId === p.id) === undefined &&
