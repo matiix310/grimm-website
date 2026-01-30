@@ -120,9 +120,9 @@ const job = {
       const textContent = `
         Salut !
         
-        ${data.sender} t'offre une place ${data.ticketKind} pour la Soirée Aphrodisiac organisée par le BDE Grimm !
+        ${data.sender} t'offre une place DUO pour la Soirée Aphrodisiac organisée par le BDE Grimm !
         
-        Voici ton code promo exclusif pour obtenir ta place ${data.ticketKind} offerte : ${code}
+        Voici ton code promo exclusif pour obtenir ta place DUO offerte : ${code}
         
         Utilise ce lien pour prendre ta place : ${ticketLink}
         
@@ -155,7 +155,7 @@ const job = {
                  Salut !
                </p>
                <p style="font-size: 16px; line-height: 1.6; color: #e0e0e0;">
-                 <strong>${data.sender}</strong> t'offre une place <strong>${data.ticketKind}</strong> pour la soirée la plus attendue de l'année. Prépare-toi à une ambiance électrique !
+                 <strong>${data.sender}</strong> t'offre une place <strong>DUO</strong> pour la soirée la plus attendue de l'année. Prépare-toi à une ambiance électrique !
                </p>
                
                <!-- Promo Code Box -->
@@ -165,7 +165,7 @@ const job = {
                </div>
         
                <p style="font-size: 16px; line-height: 1.6; color: #e0e0e0; text-align: center; margin-bottom: 30px;">
-                 Pour utiliser ce code, séléctionne un ticket <strong>${data.ticketKind}</strong>, puis, à la dernière étape, entre le code promo pour bénéficier de ta place offerte.
+                 Pour utiliser ce code, séléctionne un ticket <strong>BILLET DUO (AVEC CODE PROMO)</strong>, puis, à la dernière étape, entre le code promo pour bénéficier de ta place offerte.
                </p>
         
                <!-- CTA Button -->
