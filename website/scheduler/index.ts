@@ -1,9 +1,8 @@
 import cron, { TaskFn, TaskOptions } from "node-cron";
 
-import haSaintValentin from "./jobs/haSaintValentin";
 import syncRolesJob from "./jobs/syncRolesJob";
 
-const jobs: ScheduledJob[] = [haSaintValentin, syncRolesJob];
+const jobs: ScheduledJob[] = [syncRolesJob];
 
 export async function initScheduler() {
   for (const job of jobs) {
