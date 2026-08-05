@@ -13,8 +13,14 @@ const schema = {
   ...discordLogChannelSchema,
 };
 
+const DB_NAME = getEnvOrThrow("DB_NAME");
+const DB_HOST = getEnvOrThrow("DB_HOST");
+const DB_PASSWORD = getEnvOrThrow("DB_PASSWORD");
+const DB_PORT = getEnvOrThrow("DB_PORT");
+const DB_USER = getEnvOrThrow("DB_USER");
+
 export const db = drizzle(
-  "postgresql://postgres:" + getEnvOrThrow("DB_PASSWORD") + "@db:5432/discord",
+  `postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}`,
   {
     schema,
   },

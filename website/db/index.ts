@@ -24,7 +24,11 @@ import * as links from "./schema/links";
 import * as adventCalendar from "./schema/adventCalendar";
 import * as promoCodes from "./schema/promoCodes";
 
+const DB_NAME = getEnvOrThrow("DB_NAME");
+const DB_HOST = getEnvOrThrow("DB_HOST");
 const DB_PASSWORD = getEnvOrThrow("DB_PASSWORD");
+const DB_PORT = getEnvOrThrow("DB_PORT");
+const DB_USER = getEnvOrThrow("DB_USER");
 
 const schema = {
   ...auth,
@@ -46,9 +50,12 @@ const schema = {
   ...promoCodes,
 } as const;
 
-export const db = drizzle("postgres://postgres:" + DB_PASSWORD + "@db:5432/grimm", {
-  schema,
-});
+export const db = drizzle(
+  `postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}`,
+  {
+    schema,
+  },
+);
 
 type Schema = typeof schema;
 type TablesWithRelations = ExtractTablesWithRelations<Schema>;
