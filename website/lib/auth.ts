@@ -141,17 +141,26 @@ export const auth = betterAuth({
   },
   hooks: {
     after: createAuthMiddleware(async (ctx) => {
-      if (ctx.path === "/callback/:id") {
-        const provider = ctx.params.id;
-        if (provider === "authentik") {
-          const session = await auth.api.getSession({
-            headers: ctx.headers ?? new Headers(),
-          });
+      if (
+        ctx.path !== "/callback/:id" &&
+        !ctx.path.startsWith("/oauth2/callback/")
+      ) {
+        return;
+      }
+      try {
+        const params = ctx.params as Record<string, string | undefined>;
+        const provider = params.id ?? params.providerId;
+        if (provider !== "authentik") return;
 
-          if (session?.user.login) {
-            await performUserRoleSync(session.user.login);
-          }
+        const session = await auth.api.getSession({
+          headers: ctx.headers ?? new Headers(),
+        });
+
+        if (session?.user.login) {
+          await performUserRoleSync(session.user.login);
         }
+      } catch (err) {
+        console.error("[auth-hook] post-callback sync failed:", err);
       }
     }),
   },
