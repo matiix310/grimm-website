@@ -40,6 +40,8 @@ import { performUserRoleSync } from "./sync-roles";
 
 const ac = createAccessControl(statement);
 
+const ROLE_SYNC_PROVIDERS = new Set(["authentik"]);
+
 export const user = ac.newRole(userRole);
 export const admin = ac.newRole(adminRole);
 export const bureau = ac.newRole(bureauRole);
@@ -141,30 +143,21 @@ export const auth = betterAuth({
   },
   hooks: {
     after: createAuthMiddleware(async (ctx) => {
-      try {
-        const isOauthCallback =
-          ctx.path.endsWith("/oauth2/callback/authentik") ||
-          ctx.path.endsWith("/callback/authentik");
-        if (!isOauthCallback) return;
+      if (ctx.path === "/oauth2/callback/:id") {
+        const provider = ctx.params?.providerId ?? ctx.params?.id;
+        if (provider && ROLE_SYNC_PROVIDERS.has(provider)) {
+          try {
+            const session = await auth.api.getSession({
+              headers: ctx.headers ?? new Headers(),
+            });
 
-        const params = (ctx.params ?? {}) as Record<string, string | undefined>;
-        const provider = params.providerId ?? params.id;
-        if (provider !== "authentik") return;
-
-        console.log("[auth-hook] authentik callback", {
-          path: ctx.path,
-          params: ctx.params,
-        });
-
-        const session = await auth.api.getSession({
-          headers: ctx.headers ?? new Headers(),
-        });
-
-        if (session?.user.login) {
-          await performUserRoleSync(session.user.login);
+            if (session?.user.login) {
+              await performUserRoleSync(session.user.login);
+            }
+          } catch (err) {
+            console.error("[auth-hook] post-callback sync failed:", err);
+          }
         }
-      } catch (err) {
-        console.error("[auth-hook] post-callback sync failed:", err);
       }
     }),
   },
@@ -186,8 +179,7 @@ export const auth = betterAuth({
             "/application/o/website/.well-known/openid-configuration",
           scopes: ["openid", "profile", "email"],
           disableSignUp: true,
-          redirectURI:
-            getEnvOrThrow("BASE_URL") + "/api/auth/oauth2/callback/authentik",
+          redirectURI: getEnvOrThrow("BASE_URL") + "/api/auth/oauth2/callback/authentik",
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           mapProfileToUser: (profile) => {
