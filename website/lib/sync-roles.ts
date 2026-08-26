@@ -1,41 +1,37 @@
 import { db } from "@/db";
 import { account, user } from "@/db/schema/auth";
 import { Roles } from "@/lib/auth";
-import { eq, inArray, isNotNull, notInArray, and } from "drizzle-orm";
-import { getUserGroups } from "./google-workspace";
+import { eq, and } from "drizzle-orm";
+import { getUserAuthentikGroups } from "./authentik";
 import { getEnvOrThrow, getEnv } from "./env";
 import { sendDiscordNotification } from "./discord";
 
-// Role mapping from Google Workspace group names to internal role names
+const ADMIN_GROUP = "website-admin";
+
+// Role mapping from Authentik group names to internal role names
 const roleMapping: Record<string, Roles> = {
-  // Bureau
-  "039kk8xu21d4a3b": "bureau",
+  bureau: "bureau",
 
-  // Respos
-  "01baon6m0qidpje": "respoTech",
-  "04h042r0370z0tg": "respoDesign",
-  "03ygebqi3q37nt0": "respoCom",
-  "0319y80a310l5zi": "respoAssistants",
-  "00haapch40qlumk": "respoWei",
-  "00sqyw6430eht6k": "respoInter",
-  "023ckvvd4dvekl0": "respoVJ",
-  "00ihv6360tmquq0": "respoEvent",
-  "00kgcv8k1056q0k": "respoMerch",
-  "04bvk7pj3uj6xo0": "respoPart",
-  "03vac5uf1uijflq": "respoTreso",
+  "respo-tech": "respoTech",
+  "respo-design": "respoDesign",
+  "respo-com": "respoCom",
+  "respo-assistants": "respoAssistants",
+  "respo-wei": "respoWei",
+  "respo-inter": "respoInter",
+  "respo-vj": "respoVJ",
+  "respo-event": "respoEvent",
+  "respo-merch": "respoMerch",
+  "respo-part": "respoPart",
+  "respo-treso": "respoTreso",
 
-  // Teams
-  "02grqrue40zqwes": "teamTech",
-  "03oy7u290m4e7u8": "teamDesign",
-  "02ce457m0s4ds2f": "teamCom",
-  "03ygebqi2n0ytbi": "teamEvent",
-  "02u6wntf3ujcss2": "teamPart",
-  "02w5ecyt2k0x38v": "teamTreso",
+  "team-tech": "teamTech",
+  "team-design": "teamDesign",
+  "team-com": "teamCom",
+  "team-event": "teamEvent",
+  "team-part": "teamPart",
+  "team-treso": "teamTreso",
 
-  // Members
-  "00meukdy1c1yrhk": "member",
-
-  // Staff
+  member: "member",
   staff: "staff",
 };
 
@@ -50,192 +46,93 @@ export interface SyncRolesResult {
   };
 }
 
+function computeRoles(groups: string[]): Roles[] {
+  const mapped = groups
+    .map((g) => roleMapping[g])
+    .filter((r): r is Roles => Boolean(r));
+  const finalSet = new Set<Roles>(["user", ...mapped]);
+  if (groups.includes(ADMIN_GROUP)) finalSet.add("admin");
+  return Array.from(finalSet);
+}
+
 export async function performRoleSync(): Promise<SyncRolesResult> {
-  const serviceAccountEmail = getEnvOrThrow("GOOGLE_SERVICE_ACCOUNT_EMAIL");
-  const privateKey = getEnvOrThrow("GOOGLE_PRIVATE_KEY");
-
-  if (!serviceAccountEmail || !privateKey) {
-    await sendDiscordNotification(
-      "Scheduled Bulk Role Sync",
-      "Missing Google Workspace credentials",
-      "error",
-    );
-    return { success: false, message: "Missing Google Workspace credentials" };
-  }
-
-  await sendDiscordNotification("Scheduled Bulk Role Sync", "Role sync started", "info");
+  await sendDiscordNotification(
+    "Scheduled Bulk Role Sync",
+    "Role sync started",
+    "info",
+  );
 
   try {
-    const loginToRolesMap = new Map<string, { newRoles: Roles[] }>();
+    const allUsers = await db.query.user.findMany({
+      columns: { id: true, login: true, role: true },
+    });
 
-    const accounts = await db
-      .select()
-      .from(account)
-      .where(eq(account.providerId, "google"))
-      .innerJoin(user, eq(account.userId, user.id));
+    const loginToRolesMap = new Map<string, Roles[]>();
+    const skippedLogins: Array<{ login: string; reason: string }> = [];
 
-    for (const account of accounts) {
-      const login = account.user.login;
-
-      const roles = await getUserGroups(
-        account.account.accountId,
-        serviceAccountEmail,
-        privateKey,
-      );
-
-      const newRoles: Roles[] = [];
-
-      for (const roleString of roles) {
-        if (roleString in roleMapping) newRoles.push(roleMapping[roleString]);
+    for (const u of allUsers) {
+      try {
+        const groups = await getUserAuthentikGroups(u.login);
+        loginToRolesMap.set(u.login, computeRoles(groups));
+      } catch (err) {
+        const reason = err instanceof Error ? err.message : String(err);
+        console.error(`Failed to fetch Authentik groups for ${u.login}:`, err);
+        skippedLogins.push({ login: u.login, reason });
       }
-
-      loginToRolesMap.set(login, { newRoles });
     }
 
-    const logins = Array.from(loginToRolesMap.keys());
-
     let updatedCount = 0;
+    let clearedCount = 0;
     const errors: string[] = [];
     const changes: Array<{ login: string; from: string[]; to: string[] }> = [];
 
-    if (logins.length !== 0) {
-      // Fetch all users in one query
-      const users = await db.query.user.findMany({
-        where: inArray(user.login, logins),
-        columns: {
-          id: true,
-          login: true,
-          role: true,
-        },
-      });
+    for (const u of allUsers) {
+      const newRoles = loginToRolesMap.get(u.login);
+      if (!newRoles) continue;
 
-      // Build a map of users by login for quick lookup
-      const userMap = new Map(users.map((u) => [u.login, u]));
+      const existingRoles = u.role
+        ? u.role
+            .split(",")
+            .map((r) => r.trim())
+            .filter(Boolean)
+        : [];
 
-      // Process updates
-      for (const [login, { newRoles }] of loginToRolesMap.entries()) {
-        const existingUser = userMap.get(login);
+      const newRoleString = newRoles.toSorted().join(",");
+      const currentRoleString = existingRoles.toSorted().join(",");
 
-        if (!existingUser) {
-          // User not found in database, skip this user
-          continue;
-        }
+      if (currentRoleString === newRoleString) continue;
 
-        try {
-          // Parse existing roles (comma-separated)
-          const existingRoles = existingUser.role
-            ? existingUser.role
-                .split(",")
-                .map((r: string) => r.trim())
-                .filter(Boolean)
-            : [];
-
-          // Preserve user and admin roles
-          const preservedRoles = existingRoles.filter(
-            (r: string) => r === "user" || r === "admin",
-          );
-
-          // Build new role set: preserved roles + new roles from workspace
-          const finalRoles = [...new Set([...preservedRoles, ...newRoles])];
-
-          // Only update if different
-          const newRoleString = finalRoles.toSorted().join(",");
-          const currentRoleString =
-            existingUser.role?.split(",").toSorted().join(",") || "";
-
-          if (currentRoleString !== newRoleString) {
-            await db
-              .update(user)
-              .set({ role: newRoleString })
-              .where(eq(user.login, login));
-            updatedCount++;
-            changes.push({
-              login,
-              from: existingRoles,
-              to: finalRoles,
-            });
-          }
-        } catch (err) {
-          console.error(`Failed to update user ${login}:`, err);
-          errors.push(`Failed to update ${login}`);
-        }
-      }
-    }
-
-    // Clean up users not in the Google Workspace
-    // Fetch only users NOT in the workspace who have roles
-    const usersNotInWorkspace = await db.query.user.findMany({
-      where: and(
-        isNotNull(user.role),
-        notInArray(user.login, logins.length > 0 ? logins : [""]),
-      ),
-      columns: {
-        id: true,
-        login: true,
-        role: true,
-      },
-    });
-
-    let clearedCount = 0;
-
-    for (const dbUser of usersNotInWorkspace) {
-      // Skip users with null or empty roles
-      if (!dbUser.role) {
-        continue;
-      }
+      const isDemotion = existingRoles.length > newRoles.length;
 
       try {
-        // Parse existing roles
-        const existingRoles = dbUser.role
-          .split(",")
-          .map((r: string) => r.trim())
-          .filter(Boolean);
-
-        // Remove all synchronized roles
-        const preservedRoles = existingRoles.filter(
-          (r: string) =>
-            !Object.values(roleMapping).includes(
-              r as (typeof roleMapping)[keyof typeof roleMapping],
-            ),
-        );
-
-        // Only update if there were organizational roles to remove
-        if (preservedRoles.length < existingRoles.length) {
-          const newRoleString =
-            preservedRoles.length > 0 ? preservedRoles.join(",") : "user";
-
-          await db
-            .update(user)
-            .set({ role: newRoleString })
-            .where(eq(user.login, dbUser.login));
-          clearedCount++;
-          changes.push({
-            login: dbUser.login,
-            from: existingRoles,
-            to: preservedRoles.length > 0 ? preservedRoles : ["user"],
-          });
-        }
+        await db
+          .update(user)
+          .set({ role: newRoleString })
+          .where(eq(user.login, u.login));
+        if (isDemotion) clearedCount++;
+        else updatedCount++;
+        changes.push({ login: u.login, from: existingRoles, to: newRoles });
       } catch (err) {
-        console.error(`Failed to clear roles for user ${dbUser.login}:`, err);
-        errors.push(`Failed to clear ${dbUser.login}`);
+        console.error(`Failed to update user ${u.login}:`, err);
+        errors.push(`Failed to update ${u.login}`);
       }
     }
 
-    let message = `Synced ${updatedCount} users.`;
-    if (clearedCount > 0) {
-      message += ` Cleared ${clearedCount} users not in workspace.`;
+    let message = `Synced ${updatedCount} users. Cleared ${clearedCount} users.`;
+    if (skippedLogins.length > 0) {
+      message += ` Skipped ${skippedLogins.length} due to API errors.`;
     }
     if (errors.length > 0) {
       message += ` Errors: ${errors.length}.`;
     }
 
-    // Send Discord webhook notification
     const discordWebhook = getEnvOrThrow("DISCORD_ROLE_SYNC_WEBHOOK_URL");
-    if (discordWebhook && (updatedCount > 0 || clearedCount > 0)) {
+    const hasActivity = updatedCount > 0 || clearedCount > 0;
+
+    if (discordWebhook && hasActivity) {
       try {
         const serverUrl = getEnv("BASE_URL") || "Unknown Server";
 
-        // Build changes list (limit to avoid Discord message size limits)
         const maxChanges = 10;
         const changesList = changes
           .slice(0, maxChanges)
@@ -246,7 +143,6 @@ export async function performRoleSync(): Promise<SyncRolesResult> {
               )}\``,
           )
           .join("\n");
-
         const moreChanges =
           changes.length > maxChanges
             ? `\n...and ${changes.length - maxChanges} more`
@@ -260,18 +156,27 @@ export async function performRoleSync(): Promise<SyncRolesResult> {
             }`,
             inline: true,
           },
-          {
-            name: "Server",
-            value: serverUrl,
-            inline: true,
-          },
+          { name: "Server", value: serverUrl, inline: true },
         ];
-
-        // Add changes field if there are any
         if (changes.length > 0) {
           fields.push({
             name: "Changes",
             value: changesList + moreChanges,
+            inline: false,
+          });
+        }
+        if (skippedLogins.length > 0) {
+          const skippedList = skippedLogins
+            .slice(0, maxChanges)
+            .map((s) => `**${s.login}**: ${s.reason}`)
+            .join("\n");
+          const moreSkipped =
+            skippedLogins.length > maxChanges
+              ? `\n...and ${skippedLogins.length - maxChanges} more`
+              : "";
+          fields.push({
+            name: "⚠️ Skipped (Authentik API errors)",
+            value: skippedList + moreSkipped,
             inline: false,
           });
         }
@@ -282,23 +187,16 @@ export async function performRoleSync(): Promise<SyncRolesResult> {
           color: 0x00ff00,
           fields,
           timestamp: new Date().toISOString(),
-          footer: {
-            text: "Role Sync System",
-          },
+          footer: { text: "Role Sync System" },
         };
 
         await fetch(discordWebhook, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            embeds: [embed],
-          }),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ embeds: [embed] }),
         });
       } catch (err) {
         console.error("Failed to send Discord notification:", err);
-        // Don't fail the sync if Discord notification fails
       }
     }
 
@@ -310,7 +208,7 @@ export async function performRoleSync(): Promise<SyncRolesResult> {
       );
     }
 
-    if (updatedCount === 0 && clearedCount === 0) {
+    if (!hasActivity && skippedLogins.length === 0) {
       await sendDiscordNotification(
         "Scheduled Bulk Role Sync",
         "No changes occurred.",
@@ -318,10 +216,19 @@ export async function performRoleSync(): Promise<SyncRolesResult> {
       );
     }
 
-    const discordUrl = process.env.DISCORD_URL;
+    if (skippedLogins.length > 0) {
+      await sendDiscordNotification(
+        "Scheduled Bulk Role Sync",
+        `Skipped ${skippedLogins.length} user(s) due to Authentik API errors: ${skippedLogins.map((s) => s.login).join(", ")}`,
+        "error",
+      );
+    }
 
+    const discordUrl = process.env.DISCORD_URL;
     if (discordUrl) {
-      await fetch(`${discordUrl}/sync`);
+      // TODO: re-enable when ready to push role changes to Discord
+      // await fetch(`${discordUrl}/sync`);
+      console.log("[role-sync] Discord bot call skipped (commented out)");
     }
 
     return {
@@ -340,19 +247,9 @@ export async function performRoleSync(): Promise<SyncRolesResult> {
   }
 }
 
-export async function performUserRoleSync(login: string): Promise<SyncRolesResult> {
-  const serviceAccountEmail = getEnvOrThrow("GOOGLE_SERVICE_ACCOUNT_EMAIL");
-  const privateKey = getEnvOrThrow("GOOGLE_PRIVATE_KEY");
-
-  if (!serviceAccountEmail || !privateKey) {
-    await sendDiscordNotification(
-      "Scheduled User Role Sync [" + login + "]",
-      "Missing Google Workspace credentials",
-      "error",
-    );
-    return { success: false, message: "Missing Google Workspace credentials" };
-  }
-
+export async function performUserRoleSync(
+  login: string,
+): Promise<SyncRolesResult> {
   await sendDiscordNotification(
     "Scheduled User Role Sync [" + login + "]",
     "Role sync started for user " + login,
@@ -360,17 +257,12 @@ export async function performUserRoleSync(login: string): Promise<SyncRolesResul
   );
 
   try {
-    const result = await db
-      .select()
-      .from(user)
-      .where(eq(user.login, login))
-      .leftJoin(
-        account,
-        and(eq(account.userId, user.id), eq(account.providerId, "google")),
-      )
-      .limit(1);
+    const existing = await db.query.user.findFirst({
+      where: eq(user.login, login),
+      columns: { id: true, login: true, role: true },
+    });
 
-    if (result.length === 0) {
+    if (!existing) {
       await sendDiscordNotification(
         "Scheduled User Role Sync [" + login + "]",
         "User " + login + " not found",
@@ -379,67 +271,38 @@ export async function performUserRoleSync(login: string): Promise<SyncRolesResul
       return { success: false, message: `User ${login} not found` };
     }
 
-    const { user: existingUser, account: googleAccount } = result[0];
+    const groups = await getUserAuthentikGroups(login);
+    const newRoles = computeRoles(groups);
 
-    if (!googleAccount) {
-      await sendDiscordNotification(
-        "Scheduled User Role Sync [" + login + "]",
-        "User " + login + " does not have a Google account linked",
-        "error",
-      );
-      return {
-        success: false,
-        message: `User ${login} does not have a Google account linked`,
-      };
-    }
-
-    const roles = await getUserGroups(
-      googleAccount.accountId,
-      serviceAccountEmail,
-      privateKey,
-    );
-
-    const newRoles: Roles[] = [];
-    for (const roleString of roles) {
-      if (roleString in roleMapping) newRoles.push(roleMapping[roleString]);
-    }
-
-    // Parse existing roles
-    const existingRoles = existingUser.role
-      ? existingUser.role
+    const existingRoles = existing.role
+      ? existing.role
           .split(",")
-          .map((r: string) => r.trim())
+          .map((r) => r.trim())
           .filter(Boolean)
       : [];
 
-    // Preserve user and admin roles
-    const preservedRoles = existingRoles.filter(
-      (r: string) => r === "user" || r === "admin",
-    );
-
-    // Build new role set
-    const finalRoles = [...new Set([...preservedRoles, ...newRoles])];
-
-    const newRoleString = finalRoles.toSorted().join(",");
-    const currentRoleString = existingUser.role?.split(",").toSorted().join(",") || "";
+    const newRoleString = newRoles.toSorted().join(",");
+    const currentRoleString = existingRoles.toSorted().join(",");
 
     if (currentRoleString !== newRoleString) {
-      await db.update(user).set({ role: newRoleString }).where(eq(user.login, login));
+      await db
+        .update(user)
+        .set({ role: newRoleString })
+        .where(eq(user.login, login));
     }
 
-    // update the discord user if any
     const discordUrl = process.env.DISCORD_URL;
-
     if (discordUrl) {
       const discordAccount = await db.query.account.findFirst({
         where: and(
-          eq(account.userId, existingUser.id),
+          eq(account.userId, existing.id),
           eq(account.providerId, "discord"),
         ),
       });
-
       if (discordAccount) {
-        await fetch(`${discordUrl}/sync/${discordAccount.accountId}`);
+        // TODO: re-enable when ready to push role changes to Discord
+        // await fetch(`${discordUrl}/sync/${discordAccount.accountId}`);
+        console.log(`[role-sync] Discord bot call skipped for ${login} (commented out)`);
       }
     }
 
@@ -451,11 +314,10 @@ export async function performUserRoleSync(login: string): Promise<SyncRolesResul
           "\nFrom: `" +
           existingRoles.join(", ") +
           "`\nTo: `" +
-          finalRoles.join(", ") +
+          newRoles.join(", ") +
           "`",
         "success",
       );
-
       return {
         success: true,
         message: `Synced roles for user ${login}`,
@@ -463,13 +325,7 @@ export async function performUserRoleSync(login: string): Promise<SyncRolesResul
           updated: 1,
           cleared: 0,
           errors: [],
-          changes: [
-            {
-              login,
-              from: existingRoles,
-              to: finalRoles,
-            },
-          ],
+          changes: [{ login, from: existingRoles, to: newRoles }],
         },
       };
     }
@@ -483,12 +339,7 @@ export async function performUserRoleSync(login: string): Promise<SyncRolesResul
     return {
       success: true,
       message: `No changes for user ${login}`,
-      details: {
-        updated: 0,
-        cleared: 0,
-        errors: [],
-        changes: [],
-      },
+      details: { updated: 0, cleared: 0, errors: [], changes: [] },
     };
   } catch (error) {
     console.error(`Sync failed for user ${login}:`, error);

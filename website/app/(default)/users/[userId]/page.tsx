@@ -32,7 +32,8 @@ const UserPage = async ({ params }: PageProps<"/users/[userId]">) => {
   const external = user.username !== null;
 
   const roles = (
-    (user.role?.split(",").filter((r) => r !== "user") ?? []) as Roles[]
+    (user.role?.split(",").filter((r) => r in rolesMetadata && r !== "user") ??
+      []) as Roles[]
   ).toSorted((a, b) => rolesMetadata[b].priority - rolesMetadata[a].priority);
 
   const owner = session?.user.id === user.id;

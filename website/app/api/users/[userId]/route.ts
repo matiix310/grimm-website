@@ -11,6 +11,12 @@ import { headers as nextHeaders } from "next/headers";
 import { NextRequest } from "next/server";
 import z from "zod";
 
+function priorityOf(roles: string[]): number {
+  const known = roles.filter((r): r is keyof typeof rolesMetadata => r in rolesMetadata);
+  if (known.length === 0) return 0;
+  return Math.max(...known.map((r) => rolesMetadata[r].priority));
+}
+
 export const getUser = async (login: string) => {
   const target = await db.query.user.findFirst({
     where: eq(userSchema.login, login),
@@ -22,18 +28,11 @@ export const getUser = async (login: string) => {
 
   const user = await auth.api.getSession({ headers });
 
-  // By default, users can manage users with a role that has a lower priority
-  // If a user is not logged in it gets a priority of -Infinity (aka can't do anything)
-
   const userRoles = user?.user.role?.split(",").filter((r) => r in rolesMetadata) ?? [];
-  const userPriority = Math.max(
-    ...userRoles.map((r) => rolesMetadata[r as keyof typeof rolesMetadata].priority),
-  );
+  const userPriority = priorityOf(userRoles);
 
   const targetRoles = target.role?.split(",").filter((r) => r in rolesMetadata) ?? [];
-  const targetPriority = Math.max(
-    ...targetRoles.map((r) => rolesMetadata[r as keyof typeof rolesMetadata].priority),
-  );
+  const targetPriority = priorityOf(targetRoles);
 
   const canEditRoles =
     userPriority <= targetPriority && userPriority < rolesMetadata.admin.priority
@@ -173,17 +172,8 @@ export const POST = async (
       .filter((r) => r in rolesMetadata) ?? []) as (keyof typeof rolesMetadata)[];
 
     // check that the target user has a lower priority than the origin user
-    const originUserMaxPriority = Math.max(
-      ...originUserRoles.map(
-        (r) => rolesMetadata[r as keyof typeof rolesMetadata].priority,
-      ),
-    );
-
-    const targetUserMaxPriority = Math.max(
-      ...targetUserRoles.map(
-        (r) => rolesMetadata[r as keyof typeof rolesMetadata].priority,
-      ),
-    );
+    const originUserMaxPriority = priorityOf(originUserRoles);
+    const targetUserMaxPriority = priorityOf(targetUserRoles);
 
     if (
       targetUserMaxPriority >= originUserMaxPriority &&
@@ -199,11 +189,9 @@ export const POST = async (
 
     const editedRoles = [...newRoles, ...removedRoles];
 
-    if (removedRoles.includes("user"))
-      return ApiResponse.unauthorized(`You can't remove the defautl role: ${user}`);
-
     for (const role of editedRoles) {
-      const priority = rolesMetadata[role].priority;
+      if (!(role in rolesMetadata)) continue;
+      const priority = rolesMetadata[role as keyof typeof rolesMetadata].priority;
       if (priority >= originUserMaxPriority)
         return ApiResponse.unauthorized(
           `You can't edit the role ${role}. You don't have the required permissions.`,

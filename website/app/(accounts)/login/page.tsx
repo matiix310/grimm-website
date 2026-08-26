@@ -13,14 +13,14 @@ const LoginPage = ({
 }) => {
   const params = React.use(searchParams);
 
-  const handleForgeIdClick = React.useCallback(async () => {
+  const handleAuthentikClick = React.useCallback(async () => {
     const { error } = await authClient.signIn.oauth2({
-      providerId: "forge-id",
+      providerId: "authentik",
       callbackURL: params.redirect ?? "/",
       errorCallbackURL: "/",
       newUserCallbackURL: "/",
       disableRedirect: false,
-      scopes: ["openid", "profile"],
+      scopes: ["openid", "profile", "email"],
       requestSignUp: false,
     });
 
@@ -28,8 +28,8 @@ const LoginPage = ({
   }, [params.redirect]);
 
   React.useEffect(() => {
-    handleForgeIdClick();
-  }, [handleForgeIdClick]);
+    handleAuthentikClick();
+  }, [handleAuthentikClick]);
 
   return (
     <div className="relative w-screen h-screen flex items-center justify-center">
@@ -43,10 +43,10 @@ const LoginPage = ({
       />
       <Card>
         <h1 className="text-4xl font-paytone">
-          Vous allez être redirigé vers la page de connexion de la forge...
+          Vous allez être redirigé vers la page de connexion...
         </h1>
         <div className="w-full flex justify-center">
-          <Button className="w-[80%]" onClick={() => handleForgeIdClick()}>
+          <Button className="w-[80%]" onClick={() => handleAuthentikClick()}>
             Forcer la redirection
           </Button>
         </div>

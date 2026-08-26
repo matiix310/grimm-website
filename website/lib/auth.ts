@@ -134,11 +134,6 @@ export const auth = betterAuth({
       clientSecret: getEnv("DISCORD_CLIENT_SECRET") ?? "123",
       disableSignUp: true,
     },
-    google: {
-      clientId: getEnv("GOOGLE_CLIENT_ID") ?? "123",
-      clientSecret: getEnv("GOOGLE_CLIENT_SECRET") ?? "123",
-      disableSignUp: true,
-    },
   },
   emailAndPassword: {
     enabled: true,
@@ -148,7 +143,7 @@ export const auth = betterAuth({
     after: createAuthMiddleware(async (ctx) => {
       if (ctx.path === "/callback/:id") {
         const provider = ctx.params.id;
-        if (provider === "google" || provider === "discord") {
+        if (provider === "authentik") {
           const session = await auth.api.getSession({
             headers: ctx.headers ?? new Headers(),
           });
@@ -170,24 +165,26 @@ export const auth = betterAuth({
     genericOAuth({
       config: [
         {
-          providerId: "forge-id",
-          clientId: getEnvOrThrow("FORGE_ID_CLIENT_ID"),
-          clientSecret: getEnvOrThrow("FORGE_ID_CLIENT_SECRET"),
-          discoveryUrl: "https://cri.epita.fr/.well-known/openid-configuration",
-          scopes: ["openid", "profile"],
+          providerId: "authentik",
+          clientId: getEnvOrThrow("AUTHENTIK_CLIENT_ID"),
+          clientSecret: getEnvOrThrow("AUTHENTIK_CLIENT_SECRET"),
+          discoveryUrl:
+            getEnvOrThrow("AUTHENTIK_BASE_URL") +
+            "/application/o/website/.well-known/openid-configuration",
+          scopes: ["openid", "profile", "email"],
+          disableSignUp: true,
           redirectURI:
-            getEnvOrThrow("BASE_URL") +
-            (process.env.NODE_ENV === "development"
-              ? "/complete/epita/"
-              : "/api/auth/oauth2/callback/forge-id"),
+            getEnvOrThrow("BASE_URL") + "/api/auth/oauth2/callback/authentik",
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           mapProfileToUser: (profile) => {
+            const login = profile.preferred_username as string | undefined;
             return {
-              login: profile.id,
-              email: `${profile.id}@epita.fr`,
+              login,
+              email: `${login}@epita.fr`,
               emailVerified: true,
-              image: `https://photos.cri.epita.fr/square/${profile.id}`,
+              name: profile.name ?? login,
+              image: login ? `https://photos.cri.epita.fr/square/${login}` : undefined,
             };
           },
         },

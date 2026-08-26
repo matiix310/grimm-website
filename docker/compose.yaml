@@ -59,6 +59,11 @@ services:
       FORGE_ID_CLIENT_ID_FILE: /run/secrets/forge_id_client_id
       FORGE_ID_CLIENT_SECRET_FILE: /run/secrets/forge_id_client_secret
 
+      AUTHENTIK_CLIENT_ID_FILE: /run/secrets/authentik_client_id
+      AUTHENTIK_CLIENT_SECRET_FILE: /run/secrets/authentik_client_secret
+      AUTHENTIK_BASE_URL: https://auth.bde-grimm.com
+      AUTHENTIK_API_TOKEN_FILE: /run/secrets/authentik_api_token
+
       GOOGLE_SERVICE_ACCOUNT_EMAIL_FILE: /run/secrets/google_service_account_email
       GOOGLE_PRIVATE_KEY_FILE: /run/secrets/google_private_key
 
@@ -108,6 +113,9 @@ services:
       - base_url
       - helloasso_client_id
       - helloasso_client_secret
+      - authentik_client_id
+      - authentik_client_secret
+      - authentik_api_token
 
   discord-bot:
     build:
@@ -199,6 +207,12 @@ secrets:
     environment: FORGE_ID_CLIENT_ID
   forge_id_client_secret:
     environment: FORGE_ID_CLIENT_SECRET
+  authentik_client_id:
+    environment: AUTHENTIK_CLIENT_ID
+  authentik_client_secret:
+    environment: AUTHENTIK_CLIENT_SECRET
+  authentik_api_token:
+    environment: AUTHENTIK_API_TOKEN
   website_discord_client_id:
     environment: WEBSITE_DISCORD_CLIENT_ID
   website_discord_client_secret:
