@@ -1,7 +1,7 @@
-import { db } from "@/db";
 import { getEnv, getEnvOrThrow } from "@/lib/env";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { db } from "@/db";
 import { nextCookies } from "better-auth/next-js";
 import {
   admin as adminPlugin,
@@ -36,11 +36,9 @@ import {
   teamTresoRole,
   userRole,
 } from "./permissions";
-import { performUserRoleSync } from "./sync-roles";
+import { computeRolesFromCached, performUserRoleSync } from "./sync-roles";
 
 const ac = createAccessControl(statement);
-
-const ROLE_SYNC_PROVIDERS = new Set(["authentik"]);
 
 export const user = ac.newRole(userRole);
 export const admin = ac.newRole(adminRole);
@@ -143,21 +141,17 @@ export const auth = betterAuth({
   },
   hooks: {
     after: createAuthMiddleware(async (ctx) => {
-      if (ctx.path === "/oauth2/callback/:id") {
-        const provider = ctx.params?.providerId ?? ctx.params?.id;
-        if (provider && ROLE_SYNC_PROVIDERS.has(provider)) {
-          try {
-            const session = await auth.api.getSession({
-              headers: ctx.headers ?? new Headers(),
-            });
+      if (ctx.path !== "/callback/:id") return;
+      if (ctx.params?.id !== "discord") return;
 
-            if (session?.user.login) {
-              await performUserRoleSync(session.user.login);
-            }
-          } catch (err) {
-            console.error("[auth-hook] post-callback sync failed:", err);
-          }
-        }
+      try {
+        const session = ctx.context.session;
+        const login = (session?.user as { login?: string } | undefined)?.login;
+        if (!login) return;
+
+        await performUserRoleSync(login);
+      } catch (err) {
+        console.error("[auth-hook] discord link sync failed:", err);
       }
     }),
   },
@@ -179,17 +173,22 @@ export const auth = betterAuth({
             "/application/o/website/.well-known/openid-configuration",
           scopes: ["openid", "profile", "email"],
           disableSignUp: true,
+          overrideUserInfo: true,
           redirectURI: getEnvOrThrow("BASE_URL") + "/api/auth/oauth2/callback/authentik",
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           mapProfileToUser: (profile) => {
             const login = profile.preferred_username as string | undefined;
+            const groups = Array.isArray(profile.groups)
+              ? (profile.groups as string[])
+              : [];
             return {
               login,
               email: `${login}@epita.fr`,
               emailVerified: true,
               name: profile.name ?? login,
               image: login ? `https://photos.cri.epita.fr/square/${login}` : undefined,
+              role: computeRolesFromCached(groups).toSorted().join(","),
             };
           },
         },

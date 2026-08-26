@@ -6,10 +6,32 @@ import { getUserAuthentikGroups } from "./authentik";
 import { getEnvOrThrow, getEnv } from "./env";
 import { sendDiscordNotification } from "./discord";
 
-const ADMIN_GROUP = "website-admin";
+export const ADMIN_GROUP = "website-admin";
+
+// Discord limits (for chunking long content)
+const DISCORD_EMBED_FIELD_VALUE_LIMIT = 1024;
+const DISCORD_EMBED_TOTAL_LIMIT = 6000;
+const DISCORD_MAX_EMBEDS_PER_MESSAGE = 10;
+const DISCORD_TRIMMED_LOGIN_NAMES = 10;
+
+function chunkDiscordString(content: string, limit: number): string[] {
+  if (content.length <= limit) return [content];
+  const chunks: string[] = [];
+  for (let i = 0; i < content.length; i += limit) {
+    chunks.push(content.slice(i, i + limit));
+  }
+  return chunks;
+}
+
+function trimLoginList(logins: string[], maxNames = DISCORD_TRIMMED_LOGIN_NAMES): string {
+  if (logins.length <= maxNames) return logins.join(", ");
+  const shown = logins.slice(0, maxNames).join(", ");
+  const remaining = logins.length - maxNames;
+  return `${shown} (+${remaining} more)`;
+}
 
 // Role mapping from Authentik group names to internal role names
-const roleMapping: Record<string, Roles> = {
+export const ROLE_MAPPING: Record<string, Roles> = {
   bureau: "bureau",
 
   "respo-tech": "respoTech",
@@ -46,21 +68,15 @@ export interface SyncRolesResult {
   };
 }
 
-function computeRoles(groups: string[]): Roles[] {
-  const mapped = groups
-    .map((g) => roleMapping[g])
-    .filter((r): r is Roles => Boolean(r));
+export function computeRolesFromCached(groups: string[]): Roles[] {
+  const mapped = groups.map((g) => ROLE_MAPPING[g]).filter((r): r is Roles => Boolean(r));
   const finalSet = new Set<Roles>(["user", ...mapped]);
   if (groups.includes(ADMIN_GROUP)) finalSet.add("admin");
   return Array.from(finalSet);
 }
 
 export async function performRoleSync(): Promise<SyncRolesResult> {
-  await sendDiscordNotification(
-    "Scheduled Bulk Role Sync",
-    "Role sync started",
-    "info",
-  );
+  await sendDiscordNotification("Scheduled Bulk Role Sync", "Role sync started", "info");
 
   try {
     const allUsers = await db.query.user.findMany({
@@ -73,7 +89,7 @@ export async function performRoleSync(): Promise<SyncRolesResult> {
     for (const u of allUsers) {
       try {
         const groups = await getUserAuthentikGroups(u.login);
-        loginToRolesMap.set(u.login, computeRoles(groups));
+        loginToRolesMap.set(u.login, computeRolesFromCached(groups));
       } catch (err) {
         const reason = err instanceof Error ? err.message : String(err);
         console.error(`Failed to fetch Authentik groups for ${u.login}:`, err);
@@ -105,10 +121,7 @@ export async function performRoleSync(): Promise<SyncRolesResult> {
       const isDemotion = existingRoles.length > newRoles.length;
 
       try {
-        await db
-          .update(user)
-          .set({ role: newRoleString })
-          .where(eq(user.login, u.login));
+        await db.update(user).set({ role: newRoleString }).where(eq(user.login, u.login));
         if (isDemotion) clearedCount++;
         else updatedCount++;
         changes.push({ login: u.login, from: existingRoles, to: newRoles });
@@ -129,13 +142,12 @@ export async function performRoleSync(): Promise<SyncRolesResult> {
     const discordWebhook = getEnvOrThrow("DISCORD_ROLE_SYNC_WEBHOOK_URL");
     const hasActivity = updatedCount > 0 || clearedCount > 0;
 
-    if (discordWebhook && hasActivity) {
+    if (discordWebhook) {
       try {
         const serverUrl = getEnv("BASE_URL") || "Unknown Server";
 
-        const maxChanges = 10;
-        const changesList = changes
-          .slice(0, maxChanges)
+        // Build full lists — no artificial max
+        const fullChangesText = changes
           .map(
             (change) =>
               `**${change.login}**: \`${change.from.join(", ")}\` => \`${change.to.join(
@@ -143,58 +155,143 @@ export async function performRoleSync(): Promise<SyncRolesResult> {
               )}\``,
           )
           .join("\n");
-        const moreChanges =
-          changes.length > maxChanges
-            ? `\n...and ${changes.length - maxChanges} more`
-            : "";
+        const fullSkippedText = skippedLogins
+          .map((s) => `**${s.login}**: ${s.reason}`)
+          .join("\n");
 
-        const fields = [
-          {
-            name: "Summary",
-            value: `**Updated:** ${updatedCount}\n**Cleared:** ${clearedCount}\n**Total Affected:** ${
-              updatedCount + clearedCount
-            }`,
-            inline: true,
-          },
-          { name: "Server", value: serverUrl, inline: true },
-        ];
-        if (changes.length > 0) {
-          fields.push({
-            name: "Changes",
-            value: changesList + moreChanges,
-            inline: false,
+        const summaryValue = `**Updated:** ${updatedCount}\n**Cleared:** ${clearedCount}\n**Total Affected:** ${
+          updatedCount + clearedCount
+        }`;
+
+        interface EmbedRecord {
+          title: string;
+          description?: string;
+          color: number;
+          fields: Array<{ name: string; value: string; inline?: boolean }>;
+          timestamp?: string;
+          footer?: { text: string };
+        }
+        const embeds: EmbedRecord[] = [];
+
+        // Decide if everything fits in one embed or needs splitting
+        const baseOverhead =
+          summaryValue.length + (serverUrl.length + 50) + (message.length + 50) + 200;
+        const fullSize =
+          baseOverhead +
+          (changes.length > 0 ? fullChangesText.length : 0) +
+          (skippedLogins.length > 0 ? fullSkippedText.length + 50 : 0);
+
+        if (changes.length === 0 && skippedLogins.length === 0) {
+          // Single summary-only embed (no changes / skipped sections needed)
+          embeds.push({
+            title: "Scheduled Bulk Role Sync",
+            description: message,
+            color: 0x00ff00,
+            fields: [
+              { name: "Summary", value: summaryValue, inline: true },
+              { name: "Server", value: serverUrl, inline: true },
+            ],
+            timestamp: new Date().toISOString(),
+            footer: { text: "Role Sync System" },
+          });
+        } else if (fullSize <= DISCORD_EMBED_TOTAL_LIMIT) {
+          // Single embed, all fields inline
+          const fields: EmbedRecord["fields"] = [
+            { name: "Summary", value: summaryValue, inline: true },
+            { name: "Server", value: serverUrl, inline: true },
+          ];
+          if (changes.length > 0) {
+            fields.push({ name: "Changes", value: fullChangesText, inline: false });
+          }
+          if (skippedLogins.length > 0) {
+            fields.push({
+              name: "⚠️ Skipped (Authentik API errors)",
+              value: fullSkippedText,
+              inline: false,
+            });
+          }
+          embeds.push({
+            title: "Scheduled Bulk Role Sync",
+            description: message,
+            color: 0x00ff00,
+            fields,
+            timestamp: new Date().toISOString(),
+            footer: { text: "Role Sync System" },
+          });
+        } else {
+          // Split: first embed has the summary, subsequent embeds continue
+          let first = true;
+          if (changes.length > 0) {
+            const changeChunks = chunkDiscordString(
+              fullChangesText,
+              DISCORD_EMBED_FIELD_VALUE_LIMIT,
+            );
+            for (const chunk of changeChunks) {
+              embeds.push({
+                title: first ? "Scheduled Bulk Role Sync — Changes" : "Changes (continued)",
+                description: first ? message : "Continued from previous message",
+                color: 0x00ff00,
+                fields: first
+                  ? [
+                      { name: "Summary", value: summaryValue, inline: true },
+                      { name: "Server", value: serverUrl, inline: true },
+                      { name: "Changes", value: chunk, inline: false },
+                    ]
+                  : [{ name: "Changes (continued)", value: chunk, inline: false }],
+                timestamp: first ? new Date().toISOString() : undefined,
+                footer: first ? { text: "Role Sync System" } : undefined,
+              });
+              first = false;
+            }
+          }
+          if (skippedLogins.length > 0) {
+            const skippedChunks = chunkDiscordString(
+              fullSkippedText,
+              DISCORD_EMBED_FIELD_VALUE_LIMIT,
+            );
+            for (const chunk of skippedChunks) {
+              embeds.push({
+                title: first ? "Scheduled Bulk Role Sync — Skipped" : "Skipped (continued)",
+                description: first ? message : "Continued from previous message",
+                color: 0xff9900,
+                fields: first
+                  ? [
+                      { name: "Summary", value: summaryValue, inline: true },
+                      { name: "Server", value: serverUrl, inline: true },
+                      { name: "⚠️ Skipped (Authentik API errors)", value: chunk, inline: false },
+                    ]
+                  : [{ name: "⚠️ Skipped (continued)", value: chunk, inline: false }],
+                timestamp: first ? new Date().toISOString() : undefined,
+                footer: first ? { text: "Role Sync System" } : undefined,
+              });
+              first = false;
+            }
+          }
+          // If we had no changes and no skipped entries earlier, the embed is empty — guard:
+          if (embeds.length === 0) {
+            embeds.push({
+              title: "Scheduled Bulk Role Sync",
+              description: message,
+              color: 0x00ff00,
+              fields: [
+                { name: "Summary", value: summaryValue, inline: true },
+                { name: "Server", value: serverUrl, inline: true },
+              ],
+              timestamp: new Date().toISOString(),
+              footer: { text: "Role Sync System" },
+            });
+          }
+        }
+
+        // Webhook accepts up to 10 embeds per message — batch if needed
+        for (let i = 0; i < embeds.length; i += DISCORD_MAX_EMBEDS_PER_MESSAGE) {
+          const batch = embeds.slice(i, i + DISCORD_MAX_EMBEDS_PER_MESSAGE);
+          await fetch(discordWebhook, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ embeds: batch }),
           });
         }
-        if (skippedLogins.length > 0) {
-          const skippedList = skippedLogins
-            .slice(0, maxChanges)
-            .map((s) => `**${s.login}**: ${s.reason}`)
-            .join("\n");
-          const moreSkipped =
-            skippedLogins.length > maxChanges
-              ? `\n...and ${skippedLogins.length - maxChanges} more`
-              : "";
-          fields.push({
-            name: "⚠️ Skipped (Authentik API errors)",
-            value: skippedList + moreSkipped,
-            inline: false,
-          });
-        }
-
-        const embed = {
-          title: "Scheduled Bulk Role Sync",
-          description: message,
-          color: 0x00ff00,
-          fields,
-          timestamp: new Date().toISOString(),
-          footer: { text: "Role Sync System" },
-        };
-
-        await fetch(discordWebhook, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ embeds: [embed] }),
-        });
       } catch (err) {
         console.error("Failed to send Discord notification:", err);
       }
@@ -208,18 +305,28 @@ export async function performRoleSync(): Promise<SyncRolesResult> {
       );
     }
 
-    if (!hasActivity && skippedLogins.length === 0) {
-      await sendDiscordNotification(
-        "Scheduled Bulk Role Sync",
-        "No changes occurred.",
-        "success",
-      );
-    }
+    // Always send a summary line — covers the no-changes case too
+    const summaryLine = hasActivity
+      ? message
+      : `Bulk sync completed. No role changes.${
+          skippedLogins.length > 0
+            ? ` ${skippedLogins.length} user(s) skipped due to Authentik API errors.`
+            : ""
+        }`;
+    await sendDiscordNotification(
+      "Scheduled Bulk Role Sync",
+      summaryLine,
+      hasActivity ? "success" : "info",
+    );
 
+    // Separate trimmed notification for skipped users
     if (skippedLogins.length > 0) {
+      const skippedLoginsText = trimLoginList(
+        skippedLogins.map((s) => s.login),
+      );
       await sendDiscordNotification(
         "Scheduled Bulk Role Sync",
-        `Skipped ${skippedLogins.length} user(s) due to Authentik API errors: ${skippedLogins.map((s) => s.login).join(", ")}`,
+        `${skippedLogins.length} user(s) skipped due to Authentik API errors: ${skippedLoginsText}`,
         "error",
       );
     }
@@ -247,9 +354,7 @@ export async function performRoleSync(): Promise<SyncRolesResult> {
   }
 }
 
-export async function performUserRoleSync(
-  login: string,
-): Promise<SyncRolesResult> {
+export async function performUserRoleSync(login: string): Promise<SyncRolesResult> {
   await sendDiscordNotification(
     "Scheduled User Role Sync [" + login + "]",
     "Role sync started for user " + login,
@@ -272,7 +377,7 @@ export async function performUserRoleSync(
     }
 
     const groups = await getUserAuthentikGroups(login);
-    const newRoles = computeRoles(groups);
+    const newRoles = computeRolesFromCached(groups);
 
     const existingRoles = existing.role
       ? existing.role
@@ -285,19 +390,13 @@ export async function performUserRoleSync(
     const currentRoleString = existingRoles.toSorted().join(",");
 
     if (currentRoleString !== newRoleString) {
-      await db
-        .update(user)
-        .set({ role: newRoleString })
-        .where(eq(user.login, login));
+      await db.update(user).set({ role: newRoleString }).where(eq(user.login, login));
     }
 
     const discordUrl = process.env.DISCORD_URL;
     if (discordUrl) {
       const discordAccount = await db.query.account.findFirst({
-        where: and(
-          eq(account.userId, existing.id),
-          eq(account.providerId, "discord"),
-        ),
+        where: and(eq(account.userId, existing.id), eq(account.providerId, "discord")),
       });
       if (discordAccount) {
         // TODO: re-enable when ready to push role changes to Discord
