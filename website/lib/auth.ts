@@ -141,17 +141,12 @@ export const auth = betterAuth({
   },
   hooks: {
     after: createAuthMiddleware(async (ctx) => {
-      if (
-        ctx.path !== "/callback/:id" &&
-        !ctx.path.startsWith("/oauth2/callback/")
-      ) {
-        return;
-      }
-      try {
-        const params = ctx.params as Record<string, string | undefined>;
-        const provider = params.id ?? params.providerId;
-        if (provider !== "authentik") return;
+      console.log("[auth-hook] fired", { path: ctx.path, params: ctx.params });
+      const params = ctx.params as Record<string, string | undefined>;
+      const provider = params.providerId ?? params.id;
+      if (provider !== "authentik") return;
 
+      try {
         const session = await auth.api.getSession({
           headers: ctx.headers ?? new Headers(),
         });
