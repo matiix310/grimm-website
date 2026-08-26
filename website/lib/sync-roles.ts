@@ -228,7 +228,9 @@ export async function performRoleSync(): Promise<SyncRolesResult> {
             );
             for (const chunk of changeChunks) {
               embeds.push({
-                title: first ? "Scheduled Bulk Role Sync — Changes" : "Changes (continued)",
+                title: first
+                  ? "Scheduled Bulk Role Sync — Changes"
+                  : "Changes (continued)",
                 description: first ? message : "Continued from previous message",
                 color: 0x00ff00,
                 fields: first
@@ -251,14 +253,20 @@ export async function performRoleSync(): Promise<SyncRolesResult> {
             );
             for (const chunk of skippedChunks) {
               embeds.push({
-                title: first ? "Scheduled Bulk Role Sync — Skipped" : "Skipped (continued)",
+                title: first
+                  ? "Scheduled Bulk Role Sync — Skipped"
+                  : "Skipped (continued)",
                 description: first ? message : "Continued from previous message",
                 color: 0xff9900,
                 fields: first
                   ? [
                       { name: "Summary", value: summaryValue, inline: true },
                       { name: "Server", value: serverUrl, inline: true },
-                      { name: "⚠️ Skipped (Authentik API errors)", value: chunk, inline: false },
+                      {
+                        name: "⚠️ Skipped (Authentik API errors)",
+                        value: chunk,
+                        inline: false,
+                      },
                     ]
                   : [{ name: "⚠️ Skipped (continued)", value: chunk, inline: false }],
                 timestamp: first ? new Date().toISOString() : undefined,
@@ -313,17 +321,11 @@ export async function performRoleSync(): Promise<SyncRolesResult> {
             ? ` ${skippedLogins.length} user(s) skipped due to Authentik API errors.`
             : ""
         }`;
-    await sendDiscordNotification(
-      "Scheduled Bulk Role Sync",
-      summaryLine,
-      hasActivity ? "success" : "info",
-    );
+    await sendDiscordNotification("Scheduled Bulk Role Sync", summaryLine, "success");
 
     // Separate trimmed notification for skipped users
     if (skippedLogins.length > 0) {
-      const skippedLoginsText = trimLoginList(
-        skippedLogins.map((s) => s.login),
-      );
+      const skippedLoginsText = trimLoginList(skippedLogins.map((s) => s.login));
       await sendDiscordNotification(
         "Scheduled Bulk Role Sync",
         `${skippedLogins.length} user(s) skipped due to Authentik API errors: ${skippedLoginsText}`,
