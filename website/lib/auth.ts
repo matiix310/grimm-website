@@ -172,7 +172,7 @@ export const auth = betterAuth({
             getEnvOrThrow("AUTHENTIK_BASE_URL") +
             "/application/o/website/.well-known/openid-configuration",
           scopes: ["openid", "profile", "email"],
-          disableSignUp: true,
+          disableSignUp: false,
           overrideUserInfo: true,
           redirectURI: getEnvOrThrow("BASE_URL") + "/api/auth/oauth2/callback/authentik",
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
