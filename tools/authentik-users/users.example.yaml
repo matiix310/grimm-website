@@ -1,0 +1,31 @@
+# Example input file for authentik-users
+#
+# Each user entry has:
+#   - login:          the username in authentik (required)
+#   - display_name:   friendly name shown in the UI (optional; defaults to login)
+#   - added_groups:   group NAMES to add to the user (optional)
+#   - removed_groups: group NAMES to remove from the user (optional)
+#
+# Existing groups are preserved — only the listed changes are applied.
+# A group appearing in BOTH added_groups and removed_groups causes that user to be skipped.
+#
+# All users will be:
+#   - linked to the "forge-id" source (path = "goauthentik.io/sources/forge-id")
+#   - given these attributes:
+#       oidc_iss: null
+#       oidc_sub: <login>
+#       goauthentik.io/user/sources: ["FORGE ID"]
+
+users:
+  - login: alice.dupont
+    display_name: Alice Dupont
+    added_groups:
+      - bde-members
+    removed_groups:
+      - students
+  - login: bob.martin
+    added_groups:
+      - students
+  - login: charlie.admin
+    display_name: Charlie (Admin)
+    # no group changes — only display_name and other fields will be synced

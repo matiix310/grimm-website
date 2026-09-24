@@ -1,0 +1,195 @@
+users:
+  - login: adrien.cosson
+    display_name: Adrien Cosson
+    added_groups:
+      - epita-acu
+  - login: aissa.razani
+    display_name: Aïssa Razani
+    added_groups:
+      - epita-acu
+  - login: akshay.ramael
+    display_name: Akshay Ramael
+    added_groups:
+      - epita-acu
+  - login: alexandre.lacroix
+    display_name: Alexandre Lacroix
+    added_groups:
+      - epita-acu
+  - login: alexis.giaquinta
+    display_name: Alexis Giaquinta
+    added_groups:
+      - epita-acu
+  - login: alexis.kervella
+    display_name: Alexis Kervella
+    added_groups:
+      - epita-acu
+  - login: alexis.meunier
+    display_name: Alexis Meunier
+    added_groups:
+      - epita-acu
+  - login: anis.feore
+    display_name: Anis Feore
+    added_groups:
+      - epita-acu
+  - login: augustin.hubert
+    added_groups:
+      - epita-acu
+  - login: aurelien.marques
+    added_groups:
+      - epita-acu
+  - login: axel.gil
+    added_groups:
+      - epita-acu
+  - login: bastien.desert
+    added_groups:
+      - epita-acu
+  - login: camille.geoffroy
+    added_groups:
+      - epita-acu
+  - login: cyril.drexler
+    added_groups:
+      - epita-acu
+  - login: damien.duthou
+    added_groups:
+      - epita-acu
+  - login: dorian.forot
+    added_groups:
+      - epita-acu
+  - login: enzo.francil
+    added_groups:
+      - epita-acu
+  - login: enzo.revel
+    added_groups:
+      - epita-acu
+  - login: flavien.henrotte-robert
+    added_groups:
+      - epita-acu
+  - login: godric.bouteloup
+    added_groups:
+      - epita-acu
+  - login: gurvan.biguet-kerloch
+    added_groups:
+      - epita-acu
+  - login: ilan.mayeux
+    added_groups:
+      - epita-acu
+  - login: ivan.estieu
+    added_groups:
+      - epita-acu
+  - login: joanne.jabbour
+    added_groups:
+      - epita-acu
+  - login: jon.gouspy
+    added_groups:
+      - epita-acu
+  - login: jules.magnan
+    added_groups:
+      - epita-acu
+  - login: kim.tayant-serrat
+    added_groups:
+      - epita-acu
+  - login: kim.tessier
+    added_groups:
+      - epita-acu
+  - login: kylian.drif
+    added_groups:
+      - epita-acu
+  - login: lenny.chiadmi-delage
+    added_groups:
+      - epita-acu
+  - login: leo.menaldo
+    added_groups:
+      - epita-acu
+  - login: louann.monin
+    added_groups:
+      - epita-acu
+  - login: louis.camborieux
+    added_groups:
+      - epita-acu
+  - login: louis.laverne
+    added_groups:
+      - epita-acu
+  - login: luca.sarubbi
+    added_groups:
+      - epita-acu
+  - login: lucas.demuliere
+    added_groups:
+      - epita-acu
+  - login: lucas.ly-ba
+    added_groups:
+      - epita-acu
+  - login: lucas.stephan
+    added_groups:
+      - epita-acu
+  - login: lucil.finkelstein
+    added_groups:
+      - epita-acu
+  - login: lucile.pelou
+    added_groups:
+      - epita-acu
+  - login: marius.charpentier
+    added_groups:
+      - epita-acu
+  - login: nathan.sanchez
+    added_groups:
+      - epita-acu
+  - login: nicolas.lefevre-pontalis
+    added_groups:
+      - epita-acu
+  - login: noe.dangla
+    added_groups:
+      - epita-acu
+  - login: oana-alexandra.patru
+    added_groups:
+      - epita-acu
+  - login: philippe.carmeille
+    added_groups:
+      - epita-acu
+  - login: roman.miralves
+    added_groups:
+      - epita-acu
+  - login: ruben.maurizio
+    added_groups:
+      - epita-acu
+  - login: simon.bousquet
+    added_groups:
+      - epita-acu
+  - login: thibaud.guignon
+    added_groups:
+      - epita-acu
+  - login: ugo.col
+    added_groups:
+      - epita-acu
+  - login: valentin.delhommeau
+    added_groups:
+      - epita-acu
+  - login: valerian.pichot
+    added_groups:
+      - epita-acu
+  - login: yan.bertile
+    added_groups:
+      - epita-acu
+  - login: yann.lupoglazoff
+    added_groups:
+      - epita-acu
+  - login: youssouf.said-ali
+    added_groups:
+      - epita-acu
+  - login: zahra.ben-akremi
+    added_groups:
+      - epita-acu
+  - login: louis.martin
+    added_groups:
+      - epita-acu
+  - login: arnaud.bellicha
+    added_groups:
+      - epita-acu
+  - login: gabin.cadic
+    added_groups:
+      - epita-acu
+  - login: dodie.bonis
+    added_groups:
+      - epita-acu
+  - login: victor.flament
+    added_groups:
+      - epita-acu
