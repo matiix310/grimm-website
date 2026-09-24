@@ -47,8 +47,17 @@ export const syncUser = async (
   allManagedRoleIds: Set<string>,
 ): Promise<{ success: boolean; changes: string[] }> => {
   try {
+    console.error(
+      `[SYNC] Syncing user ${memberId} in guild "${guild.name}": started`,
+    );
+
     const member = await guild.members.fetch(memberId).catch(() => null);
-    if (!member || member.user.bot) return { success: false, changes: [] };
+    if (!member || member.user.bot) {
+      console.error(
+        `[SYNC] Bot or member not found for id ${memberId} in guild "${guild.name}": skipped`,
+      );
+      return { success: false, changes: [] };
+    }
 
     const userResponse = await fetch(`${WEBSITE_URL}/api/discord/${memberId}`, {
       headers: {
@@ -60,7 +69,9 @@ export const syncUser = async (
     if (userResponse.status === 404) {
       roles = [];
     } else if (!userResponse.ok) {
-      console.error(`Failed to fetch user ${memberId}: ${userResponse.status}`);
+      console.error(
+        `[SYNC] Failed to fetch user ${memberId} in guild "${guild.name}": HTTP ${userResponse.status}`,
+      );
       return { success: false, changes: [] };
     } else {
       const userData = await userResponse.json();
@@ -101,9 +112,22 @@ export const syncUser = async (
       changesForUser.push(`\\- ${rolesToRemove.map((r) => `<@&${r.id}>`).join(", ")}`);
     }
 
+    if (changesForUser.length > 0) {
+      console.error(
+        `[SYNC] Syncing user ${memberId} in guild "${guild.name}": ${changesForUser.join(", ")}`,
+      );
+    } else {
+      console.error(
+        `[SYNC] Syncing user ${memberId} in guild "${guild.name}": no changes`,
+      );
+    }
+
     return { success: true, changes: changesForUser };
   } catch (err) {
-    console.error(`Error updating member ${memberId}:`, err);
+    console.error(
+      `[SYNC] Failed to sync user ${memberId} in guild "${guild.name}":`,
+      err,
+    );
     return { success: false, changes: [] };
   }
 };
