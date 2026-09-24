@@ -1,12 +1,9 @@
 import { db } from "@/db";
 import { account, user } from "@/db/schema/auth";
-import { Roles } from "@/lib/auth";
 import { eq, and } from "drizzle-orm";
 import { getUserAuthentikGroups } from "./authentik";
 import { getEnvOrThrow, getEnv } from "./env";
 import { sendDiscordNotification } from "./discord";
-
-export const ADMIN_GROUP = "website-admin";
 
 // Discord limits (for chunking long content)
 const DISCORD_EMBED_FIELD_VALUE_LIMIT = 1024;
@@ -30,33 +27,6 @@ function trimLoginList(logins: string[], maxNames = DISCORD_TRIMMED_LOGIN_NAMES)
   return `${shown} (+${remaining} more)`;
 }
 
-// Role mapping from Authentik group names to internal role names
-export const ROLE_MAPPING: Record<string, Roles> = {
-  bureau: "bureau",
-
-  "respo-tech": "respoTech",
-  "respo-design": "respoDesign",
-  "respo-com": "respoCom",
-  "respo-assistants": "respoAssistants",
-  "respo-wei": "respoWei",
-  "respo-inter": "respoInter",
-  "respo-vj": "respoVJ",
-  "respo-event": "respoEvent",
-  "respo-merch": "respoMerch",
-  "respo-part": "respoPart",
-  "respo-treso": "respoTreso",
-
-  "team-tech": "teamTech",
-  "team-design": "teamDesign",
-  "team-com": "teamCom",
-  "team-event": "teamEvent",
-  "team-part": "teamPart",
-  "team-treso": "teamTreso",
-
-  member: "member",
-  staff: "staff",
-};
-
 export interface SyncRolesResult {
   success: boolean;
   message: string;
@@ -68,13 +38,6 @@ export interface SyncRolesResult {
   };
 }
 
-export function computeRolesFromCached(groups: string[]): Roles[] {
-  const mapped = groups.map((g) => ROLE_MAPPING[g]).filter((r): r is Roles => Boolean(r));
-  const finalSet = new Set<Roles>(["user", ...mapped]);
-  if (groups.includes(ADMIN_GROUP)) finalSet.add("admin");
-  return Array.from(finalSet);
-}
-
 export async function performRoleSync(): Promise<SyncRolesResult> {
   await sendDiscordNotification("Scheduled Bulk Role Sync", "Role sync started", "info");
 
@@ -83,13 +46,13 @@ export async function performRoleSync(): Promise<SyncRolesResult> {
       columns: { id: true, login: true, role: true },
     });
 
-    const loginToRolesMap = new Map<string, Roles[]>();
+    const loginToRolesMap = new Map<string, string[]>();
     const skippedLogins: Array<{ login: string; reason: string }> = [];
 
     for (const u of allUsers) {
       try {
         const groups = await getUserAuthentikGroups(u.login);
-        loginToRolesMap.set(u.login, computeRolesFromCached(groups));
+        loginToRolesMap.set(u.login, groups);
       } catch (err) {
         const reason = err instanceof Error ? err.message : String(err);
         console.error(`Failed to fetch Authentik groups for ${u.login}:`, err);
@@ -335,9 +298,7 @@ export async function performRoleSync(): Promise<SyncRolesResult> {
 
     const discordUrl = process.env.DISCORD_URL;
     if (discordUrl) {
-      // TODO: re-enable when ready to push role changes to Discord
-      // await fetch(`${discordUrl}/sync`);
-      console.log("[role-sync] Discord bot call skipped (commented out)");
+      await fetch(`${discordUrl}/sync`);
     }
 
     return {
@@ -378,8 +339,7 @@ export async function performUserRoleSync(login: string): Promise<SyncRolesResul
       return { success: false, message: `User ${login} not found` };
     }
 
-    const groups = await getUserAuthentikGroups(login);
-    const newRoles = computeRolesFromCached(groups);
+    const newRoles = await getUserAuthentikGroups(login);
 
     const existingRoles = existing.role
       ? existing.role
@@ -401,9 +361,7 @@ export async function performUserRoleSync(login: string): Promise<SyncRolesResul
         where: and(eq(account.userId, existing.id), eq(account.providerId, "discord")),
       });
       if (discordAccount) {
-        // TODO: re-enable when ready to push role changes to Discord
-        // await fetch(`${discordUrl}/sync/${discordAccount.accountId}`);
-        console.log(`[role-sync] Discord bot call skipped for ${login} (commented out)`);
+        await fetch(`${discordUrl}/sync/${discordAccount.accountId}`);
       }
     }
 

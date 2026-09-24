@@ -22,7 +22,6 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/Field
 import { Input } from "@/components/ui/Input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/Popover";
 import { $fetch, ApiSchema } from "@/lib/betterFetch";
-import { rolesMetadata } from "@/lib/permissions";
 import { useForm } from "@tanstack/react-form";
 import { Plus } from "lucide-react";
 import React from "react";
@@ -32,21 +31,19 @@ const formSchema = z.object({
   name: z.string().refine((name) => name.replaceAll(" ", "").length > 0, {
     error: "Ne dois pas être vide",
   }),
-  roles: z.array(
-    z.union(
-      Object.keys(rolesMetadata).map((r) => z.literal(r as keyof typeof rolesMetadata))
-    )
-  ),
+  roles: z.array(z.string().min(1)),
 });
 
 type AdminUserEditDialogProps = {
   userLogin?: string;
   onUpdateUser: (user: ApiSchema["@post/api/users/:id"]["output"]) => unknown;
+  websiteRoles: { name: string }[];
 } & React.ComponentProps<typeof Dialog>;
 
 const AdminUserEditDialog = ({
   userLogin,
   onUpdateUser,
+  websiteRoles,
   open,
   onOpenChange,
 }: AdminUserEditDialogProps) => {
@@ -158,9 +155,8 @@ const AdminUserEditDialog = ({
                           onClick={() =>
                             field.handleChange((old) => old.filter((oldR) => oldR !== r))
                           }
-                          disabled={!user?.canEditRoles.includes(r)}
                         >
-                          {rolesMetadata[r].displayName}
+                          {r}
                         </Button>
                       ))}
                       <Popover modal={true} open={rolesOpen} onOpenChange={setRolesOpen}>
@@ -175,21 +171,21 @@ const AdminUserEditDialog = ({
                             <CommandList>
                               <CommandEmpty>Aucun role disponible</CommandEmpty>
                               <CommandGroup>
-                                {user?.canEditRoles
-                                  .filter((r) => !field.state.value.includes(r))
+                                {websiteRoles
+                                  .filter((r) => !field.state.value.includes(r.name))
                                   .map((r) => (
                                     <CommandItem
                                       className="cursor-pointer"
-                                      key={r}
-                                      value={rolesMetadata[r].displayName}
+                                      key={r.name}
+                                      value={r.name}
                                       onSelect={() => {
                                         field.handleChange((old) => {
-                                          return [...old, r];
+                                          return [...old, r.name];
                                         });
                                         setRolesOpen(false);
                                       }}
                                     >
-                                      {rolesMetadata[r].displayName}
+                                      {r.name}
                                     </CommandItem>
                                   ))}
                               </CommandGroup>

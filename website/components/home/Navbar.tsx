@@ -5,6 +5,7 @@ import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { headers as nextHeaders } from "next/headers";
 import { MobileMenu } from "./MobileMenu";
+import { hasPermission } from "@/utils/auth";
 
 export type MenuButton = {
   name: string;
@@ -23,13 +24,9 @@ const Navbar = async ({ className, ...rest }: NavbarProps) => {
 
   const hasAccessToAdminPanel =
     !!session &&
-    (await auth.api.userHasPermission({
+    (await hasPermission({
       headers,
-      body: {
-        permissions: {
-          adminPanel: ["access"],
-        },
-      },
+      permissions: { adminPanel: ["access"] },
     }));
 
   const buttons: MenuButton[] = [

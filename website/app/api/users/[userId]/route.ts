@@ -3,6 +3,7 @@ import { account, user, user as userSchema } from "@/db/schema/auth";
 import { minecraftUsernames } from "@/db/schema/minecraftUsernames";
 import ApiResponse from "@/lib/apiResponse";
 import { auth } from "@/lib/auth";
+import { listAuthentikGroups } from "@/lib/authentik";
 import { rolesMetadata } from "@/lib/permissions";
 import { performUserRoleSync } from "@/lib/sync-roles";
 import { hasPermission } from "@/utils/auth";
@@ -15,6 +16,11 @@ function priorityOf(roles: string[]): number {
   const known = roles.filter((r): r is keyof typeof rolesMetadata => r in rolesMetadata);
   if (known.length === 0) return 0;
   return Math.max(...known.map((r) => rolesMetadata[r].priority));
+}
+
+async function getValidAuthentikGroupNames(): Promise<Set<string>> {
+  const groups = await listAuthentikGroups();
+  return new Set(groups.map((g) => g.name));
 }
 
 export const getUser = async (login: string) => {
@@ -31,15 +37,34 @@ export const getUser = async (login: string) => {
   const userRoles = user?.user.role?.split(",").filter((r) => r in rolesMetadata) ?? [];
   const userPriority = priorityOf(userRoles);
 
-  const targetRoles = target.role?.split(",").filter((r) => r in rolesMetadata) ?? [];
-  const targetPriority = priorityOf(targetRoles);
+  // A website-admin may grant any catalog role regardless of the priority
+  // ladder. We check this by literal name (not by priority value) so a future
+  // "owner" role above 99 does not silently inherit admin powers.
+  const isWebsiteAdmin = userRoles.includes("website-admin");
 
-  const canEditRoles =
-    userPriority <= targetPriority && userPriority < rolesMetadata.admin.priority
+  const targetPriority = priorityOf(
+    target.role?.split(",").filter((r) => r in rolesMetadata) ?? [],
+  );
+
+  // Roles an admin is allowed to assign: derived from the live Authentik
+  // catalog, gated by the known priority ladder. Only roles whose priority is
+  // known AND strictly lower than the acting user's priority are kept.
+  // website-admin bypasses that gate and sees the full catalog.
+  const allAuthentikGroupNames = await listAuthentikGroups();
+  const grantableKnownRoleNames = new Set(
+    Object.entries(rolesMetadata)
+      .filter(([r, { priority }]) => priority < userPriority && r !== "user")
+      .map(([roleName]) => roleName),
+  );
+
+  const canEditRoles = isWebsiteAdmin
+    ? allAuthentikGroupNames.map((g) => g.name)
+    : userPriority <= targetPriority &&
+        userPriority < rolesMetadata["website-admin"].priority
       ? []
-      : Object.entries(rolesMetadata)
-          .filter(([r, { priority }]) => priority < userPriority && r !== "user")
-          .map(([roleName]) => roleName);
+      : allAuthentikGroupNames
+          .filter((g) => grantableKnownRoleNames.has(g.name))
+          .map((g) => g.name);
 
   const connections: { discord?: string; minecraft?: string } = {};
 
@@ -87,7 +112,11 @@ export const getUser = async (login: string) => {
       id: target.id,
       name: target.name,
       image: target.image,
-      roles: targetRoles,
+      roles:
+        target.role
+          ?.split(",")
+          .map((r) => r.trim())
+          .filter(Boolean) ?? [],
       banned: target.banned,
       login: target.login,
       updatedAt: target.updatedAt,
@@ -142,13 +171,7 @@ export const POST = async (
         .refine((arg) => arg.replaceAll(" ", "").length > 0, {
           error: "Should not be empty",
         }),
-      roles: z.array(
-        z.union(
-          Object.keys(rolesMetadata).map((r) =>
-            z.literal(r as keyof typeof rolesMetadata),
-          ),
-        ),
-      ),
+      roles: z.array(z.string().min(1)),
     })
     .partial()
     .safeParse(json);
@@ -164,12 +187,12 @@ export const POST = async (
     if (!originUser)
       return ApiResponse.unauthorized("Only a user can change the role of another user");
 
-    const originUserRoles = (originUser.user.role
-      ?.split(",")
-      .filter((r) => r in rolesMetadata) ?? []) as (keyof typeof rolesMetadata)[];
-    const targetUserRoles = (targetUser.role
-      ?.split(",")
-      .filter((r) => r in rolesMetadata) ?? []) as (keyof typeof rolesMetadata)[];
+    const originUserRoles = originUser.user.role?.split(",").filter((r) => r in rolesMetadata) ?? [];
+    // website-admin may grant any role in the live Authentik catalog,
+    // including those not present in the rolesMetadata priority ladder.
+    const isWebsiteAdmin = originUserRoles.includes("website-admin");
+
+    const targetUserRoles = targetUser.role?.split(",") ?? [];
 
     // check that the target user has a lower priority than the origin user
     const originUserMaxPriority = priorityOf(originUserRoles);
@@ -177,11 +200,19 @@ export const POST = async (
 
     if (
       targetUserMaxPriority >= originUserMaxPriority &&
-      originUserMaxPriority < rolesMetadata.admin.priority
+      originUserMaxPriority < rolesMetadata["website-admin"].priority
     )
       return ApiResponse.unauthorized(
         "The target user has a greater priority than yours. You can't edit their roles",
       );
+
+    // every submitted role must correspond to a group that actually exists
+    // in the configured Authentik instance
+    const validAuthentikGroupNames = await getValidAuthentikGroupNames();
+    for (const role of parsed.data.roles) {
+      if (!validAuthentikGroupNames.has(role))
+        return ApiResponse.unauthorized(`Unknown role \`${role}\`.`);
+    }
 
     // check that the origin user can give / remove the roles he has given / removed
     const newRoles = parsed.data.roles.filter((r) => !targetUserRoles.includes(r));
@@ -190,18 +221,30 @@ export const POST = async (
     const editedRoles = [...newRoles, ...removedRoles];
 
     for (const role of editedRoles) {
-      if (!(role in rolesMetadata)) continue;
+      // Unknown Authentik role: not in the priority ladder. website-admin
+      // bypasses this gate and may grant any catalog role. Lower-tier users
+      // cannot grant unknown roles.
+      if (!(role in rolesMetadata)) {
+        if (!isWebsiteAdmin)
+          return ApiResponse.unauthorized(`Unknown role \`${role}\`.`);
+        continue;
+      }
       const priority = rolesMetadata[role as keyof typeof rolesMetadata].priority;
-      if (priority >= originUserMaxPriority)
+      // website-admin may also grant roles whose priority is at or above their
+      // own priority (e.g. website-admin itself). Lower-tier users cannot
+      // promote beyond their own priority.
+      if (priority >= originUserMaxPriority && !isWebsiteAdmin)
         return ApiResponse.unauthorized(
           `You can't edit the role ${role}. You don't have the required permissions.`,
         );
     }
 
-    // order the role with their priority
-    parsed.data.roles.toSorted(
-      (a, b) => rolesMetadata[b].priority - rolesMetadata[a].priority,
-    );
+    // order the roles by their known priority (unknown sorts as 0 = neutral)
+    parsed.data.roles = parsed.data.roles.toSorted((a, b) => {
+      const pa = a in rolesMetadata ? rolesMetadata[a as keyof typeof rolesMetadata].priority : 0;
+      const pb = b in rolesMetadata ? rolesMetadata[b as keyof typeof rolesMetadata].priority : 0;
+      return pb - pa;
+    });
   }
 
   const updatedUser = await db
@@ -220,7 +263,11 @@ export const POST = async (
     id: updatedUser[0].id,
     name: updatedUser[0].name,
     image: updatedUser[0].image,
-    roles: updatedUser[0].role?.split(",").filter((r) => r in rolesMetadata) ?? [],
+    roles:
+      updatedUser[0].role
+        ?.split(",")
+        .map((r) => r.trim())
+        .filter(Boolean) ?? [],
     banned: updatedUser[0].banned,
     login: updatedUser[0].login,
     updatedAt: updatedUser[0].updatedAt,

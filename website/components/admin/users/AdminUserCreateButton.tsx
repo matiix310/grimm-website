@@ -36,7 +36,7 @@ const formSchema = z.object({
 
 type AdminUserCreateButtonProps = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onNewUser: (user: any) => unknown;
+  onNewUser?: (user: any) => unknown;
 };
 
 const AdminUserCreateButton = ({ onNewUser }: AdminUserCreateButtonProps) => {
@@ -72,7 +72,7 @@ const AdminUserCreateButton = ({ onNewUser }: AdminUserCreateButtonProps) => {
 
       setCreateUserOpen(false);
 
-      onNewUser(data);
+      onNewUser?.(data);
       form.reset();
     },
   });

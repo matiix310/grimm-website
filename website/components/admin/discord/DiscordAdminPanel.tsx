@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { rolesMetadata } from "@/lib/permissions";
 import { Button } from "@/components/ui/Button";
 import {
   Table,
@@ -27,6 +26,10 @@ type Role = {
   position: number;
 };
 
+type WebsiteRole = {
+  name: string;
+};
+
 type Mapping = {
   id: string;
   guildId: string;
@@ -36,7 +39,11 @@ type Mapping = {
 
 const API_URL = "/api/admin/discord";
 
-export function DiscordAdminPanel() {
+type DiscordAdminPanelProps = {
+  websiteRoles: WebsiteRole[];
+};
+
+export function DiscordAdminPanel({ websiteRoles }: DiscordAdminPanelProps) {
   const [guilds, setGuilds] = useState<Guild[]>([]);
   const [selectedGuild, setSelectedGuild] = useState<string | null>(null);
   const [roles, setRoles] = useState<Role[]>([]);
@@ -237,9 +244,9 @@ export function DiscordAdminPanel() {
                             }
                           >
                             <option value="">Sélectionner un rôle...</option>
-                            {Object.entries(rolesMetadata).map(([key, meta]) => (
-                              <option key={key} value={key}>
-                                {meta.displayName}
+                            {websiteRoles.map((role) => (
+                              <option key={role.name} value={role.name}>
+                                {role.name}
                               </option>
                             ))}
                           </select>

@@ -42,7 +42,7 @@ export async function proxy(request: NextRequest) {
   const roles = session.user.role?.split(",") ?? [];
 
   if (request.headers.get("host") === "db.bde-grimm.com")
-    if (!roles.includes("admin"))
+    if (!roles.includes("website-admin"))
       return NextResponse.redirect(
         new URL(
           `${getEnvOrThrow("BASE_URL")}/login?redirect=https://db.bde-grimm.com${path}`,

@@ -21,12 +21,13 @@ import { $fetch } from "@/lib/betterFetch";
 import { toast } from "sonner";
 
 type AdminUsersTableProps = {
+  websiteRoles: { name: string }[];
   _?: string;
 };
 
 type User = Omit<UserWithRole & { login: string }, "email" | "emailVerified">;
 
-const AdminUsersTable = ({}: AdminUsersTableProps) => {
+const AdminUsersTable = ({ websiteRoles }: AdminUsersTableProps) => {
   const [users, setUsers] = React.useState<User[]>([]);
   const [editMinecraftUsername, setEditMinecraftUsername] = React.useState<string>();
   const [editUser, setEditUser] = React.useState<string>();
@@ -101,10 +102,8 @@ const AdminUsersTable = ({}: AdminUsersTableProps) => {
         const handleSyncRoles = async () => {
           const loadingToast = toast.loading("Synchronising user with other services...");
 
-          const { data, error } = await $fetch("/api/users/:id", {
-            params: {
-              id: user.login,
-            },
+          const { data, error } = await $fetch("@post/api/admin/sync-roles/:login", {
+            params: { login: user.login },
           });
 
           toast.dismiss(loadingToast);
@@ -114,9 +113,19 @@ const AdminUsersTable = ({}: AdminUsersTableProps) => {
             throw new Error(error.message);
           }
 
-          toast.success("User roles synchronised");
+          if (!data.success) {
+            toast.error(data.message);
+            throw new Error(data.message);
+          }
 
-          updateUser({ ...user, role: data.user.roles.join(",") });
+          toast.success(data.message);
+
+          // `data.details.changes[0]` is undefined when there were no changes;
+          // in that case keep the row as-is.
+          const newRoles = data.details?.changes?.[0]?.to;
+          if (newRoles) {
+            updateUser({ ...user, role: newRoles.join(",") });
+          }
         };
 
         return (
@@ -181,6 +190,7 @@ const AdminUsersTable = ({}: AdminUsersTableProps) => {
           if (!open) setEditUser(undefined);
         }}
         onUpdateUser={(user) => updateUser(user as User)}
+        websiteRoles={websiteRoles}
       />
       <AdminMinecraftEditDialog
         userLogin={editMinecraftUsername}

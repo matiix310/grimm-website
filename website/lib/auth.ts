@@ -36,7 +36,7 @@ import {
   teamTresoRole,
   userRole,
 } from "./permissions";
-import { computeRolesFromCached, performUserRoleSync } from "./sync-roles";
+import { performUserRoleSync } from "./sync-roles";
 
 const ac = createAccessControl(statement);
 
@@ -68,25 +68,25 @@ export const staff = ac.newRole(staffRole);
 
 const roles = {
   user,
-  admin,
+  "website-admin": admin,
   bureau,
-  respoTech,
-  respoDesign,
-  respoCom,
-  respoAssistants,
-  respoWei,
-  respoInter,
-  respoVJ,
-  respoEvent,
-  respoMerch,
-  respoPart,
-  respoTreso,
-  teamTech,
-  teamDesign,
-  teamCom,
-  teamEvent,
-  teamPart,
-  teamTreso,
+  "respo-tech": respoTech,
+  "respo-design": respoDesign,
+  "respo-com": respoCom,
+  "respo-assistants": respoAssistants,
+  "respo-wei": respoWei,
+  "respo-inter": respoInter,
+  "respo-vj": respoVJ,
+  "respo-event": respoEvent,
+  "respo-merch": respoMerch,
+  "respo-part": respoPart,
+  "respo-treso": respoTreso,
+  "team-tech": teamTech,
+  "team-design": teamDesign,
+  "team-com": teamCom,
+  "team-event": teamEvent,
+  "team-part": teamPart,
+  "team-treso": teamTreso,
   member,
   staff,
 };
@@ -145,11 +145,12 @@ export const auth = betterAuth({
       if (ctx.params?.id !== "discord") return;
 
       try {
-        const session = ctx.context.session;
-        const login = (session?.user as { login?: string } | undefined)?.login;
-        if (!login) return;
+        const session = await auth.api.getSession({
+          headers: ctx.headers ?? new Headers(),
+        });
+        if (session == null) return;
 
-        await performUserRoleSync(login);
+        await performUserRoleSync(session.user.login);
       } catch (err) {
         console.error("[auth-hook] discord link sync failed:", err);
       }
@@ -160,7 +161,7 @@ export const auth = betterAuth({
       ac,
       roles,
       defaultRole: "user",
-      adminRoles: ["admin"],
+      adminRoles: ["website-admin"],
     }),
     genericOAuth({
       config: [
@@ -188,7 +189,7 @@ export const auth = betterAuth({
               emailVerified: true,
               name: profile.name ?? login,
               image: login ? `https://photos.cri.epita.fr/square/${login}` : undefined,
-              role: computeRolesFromCached(groups).toSorted().join(","),
+              role: groups.toSorted().join(","),
             };
           },
         },

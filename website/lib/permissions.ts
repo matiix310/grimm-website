@@ -154,7 +154,7 @@ export type AdminRole = typeof adminRole;
 
 // Roles with greater priority can manage the roles below them
 export const rolesMetadata = {
-  admin: {
+  "website-admin": {
     priority: 99,
     backgroundColor: "var(--yellow)",
     foregroundColor: "var(--on-yellow)",
@@ -166,103 +166,103 @@ export const rolesMetadata = {
     foregroundColor: "#ffffff",
     displayName: "Bureau",
   },
-  respoTech: {
+  "respo-tech": {
     priority: 80,
     backgroundColor: "#f5a90d",
     foregroundColor: "#ffffff",
     displayName: "Respo Tech",
   },
-  respoDesign: {
+  "respo-design": {
     priority: 80,
     backgroundColor: "#f5a90d",
     foregroundColor: "#ffffff",
     displayName: "Respo Design",
   },
-  respoCom: {
+  "respo-com": {
     priority: 80,
     backgroundColor: "#f5a90d",
     foregroundColor: "#ffffff",
     displayName: "Respo Com",
   },
-  respoAssistants: {
+  "respo-assistants": {
     priority: 80,
     backgroundColor: "#f5a90d",
     foregroundColor: "#ffffff",
     displayName: "Respo Assistants",
   },
-  respoWei: {
+  "respo-wei": {
     priority: 80,
     backgroundColor: "#f5a90d",
     foregroundColor: "#ffffff",
     displayName: "Respo Wei",
   },
-  respoInter: {
+  "respo-inter": {
     priority: 80,
     backgroundColor: "#f5a90d",
     foregroundColor: "#ffffff",
     displayName: "Respo Inter",
   },
-  respoVJ: {
+  "respo-vj": {
     priority: 80,
     backgroundColor: "#f5a90d",
     foregroundColor: "#ffffff",
     displayName: "Respo VJ",
   },
-  respoEvent: {
+  "respo-event": {
     priority: 80,
     backgroundColor: "#f5a90d",
     foregroundColor: "#ffffff",
     displayName: "Respo Events",
   },
-  respoMerch: {
+  "respo-merch": {
     priority: 80,
     backgroundColor: "#f5a90d",
     foregroundColor: "#ffffff",
     displayName: "Respo Merch",
   },
-  respoPart: {
+  "respo-part": {
     priority: 80,
     backgroundColor: "#f5a90d",
     foregroundColor: "#ffffff",
     displayName: "Respo Part",
   },
-  respoTreso: {
+  "respo-treso": {
     priority: 80,
     backgroundColor: "#f5a90d",
     foregroundColor: "#ffffff",
     displayName: "Respo Treso",
   },
-  teamTech: {
+  "team-tech": {
     priority: 50,
     backgroundColor: "#3498DB",
     foregroundColor: "#ffffff",
     displayName: "Team Tech",
   },
-  teamDesign: {
+  "team-design": {
     priority: 50,
     backgroundColor: "#3498DB",
     foregroundColor: "#ffffff",
     displayName: "Team Design",
   },
-  teamCom: {
+  "team-com": {
     priority: 50,
     backgroundColor: "#3498DB",
     foregroundColor: "#ffffff",
     displayName: "Team Com",
   },
-  teamEvent: {
+  "team-event": {
     priority: 50,
     backgroundColor: "#3498DB",
     foregroundColor: "#ffffff",
     displayName: "Team Event",
   },
-  teamPart: {
+  "team-part": {
     priority: 50,
     backgroundColor: "#3498DB",
     foregroundColor: "#ffffff",
     displayName: "Team Part",
   },
-  teamTreso: {
+  "team-treso": {
     priority: 50,
     backgroundColor: "#3498DB",
     foregroundColor: "#ffffff",
